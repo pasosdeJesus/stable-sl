@@ -12,19 +12,19 @@ import {
   celoAlfajores
 } from 'wagmi/chains';
 
-const config = getDefaultConfig({
-  appName: 'RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID',
-  chains: [
-    celo,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [celoAlfajores] : []),
-  ],
-  ssr: true,
-});
+export default function AppProvider({wcid, testnet, children }) {
+  const config = getDefaultConfig({
+    appName: 'Stable-SL',
+    projectId: wcid,
+    chains: [
+      celo,
+      ...(testnet ? [celoAlfajores] : []),
+    ],
+    ssr: true,
+  });
 
-const queryClient = new QueryClient();
+  const queryClient = new QueryClient();
 
-export default function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>

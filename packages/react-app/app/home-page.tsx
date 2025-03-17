@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
-export default function Home() {
+export default function HomePage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
