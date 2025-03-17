@@ -1,0 +1,35 @@
+{
+  "author": "pasosdeJesus",
+  "bugs": {
+    "url": "https://github.com/celo-org/celo-composer/issues"
+  },
+  "description": "Custom Celo Composer project.",
+  "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
+  "keywords": [
+    "celo-composer",
+    "celo"
+  ],
+  "license": "MIT",
+  "name": "stable-sl",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celo-org/celo-composer.git"
+  },
+  "scripts": {
+    "react-app:dev": "cd packages/react-app; yarn dev",
+    "react-app:build": "cd packages/react-app; yarn build",
+    "react-app:start": "cd packages/react-app; yarn start",
+    "react-app:lint": "cd packages/react-app; yarn lint",
+    "hardhat:postinstall": "cd packages/hardhat; yarn postinstall",
+    "hardhat:compile": "cd packages/hardhat; yarn compile",
+    "hardhat:tsc": "cd packages/hardhat; yarn tsc",
+    "hardhat:build": "cd packages/hardhat; yarn build",
+    "hardhat:clean": "cd packages/hardhat; yarn clean",
+    "hardhat:run:node": "cd packages/hardhat; yarn run:node",
+    "hardhat:test": "cd packages/hardhat; yarn test",
+    "hardhat:prettier": "cd packages/hardhat; yarn prettier",
+    "hardhat:sync:abis": "cd packages/hardhat; yarn sync:abis"
+  },
+  "version": "1.0.0"
+}
