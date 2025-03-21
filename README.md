@@ -24,3 +24,11 @@ this in Sierra Leone.
 
 Sierra Leone
 
+
+## Running this project
+
+```
+cd packages/react-app
+yarn
+yarn dev
+```
