@@ -4,8 +4,9 @@ export default function handler(req, res) {
     // Handle the event
     console.log('Received event:', event);
     // Perform necessary actions based on the event
-    res.status(200).json({ message: 'Webhook received successfully' });
+    //res.status(200).json({ message: 'Webhook received successfully' });
   } else {
-    res.status(405).json({ error: 'Method Not Allowed' });
+    console.log('Problem');
+    //res.status(405).json({ error: 'Method Not Allowed' });
   }
 }
