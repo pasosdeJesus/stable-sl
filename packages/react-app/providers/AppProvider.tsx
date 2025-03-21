@@ -12,13 +12,17 @@ import {
   celoAlfajores
 } from 'wagmi/chains';
 
-export default function AppProvider({wcid, testnet, children }) {
+export default function AppProvider({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   const config = getDefaultConfig({
     appName: 'Stable-SL',
-    projectId: wcid,
+    projectId: "not needed in dev but in prod?",
     chains: [
       celo,
-      ...(testnet ? [celoAlfajores] : []),
+      celoAlfajores
     ],
     ssr: true,
   });
