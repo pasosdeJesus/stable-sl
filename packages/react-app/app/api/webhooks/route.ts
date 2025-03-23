@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   //console.log("request=", request)
   //console.log("request.cookies=", request.cookies)
+  console.log("")
+  console.log("---------------------------------")
   console.log("request.headers=", request.headers)
 
   try {
