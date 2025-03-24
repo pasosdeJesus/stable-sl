@@ -9,10 +9,10 @@ module.exports = {
     extend: {
       colors: {
         /** primary */
-        prosperity: "#FCFF52",
+        bgprimary: "#7ca3b6", // Neptune
         forest: "#476520",
         /** base */
-        gypsum: "#FCF6F1",
+        baseclear: "#C9C8C1", // Mist Gray
         sand: "#E7E3D4",
         wood: "#655947",
         fig: "#1E002B",
