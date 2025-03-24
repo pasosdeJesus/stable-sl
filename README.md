@@ -2,6 +2,8 @@
 
 Making easy for Sierra Leone people to manage stable crypto coins.
 
+Running  on <https://stable-sl.pdJ.app>
+
 
 ## Problem
 
