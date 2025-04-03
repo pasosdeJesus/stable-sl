@@ -64,7 +64,7 @@ export default function HomePage() {
       searchParams.append("address", "0x6b3bc1b55b28380193733a2fd27f2639d92f14be")
       searchParams.append("source", "u2Ldt7Hh")
       searchParams.append("country", "NG")
-      const url = `https://pay.fonbnk.com/phone?${searchParams.toString()}`;
+      const url = `https://sandbox-pay.fonbnk.com/phone?${searchParams.toString()}`;
       console.log("url=", url)
       cont = (
         <div>
