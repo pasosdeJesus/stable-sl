@@ -12,7 +12,7 @@ export default function Home() {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const handleNext = () => {
-    if (step === 1 && phoneNumber && /^\d{8}$/.test(phoneNumber)) {
+    if (step === 1 && phoneNumber && /^\d{9}$/.test(phoneNumber)) {
       setStep(2);
     } else if (step === 2 && amount && parseFloat(amount) > 0) {
       setStep(3);
@@ -35,8 +35,11 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen bg-secondary">
       <Card className="w-full max-w-md p-4 rounded-lg shadow-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL: Buy and sell USD easily in Sierra Leone</CardTitle>
-          <CardDescription>Step {step} of 3</CardDescription>
+          <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL</CardTitle>
+          <CardDescription>
+            <p>Buying USD in Sierra Leone</p>
+            <p>Step {step} of 3</p>
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {step === 1 && (
@@ -45,7 +48,7 @@ export default function Home() {
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="Enter Sierra Leone phone number e.g 075232442"
+                placeholder="Sierra Leone number e.g 075232442"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"
