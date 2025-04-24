@@ -7,6 +7,7 @@ const nextConfig = {
     };
     return config;
   },
+  allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app"],
 };
 
 module.exports = nextConfig;
