@@ -1,35 +1,118 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {ArrowLeft, Check, Phone, PiggyBank} from "lucide-react";
+import axios from 'axios'
+import {ArrowLeft, RefreshCw} from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function Home() {
-  const [step, setStep] = useState(1);
-  const [amount, setAmount] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [quoteId, setQuoteId] = useState("")
+  const [quoteTimestamp, setQuoteTimestamp] = useState(0)
+  const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
+  const [quoteMinimum, setQuoteMinimum] = useState(0)
+  const [quoteMaximum, setQuoteMaximum] = useState(0)
+  const [step, setStep] = useState(1)
+  const [amount, setAmount] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [amountUsd, setAmountUsd] = useState(0.0)
+  const [countdown, setCountdown] = useState(0)
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1)
+      }, 1000)
+
+      return () => clearTimeout(timer) // Cleanup on unmount
+    } else {
+      // Reset the timer after a short delay
+      setTimeout(() => {
+        fetchQuote()
+        setCountdown(10)
+      }, 1000) // 1 second delay before resetting
+    }
+  }, [countdown])
+
+
+  const fetchQuote = async () => {
+    try {
+     const apiQuoteUrl = `${process.env.NEXT_PUBLIC_COORDINATOR}/api/quote`
+      axios.get(apiQuoteUrl)
+      .then(response => {
+        if (response.data) {
+          let data = response.data
+          if (data.id !== undefined &&
+              data.timestamp !== undefined &&
+                data.usdPriceInSle !== undefined &&
+                  data.minimum !== undefined &&
+                    data.maximum !== undefined
+             ) {
+               setQuoteId(data.id)
+               setQuoteTimestamp(data.timestamp)
+               setQuoteUsdPriceInSle(data.usdPriceInSle)
+               setQuoteMinimum(data.minimum)
+               setQuoteMaximum(data.maximum)
+
+               if (amount && parseFloat(amount)>0) {
+                 setAmountUsd(
+                   calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
+                 )
+               }
+             } else {
+               console.error('Invalid data format from API:', data)
+             }
+
+             let rcurso = response.data[0]
+             console.log(rcurso)
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching quote:', error)
+    }
+  }
+
+  const calculateAmountUsd = (sle: double, slePerUsd: double) => {
+    return slePerUsd && slePerUsd > 0 && sle && sle > 0 ? 
+      Math.round(sle*100.0/slePerUsd)/100.0 : 0
+  }
 
   const handleNext = () => {
-    if (step === 1 && phoneNumber && /^\d{9}$/.test(phoneNumber)) {
-      setStep(2);
-    } else if (step === 2 && amount && parseFloat(amount) > 0) {
-      setStep(3);
-    } else {
-      alert('Please enter valid values.');
+    switch (step) {
+      case 1: 
+        if (phoneNumber && /^0\d{8}$/.test(phoneNumber)) {
+          setStep(2)
+        } else {
+          alert('Phone number should have 9 digits and start with 0')
+        }
+      break
+      case 2: 
+        if (+amount < quoteMinimum) {
+          alert('Amount should be greather than lower limit')
+        } else if (+amount > quoteMaximum) {
+          alert('Amount should be less than upper limit')
+        } else if (amount && parseFloat(amount) > 0) {
+          setStep(3)
+        } else {
+          alert('Please enter valid values.')
+        }
+        break
+      default:
+        alert('Please enter valid values.')
     }
-  };
+  }
 
   const handleBack = () => {
     if (step > 1) {
-      setStep(step - 1);
+      setStep(step - 1)
     }
-  };
+  }
 
   const handleConfirm = () => {
-    alert(`Collecting $${amount}SLE from ${phoneNumber}`);
-  };
+    alert(`Collecting $${amount}SLE from ${phoneNumber}`)
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary">
@@ -58,23 +141,55 @@ export default function Home() {
 
           {step === 2 && (
             <div className="space-y-2">
-              <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount</label>
+              <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE ot pay</label>
               <Input
                 id="amount"
                 type="number"
-                placeholder="Enter amount of SLE"
+                placeholder="Enter amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                aria-label="Amount"
+                min={quoteMinimum}
+                max={quoteMaximum}
+                onChange={(e) => {
+                  setAmount(e.target.value)
+                  setAmountUsd(
+                    calculateAmountUsd(parseFloat(e.target.value), 
+                                       quoteUsdPriceInSle)
+                  )
+                } }
+                aria-label="Amount of SLE"
               />
+              <p className="text-sm text-gray-500">
+                Amount of USD to receive: {amountUsd} USD
+              </p>
+              <p className="text-sm text-gray-500">
+                Price of one USD: {quoteUsdPriceInSle} SLE
+              </p>
+              <p className="text-sm text-gray-500">
+                Order limits in SLE: {quoteMinimum} - {quoteMaximum}
+              </p>
+              <div className="flex text-sm text-gray-500">
+                <span>Seconds to update:&nbsp; </span>
+                  {countdown == 10 && (<span>{countdown}</span>)}
+                  {countdown > 0 && countdown < 10 && (<span>&nbsp;{countdown}</span>)}
+                  { countdown == 0 &&
+                    <span className="">
+                      <RefreshCw className="animate-spin size-4 text-primary"/>
+                    </span>
+                  }
+              </div>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-2">
               <p>Please confirm the details below:</p>
-              <p>Phone Number: {phoneNumber}</p>
-              <p>Amount: ${amount}</p>
+              <p>Phone Number with Orange Money: {phoneNumber}</p>
+              <p>Amount in SLE to spend: ${amount}</p>
+              <p>Amount of USD to receive: ${amountUsd}</p>
+              <p>Amount within limits: ${amount>=quoteMinimum &&
+                amount <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p>Id of quote: ${quoteId}</p>
+              <p>Timestamp of quote: ${quoteTimestamp}</p>
             </div>
           )}
 
@@ -91,12 +206,17 @@ export default function Home() {
               </Button>
             ) : (
               <Button onClick={handleConfirm} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                Confirm
+                <span>Confirm (</span>
+                  { countdown > 0 && (<span>{countdown}</span>)}
+                  { countdown == 0 &&
+                    <span><RefreshCw className="animate-spin size-4 text-primary"/></span>
+                  }
+                  <span>)</span>
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

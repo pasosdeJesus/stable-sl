@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   output: 'export',
+  allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app"]
 };
 
 export default nextConfig;
