@@ -1,11 +1,22 @@
 /**
  * Represents a quote for SLE cryptocurrency.
  */
-export interface Quote {
+export interface QuoteToBuy {
   /**
    * The ID of the quote.
    */
-  id: string;
+  id: string
+
+  /**
+   * Wallet of buyer
+   */
+  wallet: string
+
+  /**
+   * Phone of buyer
+   */
+   phone: string
+
   /**
    * The timestamp of the quote.
    */
@@ -26,16 +37,18 @@ export interface Quote {
 
 /**
  * Asynchronously retrieves a quote for SLE cryptocurrency.
- * @returns A promise that resolves to a Quote object.
+ * @returns A promise that resolves to a QuoteToBuy object.
  */
-export async function getQuote(): Promise<Quote> {
-  // TODO: Implement this by calling an API.
+export async function getQuoteToBuy(wallet: string, phone: string): Promise<QuoteToBuy> {
+  // TODO: Implement this by calling an API and saving the quote 
   return {
-    id: '123',
+    id: 'sdk34ss123', // Random. We don't need to change the id if the information, doesn´t change, only timestamp
     timestamp: Date.now(),
     usdPriceInSle: 22.64,
     maximum: 1000,
-    minimum: 10
+    minimum: 10,
+    wallet: wallet,
+    phone: phone
   };
 }
 
