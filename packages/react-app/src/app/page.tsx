@@ -7,8 +7,18 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useWeb3 } from "@/contexts/useWeb3";
 
 export default function Home() {
+  const {
+    address,
+    getShortAddress,
+    getUserAddress,
+    sendCUSD,
+    mintMinipayNFT,
+    getNFTs,
+    signTransaction,
+  } = useWeb3();
   const [quoteId, setQuoteId] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
   const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
@@ -21,6 +31,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState(0)
 
   useEffect(() => {
+    getUserAddress()
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1)
@@ -30,67 +41,74 @@ export default function Home() {
     } else {
       // Reset the timer after a short delay
       setTimeout(() => {
-        fetchQuote()
+        fetchQuoteToBuy()
         setCountdown(10)
       }, 1000) // 1 second delay before resetting
     }
   }, [countdown])
 
 
-  const fetchQuote = async () => {
+  const fetchQuoteToBuy = async () => {
     try {
-     const apiQuoteUrl = `${process.env.NEXT_PUBLIC_COORDINATOR}/api/quote`
-      axios.get(apiQuoteUrl)
-      .then(response => {
-        if (response.data) {
-          let data = response.data
-          if (data.id !== undefined &&
-              data.timestamp !== undefined &&
-                data.usdPriceInSle !== undefined &&
-                  data.minimum !== undefined &&
-                    data.maximum !== undefined
-             ) {
-               setQuoteId(data.id)
-               setQuoteTimestamp(data.timestamp)
-               setQuoteUsdPriceInSle(data.usdPriceInSle)
-               setQuoteMinimum(data.minimum)
-               setQuoteMaximum(data.maximum)
-
-               if (amount && parseFloat(amount)>0) {
-                 setAmountUsd(
-                   calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
-                 )
+     if (address && phoneNumber) {
+       const apiQuoteToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/quote_to_buy?wallet=${address}&phone=${phoneNumber}`
+        axios.get(apiQuoteToBuyUrl)
+        .then(response => {
+          if (response.data) {
+            let data = response.data
+            if (data.id !== undefined &&
+                data.timestamp !== undefined &&
+                  data.usdPriceInSle !== undefined &&
+                    data.minimum !== undefined &&
+                      data.maximum !== undefined
+               ) {
+                 setQuoteId(data.id)
+                 setQuoteTimestamp(data.timestamp)
+                 setQuoteUsdPriceInSle(data.usdPriceInSle)
+                 setQuoteMinimum(data.minimum)
+                 setQuoteMaximum(data.maximum)
+  
+                 if (amount && parseFloat(amount)>0) {
+                   setAmountUsd(
+                     calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
+                   )
+                 }
+               } else {
+                 console.error('Invalid data format from API:', data)
                }
-             } else {
-               console.error('Invalid data format from API:', data)
-             }
-
-             let rcurso = response.data[0]
-             console.log(rcurso)
-        }
-      })
+  
+               let rcurso = response.data[0]
+               console.log(rcurso)
+          }
+        })
+      }
     } catch (error) {
       console.error('Error fetching quote:', error)
     }
   }
 
-  const calculateAmountUsd = (sle: double, slePerUsd: double) => {
-    return slePerUsd && slePerUsd > 0 && sle && sle > 0 ? 
+  const calculateAmountUsd = (sle: number, slePerUsd: number) => {
+    return slePerUsd && slePerUsd > 0 && sle && sle > 0 ?
       Math.round(sle*100.0/slePerUsd)/100.0 : 0
   }
 
   const handleNext = () => {
     switch (step) {
-      case 1: 
-        if (phoneNumber && /^0\d{8}$/.test(phoneNumber)) {
+      case 1:
+        if (phoneNumber && /^0\d{8}$/.test(phoneNumber) && address) {
           setStep(2)
+        } else if (!address) {
+          alert('Please connect your wallet')
         } else {
           alert('Phone number should have 9 digits and start with 0')
         }
       break
-      case 2: 
+      case 2:
         if (+amount < quoteMinimum) {
           alert('Amount should be greather than lower limit')
+        } else if (+quoteMaximum == 0) {
+          alert('Seems there is a problem with backend, try again later')
         } else if (+amount > quoteMaximum) {
           alert('Amount should be less than upper limit')
         } else if (amount && parseFloat(amount) > 0) {
@@ -111,6 +129,7 @@ export default function Home() {
   }
 
   const handleConfirm = () => {
+    
     alert(`Collecting $${amount}SLE from ${phoneNumber}`)
   }
 
@@ -136,6 +155,7 @@ export default function Home() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"
               />
+              <p>Your wallet address: {address ? getShortAddress() : "Please connect your wallet"}</p>
             </div>
           )}
 
@@ -152,7 +172,7 @@ export default function Home() {
                 onChange={(e) => {
                   setAmount(e.target.value)
                   setAmountUsd(
-                    calculateAmountUsd(parseFloat(e.target.value), 
+                    calculateAmountUsd(parseFloat(e.target.value),
                                        quoteUsdPriceInSle)
                   )
                 } }
@@ -182,18 +202,18 @@ export default function Home() {
 
           {step === 3 && (
             <div className="space-y-2">
-              <p>Please confirm the details below:</p>
+              <p className="text-2xl">Please confirm the details below:</p>
               <p>Phone Number with Orange Money: {phoneNumber}</p>
-              <p>Amount in SLE to spend: ${amount}</p>
-              <p>Amount of USD to receive: ${amountUsd}</p>
-              <p>Amount within limits: ${amount>=quoteMinimum &&
-                amount <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
-              <p>Id of quote: ${quoteId}</p>
-              <p>Timestamp of quote: ${quoteTimestamp}</p>
+              <p>Amount in SLE to spend: SLE${amount}</p>
+              <p>Your wallet address: {getShortAddress()}</p>
+              <p>Amount of USD to receive: US${amountUsd}</p>
+              <p>Amount within limits: {+amount >= quoteMinimum &&
+                +amount <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p>Timestamp of quote: {quoteTimestamp}</p>
             </div>
           )}
 
-          <div className="flex justify-between">
+          <div className={`flex ${step > 1 ? 'justify-between' : 'justify-end'}` }>
             {step > 1 && (
               <Button variant="outline" onClick={handleBack} className="mr-2">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -205,7 +225,7 @@ export default function Home() {
                 Next
               </Button>
             ) : (
-              <Button onClick={handleConfirm} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button onClick={handleConfirm} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <span>Confirm (</span>
                   { countdown > 0 && (<span>{countdown}</span>)}
                   { countdown == 0 &&
