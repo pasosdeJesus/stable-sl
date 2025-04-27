@@ -3,6 +3,7 @@
 import axios from 'axios'
 import {ArrowLeft, RefreshCw} from "lucide-react"
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,6 +30,8 @@ export default function Home() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
+  const router = useRouter();
+
 
   useEffect(() => {
     getUserAddress()
@@ -47,6 +50,8 @@ export default function Home() {
     }
   }, [countdown])
 
+  const isAlfajores = () => (typeof ethereum != "undefined") && 
+    ethereum.networkVersion === '44787'
 
   const fetchQuoteToBuy = async () => {
     try {
@@ -128,9 +133,50 @@ export default function Home() {
     }
   }
 
+  const copyTestPhone = async () => {
+    try {
+      const inputField = document.getElementById('testPhone') as HTMLInputElement;
+      await navigator.clipboard.writeText(inputField.value);
+      console.log('Text copied to clipboard successfully!');
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+    }
+  }
+
   const handleConfirm = () => {
-    
-    alert(`Collecting $${amount}SLE from ${phoneNumber}`)
+    try {
+      const apiOrderToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/order_to_buy?quote=${quoteId}`
+      axios.get(apiOrderToBuyUrl)
+      .then(response => {
+        if (response.data) {
+          debugger
+          let data = response.data
+          if (data.id !== undefined &&
+            data.seconds !== undefined &&
+            data.amountSle !== undefined &&
+            data.amountUsd !== undefined &&
+            data.phoneNumberToPay !== undefined &&
+            data.nameOfReceiver !== undefined
+           ) {
+             router.push(
+               '/waiting_payment_from_user? '+
+                 `id=${data.id}&` +
+                 `seconds=${data.seconds}&` +
+                 `amountSLE={amount}&` +
+                 `amountUSD={amountUsd}&` +
+                 `phoneNumberToPay={phoneNumberToPay}&` +
+                 `nameOfReceiver={nameOfReceiver}`
+             );
+           }
+           else {
+            alert('Insufficient information to make order')
+           }
+        }
+      })
+    } catch (error) {
+     alert('Error making order:' + error)
+    }
   }
 
   return (
@@ -146,7 +192,21 @@ export default function Home() {
         <CardContent className="space-y-4">
           {step === 1 && (
             <div className="space-y-2">
-              <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone Number with Orange Money</label>
+              <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Phone Number with Orange Money
+              </label>
+              {isAlfajores() &&
+                <div className="flex items-center text-sm">
+                  Test with &nbsp;
+                  <div className="bg-gray-50">
+                    012456789 &nbsp;
+                    <Input style={{display: "none"}} id="testPhone" value="012345478" disabled />
+                    <Button
+                      className="btn btn-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={copyTestPhone}>Copy</Button>
+                   </div>
+                </div>
+              }
               <Input
                 id="phoneNumber"
                 type="tel"
@@ -155,7 +215,14 @@ export default function Home() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"
               />
-              <p>Your wallet address: {address ? getShortAddress() : "Please connect your wallet"}</p>
+              {!address &&
+                <p>Please connect your wallet</p>
+              }
+              {address && isAlfajores() &&
+                <p className="text-sm">
+                  Your wallet address: {getShortAddress()}
+                </p>
+              }
             </div>
           )}
 
@@ -203,13 +270,17 @@ export default function Home() {
           {step === 3 && (
             <div className="space-y-2">
               <p className="text-2xl">Please confirm the details below:</p>
-              <p>Phone Number with Orange Money: {phoneNumber}</p>
-              <p>Amount in SLE to spend: SLE${amount}</p>
-              <p>Your wallet address: {getShortAddress()}</p>
-              <p>Amount of USD to receive: US${amountUsd}</p>
-              <p>Amount within limits: {+amount >= quoteMinimum &&
+              <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
+              <p className="text-sm">Amount in SLE to spend: SLE${amount}</p>
+              <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
+              <p className="text-sm">Amount within limits: {+amount >= quoteMinimum &&
                 +amount <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
-              <p>Timestamp of quote: {quoteTimestamp}</p>
+              {isAlfajores() &&
+                <div>
+                  <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
+                  <p className="text-sm">Your wallet address: {getShortAddress()}</p>
+                </div>
+              }
             </div>
           )}
 
