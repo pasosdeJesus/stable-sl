@@ -20,6 +20,7 @@ export default function Home() {
     getNFTs,
     signTransaction,
   } = useWeb3();
+
   const [quoteId, setQuoteId] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
   const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
@@ -28,25 +29,47 @@ export default function Home() {
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [buyerName, setBuyerName] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
-  const router = useRouter();
-
+  const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
+  const [phoneNumberToPay, setPhoneNumberToPay] = useState("")
+  const [nameOfReceiver, setNameOfReceiver] = useState("")
+  const [transactionUrl, setTransactionUrl] = useState("")
 
   useEffect(() => {
     getUserAddress()
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1)
+        if (step == 4) {
+          setSecondsWaitingPayment(secondsWaitingPayment - 1)
+          if (secondsWaitingPayment <= 0) {
+            setStep(6)
+          }
+        }
       }, 1000)
-
       return () => clearTimeout(timer) // Cleanup on unmount
     } else {
       // Reset the timer after a short delay
-      setTimeout(() => {
-        fetchQuoteToBuy()
-        setCountdown(10)
-      }, 1000) // 1 second delay before resetting
+      switch (step) {
+        case 1:
+        case 2:
+        case 3:
+          setTimeout(() => {
+            fetchQuoteToBuy()
+            setCountdown(10)
+          }, 1000) // 1 second delay
+          break
+        case 4:
+          setTimeout(() => {
+            fetchOrderState()
+            setCountdown(10)
+          }, 1000) // 1 second delay
+          break
+        default:
+          break
+      }
     }
   }, [countdown])
 
@@ -55,36 +78,33 @@ export default function Home() {
 
   const fetchQuoteToBuy = async () => {
     try {
-     if (address && phoneNumber) {
+     if (address && phoneNumber && buyerName) {
        const apiQuoteToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/quote_to_buy?wallet=${address}&phone=${phoneNumber}`
+        `/api/quote_to_buy?wallet=${address}&phone=${phoneNumber}&buyerName=${buyerName}`
         axios.get(apiQuoteToBuyUrl)
         .then(response => {
           if (response.data) {
             let data = response.data
             if (data.id !== undefined &&
-                data.timestamp !== undefined &&
-                  data.usdPriceInSle !== undefined &&
-                    data.minimum !== undefined &&
-                      data.maximum !== undefined
-               ) {
-                 setQuoteId(data.id)
-                 setQuoteTimestamp(data.timestamp)
-                 setQuoteUsdPriceInSle(data.usdPriceInSle)
-                 setQuoteMinimum(data.minimum)
-                 setQuoteMaximum(data.maximum)
-  
-                 if (amount && parseFloat(amount)>0) {
-                   setAmountUsd(
-                     calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
-                   )
-                 }
-               } else {
-                 console.error('Invalid data format from API:', data)
-               }
-  
-               let rcurso = response.data[0]
-               console.log(rcurso)
+              data.timestamp !== undefined &&
+              data.usdPriceInSle !== undefined &&
+              data.minimum !== undefined &&
+              data.maximum !== undefined
+            ) {
+              setQuoteId(data.id)
+              setQuoteTimestamp(data.timestamp)
+              setQuoteUsdPriceInSle(data.usdPriceInSle)
+              setQuoteMinimum(data.minimum)
+              setQuoteMaximum(data.maximum)
+
+              if (amount && parseFloat(amount)>0) {
+                setAmountUsd(
+                  calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
+                )
+              }
+            } else {
+              console.error('Invalid data format from API:', data)
+            }
           }
         })
       }
@@ -93,18 +113,26 @@ export default function Home() {
     }
   }
 
+
   const calculateAmountUsd = (sle: number, slePerUsd: number) => {
     return slePerUsd && slePerUsd > 0 && sle && sle > 0 ?
       Math.round(sle*100.0/slePerUsd)/100.0 : 0
   }
 
+  const secondsAsMinutes = (seconds: number):String => {
+    return `${Math.floor(seconds / 60)}:${seconds % 60}`
+  }
+
   const handleNext = () => {
     switch (step) {
       case 1:
-        if (phoneNumber && /^0\d{8}$/.test(phoneNumber) && address) {
+        if (phoneNumber && /^0\d{8}$/.test(phoneNumber) && address && buyerName) {
+          fetchQuoteToBuy()
           setStep(2)
         } else if (!address) {
           alert('Please connect your wallet')
+        } else if (!buyerName) {
+          alert('Please provide name linked to Orange Money')
         } else {
           alert('Phone number should have 9 digits and start with 0')
         }
@@ -113,7 +141,7 @@ export default function Home() {
         if (+amount < quoteMinimum) {
           alert('Amount should be greather than lower limit')
         } else if (+quoteMaximum == 0) {
-          alert('Seems there is a problem with backend, try again later')
+          alert('Seems there is a problem with the backend, try again later')
         } else if (+amount > quoteMaximum) {
           alert('Amount should be less than upper limit')
         } else if (amount && parseFloat(amount) > 0) {
@@ -146,28 +174,27 @@ export default function Home() {
   const handleConfirm = () => {
     try {
       const apiOrderToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/order_to_buy?quote=${quoteId}`
+        `/api/order_to_buy?quoteId=${quoteId}`
       axios.get(apiOrderToBuyUrl)
       .then(response => {
         if (response.data) {
-          debugger
           let data = response.data
-          if (data.id !== undefined &&
+          if (data.quoteId !== undefined &&
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
             data.amountUsd !== undefined &&
             data.phoneNumberToPay !== undefined &&
             data.nameOfReceiver !== undefined
            ) {
-             router.push(
-               '/waiting_payment_from_user? '+
-                 `id=${data.id}&` +
-                 `seconds=${data.seconds}&` +
-                 `amountSLE={amount}&` +
-                 `amountUSD={amountUsd}&` +
-                 `phoneNumberToPay={phoneNumberToPay}&` +
-                 `nameOfReceiver={nameOfReceiver}`
-             );
+             /* TODO: if (data.quoteId !== quoteId ||
+                 data.amountSle !== amount ||
+                   data.amountUsd !== amountUsd) {
+               alert("Mismatch in information of this app and coordinator")
+             } else { */
+             setSecondsWaitingPayment(data.seconds)
+             setPhoneNumberToPay(data.phoneNumberToPay)
+             setNameOfReceiver(data.nameOfReceiver)
+             setStep(4)
            }
            else {
             alert('Insufficient information to make order')
@@ -179,6 +206,74 @@ export default function Home() {
     }
   }
 
+  const handleSupposePaid = () => {
+    try {
+      const apiGwPaymentReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/gw_payment_received?phone=012345678&amountSle=${amount}`
+      axios.get(apiGwPaymentReceivedUrl)
+      .then(response => {
+        if (response.data) {
+          let data = response.data
+          if (data.quoteId !== undefined &&
+              data.amountSle !== undefined &&
+              data.senderPhone !== undefined &&
+              data.senderName !== undefined
+          ) {
+            console.log("quoteId=", data.quoteId)
+            console.log("amountSle=", data.amountSle)
+            console.log("senderPhone=", data.senderPhone)
+            console.log("senderName=", data.senderName)
+          } else {
+            alert('Received information is incomplete supposing payment')
+          }
+        } else {
+            alert('No data in response')
+        }
+      })
+    } catch (error) {
+      alert('Error supposing payment:' + error)
+    }
+
+  }
+
+
+  const handleReceipt = () => {
+
+  }
+
+  const fetchOrderState = async () => {
+    try {
+     if (quoteId) {
+       const apiBuyOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/buy_order_state?quoteId=${quoteId}`
+        axios.get(apiBuyOrderStateUrl)
+        .then(response => {
+          if (response.data) {
+            let data = response.data
+            if (data.state !== undefined) {
+              switch (data.state) {
+               case "pending":
+                 break
+               case "timeout":
+                 setStep(6)
+                 break
+               case "paid":
+                 setTransactionUrl(data.transactionUrl)
+                 setStep(5)
+              }
+            } else {
+              alert("Response from coordinator service doesn't include state")
+            }
+          } else {
+              alert("No response from coordinator service")
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching status from coordinator service:', error)
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary">
       <Card className="w-full max-w-md p-4 rounded-lg shadow-md">
@@ -186,15 +281,19 @@ export default function Home() {
           <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL</CardTitle>
           <CardDescription>
             <p>Buying USD in Sierra Leone</p>
-            <p>Step {step} of 3</p>
+            <p>Step {step} of 5</p>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {step === 1 && (
             <div className="space-y-2">
+              {address && isAlfajores() &&
+                <p className="text-sm">
+                  Your wallet address: {getShortAddress()}
+                </p>
+              }
               <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Phone Number with Orange Money
-              </label>
               {isAlfajores() &&
                 <div className="flex items-center text-sm">
                   Test with &nbsp;
@@ -207,6 +306,7 @@ export default function Home() {
                    </div>
                 </div>
               }
+              </label>
               <Input
                 id="phoneNumber"
                 type="tel"
@@ -215,20 +315,25 @@ export default function Home() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"
               />
+              <label htmlFor="buyerName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Name linked to Orange Money
+              </label>
+               <Input
+                id="buyerName"
+                value={buyerName}
+                onChange={(e) => setBuyerName(e.target.value)}
+                aria-label="Name linked to Orange Money"
+              />
+
               {!address &&
                 <p>Please connect your wallet</p>
-              }
-              {address && isAlfajores() &&
-                <p className="text-sm">
-                  Your wallet address: {getShortAddress()}
-                </p>
               }
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-2">
-              <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE ot pay</label>
+              <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE to pay</label>
               <Input
                 id="amount"
                 type="number"
@@ -284,18 +389,39 @@ export default function Home() {
             </div>
           )}
 
+          {step == 4 &&
+            <div className="space-y-2">
+              <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
+              <p className="text-sm">Pay {amount}SLE to the phone {phoneNumberToPay} with the name {nameOfReceiver}</p>
+            </div>
+          }
+          {step == 5 &&
+            <div className="space-y-2">
+              <p className="text-sm">Thanks for the payment. We transfered {amountUsd}USD to your wallet, see <a target="_blank" href="{transacationUrl}">{transactionUrl}</a></p>
+              <p className="text-sm">If you need contact our support team.</p>
+            </div>
+          }
+          {step == 6 &&
+            <div className="space-y-2">
+              <p className="text-sm">stable-sl didn't receive your payment. Order cancelled</p>
+              <p className="text-sm">If you need contact our support team.</p>
+            </div>
+          }
+
+
           <div className={`flex ${step > 1 ? 'justify-between' : 'justify-end'}` }>
-            {step > 1 && (
+            {step > 1 && step <= 3 && (
               <Button variant="outline" onClick={handleBack} className="mr-2">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
             )}
-            {step < 3 ? (
+            {step < 3 &&
               <Button onClick={handleNext} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Next
               </Button>
-            ) : (
+            }
+            { step == 3 &&
               <Button onClick={handleConfirm} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <span>Confirm (</span>
                   { countdown > 0 && (<span>{countdown}</span>)}
@@ -304,7 +430,19 @@ export default function Home() {
                   }
                   <span>)</span>
               </Button>
-            )}
+            }
+            { step == 4 && isAlfajores() &&
+              <Button onClick={handleSupposePaid} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Suppose I paid
+              </Button>
+            }
+
+            { step == 5 &&
+              <Button onClick={handleReceipt} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Receipt
+              </Button>
+            }
+
           </div>
         </CardContent>
       </Card>
