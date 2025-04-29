@@ -1,6 +1,8 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
+import { testcountTable } from '@/db/schema';
 
-import { delay } from '@/services/sle'
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
@@ -18,7 +20,6 @@ export async function GET(req: NextRequest) {
       )
     } else {
       // Confirm that the values of the quote are deliverable
-      delay(1000)
       // If they are succeed if not fail
       return NextResponse.json(
         {
