@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
       const transactionResponse = await signer.sendTransaction(pop)
       console.log(`Approval Sent: ${transactionResponse.hash}`) 
       const receipt = await transactionResponse.wait() 
-      const transactionUrl = `https://celoscan.io/tx/${receipt?.hash}`
+      const transactionUrl = `${process.env.EXPLORER_TX}${receipt?.hash}`
       console.log(`Approval Confirmed!$ ${transactionUrl}`)
 
 

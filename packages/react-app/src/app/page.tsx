@@ -207,6 +207,7 @@ export default function Home() {
   }
 
   const handleSupposePaid = () => {
+    document.getElementById('suppose-I-paid').disabled = true;
     try {
       const apiGwPaymentReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/gw_payment_received?phone=012345678&amountSle=${amount}`
@@ -397,7 +398,7 @@ export default function Home() {
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for the payment. We transfered {amountUsd}USD to your wallet, see <a target="_blank" href="{transacationUrl}">{transactionUrl}</a></p>
+              <p className="text-sm">Thanks for the payment. We transfered {amountUsd}USD to your wallet.</p>
               <p className="text-sm">If you need contact our support team.</p>
             </div>
           }
@@ -432,15 +433,13 @@ export default function Home() {
               </Button>
             }
             { step == 4 && isAlfajores() &&
-              <Button onClick={handleSupposePaid} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button id="suppose-I-paid" onClick={handleSupposePaid} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Suppose I paid
               </Button>
             }
 
             { step == 5 &&
-              <Button onClick={handleReceipt} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Receipt
-              </Button>
+              <a className="bg-primary text-primary-foreground hover:bg-primary/90 btn btn-sm" href={transactionUrl} target="_blank">Transaction Receipt</a>
             }
 
           </div>
