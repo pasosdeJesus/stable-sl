@@ -2,7 +2,7 @@
 
 Making easy to buy and sell stable crypto for people from Sierra Leone
 
-Prototype running  on <https://stable-sl.pdJ.app>
+Prototype running in production mode on <https://stable-sl.pdJ.app> and in development mode on <https://stable-sl.pdJ.app:9001>
 
 ## Problem
 
