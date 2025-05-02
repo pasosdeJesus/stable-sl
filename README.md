@@ -17,12 +17,11 @@ this in Sierra Leone.
     people of Sierra Leone.
 * Educate the people in the usage of stable cryptocoins and saving and 
     investment opportunities.
-* Initially we propose to FonBnk to be their partners in Sierra Leone, but later
-  they told us that they already had a team.
-  Anyway after some months of our conversation they still don't support the currency,
-  neither payment methods of Sierra Leone in their sandbox.
+* In march 2025 we proposed to FonBnk to be their partners in Sierra Leone, but later
+  they told us that they already had a team.  Anyway after some time they still
+  don't support the currency,  neither payment methods of Sierra Leone not even in thier sandbox.
 * So at least while FonBnk or another group offers an on-ramp/off-ramp solution
-  we will start to build one, operating with a local team based on the Mission Hope
+  we have started building one, operating with a local team based on the Mission Hope
   School located in Kabala (the school is lead by the pastor Zechariah Conteh who is
   in the team).
   
@@ -33,9 +32,9 @@ Sierra Leone
 ## Contents of this monorepo and architecture
 
 This monorepo includes 3 applications:
-1. An application for the android phon that will be gateway for SMS and USSD, to send and receive payments with Orange Money automatically
-2. A backend with a database that communicates with the user, with the oracle for quotes cUSD-SLE, with the database and with the CELO blockchain
-3. A frontend to interact with the customers that can run as a web application and also as a MiniPay application
+1. An application for the Android phone that will be gateway for SMS and USSD, to send and receive payments with Orange Money automatically
+2. A backend with a database that communicates with the user, with the API for quotes cUSD-SLE, with the database and with the CELO blockchain
+3. A frontend to interact with the customers that initially can run as a web application and also as a MiniPay application
 
 The architecutre is presented in the following diagram:
 ![image](https://github.com/user-attachments/assets/78dba3a7-8aed-4df5-9fe6-cf418218c104)
