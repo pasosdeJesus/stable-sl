@@ -37,7 +37,8 @@ This monorepo includes 3 applications:
 3. A frontend to interact with the customers that initially can run as a web application and also as a MiniPay application
 
 The architecutre is presented in the following diagram:
-![image](https://github.com/user-attachments/assets/78dba3a7-8aed-4df5-9fe6-cf418218c104)
+![image](https://github.com/user-attachments/assets/80ffc94c-3447-4024-881e-8c843a23b4ba)
+
 
 ## Sequence diagram for on-ramping
 
