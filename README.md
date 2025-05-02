@@ -1,8 +1,8 @@
 # stable-sl
 
-Making easy for Sierra Leone people to manage stable crypto coins.
+Making easy to buy and sell stable crypto for people from Sierra Leone
 
-Running  on <https://stable-sl.pdJ.app>
+Prototype running  on <https://stable-sl.pdJ.app>
 
 
 ## Problem
