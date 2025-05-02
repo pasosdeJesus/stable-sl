@@ -30,9 +30,15 @@ this in Sierra Leone.
 
 Sierra Leone
 
-## Architecture
+## Contents of this monorepo and architecture
 
-![image](https://github.com/user-attachments/assets/789034ce-0621-4d61-88b9-d33ef1b629e1)
+This monorepo includes 3 applications:
+1. An application for the android phon that will be gateway for SMS and USSD, to send and receive payments with Orange Money automatically
+2. A backend with a database that communicates with the user, with the oracle for quotes cUSD-SLE, with the database and with the CELO blockchain
+3. A frontend to interact with the customers that can run as a web application and also as a MiniPay application
+
+The architecutre is presented in the following diagram:
+![image](https://github.com/user-attachments/assets/78dba3a7-8aed-4df5-9fe6-cf418218c104)
 
 ## Sequence diagram for on-ramping
 
@@ -40,9 +46,17 @@ Sierra Leone
 
 ## Running this project
 
-1. Compile the kotlin application located in In the gateway phone install the application
+1. Compile the kotlin application located in `gatewaySmsUssd`, generate APK and install in the phone
+2. In a server run the coordinator backend with
 ```
-cd packages/react-app
+cd packages/coordinator
 yarn
 yarn dev
 ```
+3. In a server run
+```
+cd packages/react-app
+yarn
+yarn build
+```
+Point the webserver to the directory `out`
