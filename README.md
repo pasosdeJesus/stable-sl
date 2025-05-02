@@ -34,7 +34,7 @@ Sierra Leone
 
 ![image](https://github.com/user-attachments/assets/789034ce-0621-4d61-88b9-d33ef1b629e1)
 
-## Sequence diagram
+## Sequence diagram for on-ramping
 
 ![image](https://github.com/user-attachments/assets/5d84f0e1-3154-4ee9-8c06-c9a5e90471c4)
 
