@@ -6,7 +6,7 @@ export const testcountTable = pgTable("testcount", {
   lastAddress: varchar({length: 255}),
 });
 
-export const quotesToBuy = pgTable("quotesToBuy", {
+export const quotesToBuy = pgTable("buyquotes", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   quoteId: varchar({length: 32}),
   senderPhone: varchar({length: 15}),

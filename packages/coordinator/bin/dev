@@ -1,0 +1,5 @@
+#!/bin/sh
+
+yarn install
+. ./.env
+NODE_OPTIONS="--inspect" node_modules/next/dist/bin/next dev -p${PORT_DEV}
