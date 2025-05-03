@@ -1,7 +1,7 @@
 # Coordinator backend
 
-To run it in production from adJ/OpenBSD we have been using the followin
-`/etc/rc.d/stablessl`:
+To run it in production from adJ/OpenBSD we have been using the following
+`/etc/rc.d/stablesl`:
 
 ```
 #!/bin/ksh
@@ -27,3 +27,8 @@ rc_stop() {
 rc_cmd $1
 ```
 
+The logs are overwritten each time it starts, we check them with:
+```sh
+% tail -f prod.log
+```
+And we check the logs in 
