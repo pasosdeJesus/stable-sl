@@ -311,6 +311,7 @@ export default function Home() {
               <Input
                 id="phoneNumber"
                 type="tel"
+                maxlengt=14
                 placeholder="Sierra Leone number e.g 075232442"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -322,6 +323,7 @@ export default function Home() {
                <Input
                 id="buyerName"
                 value={buyerName}
+                maxlengt=80
                 onChange={(e) => setBuyerName(e.target.value)}
                 aria-label="Name linked to Orange Money"
               />

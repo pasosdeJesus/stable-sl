@@ -10,4 +10,5 @@ const nextConfig = {
   allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app"],
 };
 
-module.exports = nextConfig;
+export default nextConfig
+//module.exports = nextConfig;

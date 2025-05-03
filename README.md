@@ -43,21 +43,13 @@ This monorepo includes 3 applications:
 ## Running in development mode
 
 1. Compile the kotlin application located in `gatewaySmsUssd`, generate APK 
-   and install in the phone
-2. In a server run the coordinator backend with
-```
-cd packages/coordinator
-yarn
-yarn dev
-```
-It is better to use a proxy with nginx to have SSL.
-3. In a server run
-```
-cd packages/react-app
-yarn
-yarn dev
-```
-It is better to use a proxy with nginx to have SSL.
+   and install in the phone.  See detailed instructions in
+   gatewaySmsUssd/README.md
+2. To run the coordinator it is better to use a proxy with nginx to have SSL,
+   even in development mode. Follow the instructions of 
+   packages/coordinator/README.md
+3. The frontend is also better server in SSL with an nginx proxy.  See
+   detailed instructions in packages/react-app/README.md
 
 
 ## Design

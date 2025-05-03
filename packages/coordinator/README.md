@@ -1,5 +1,30 @@
 # Coordinator backend
 
+
+## Run in development mode
+
+Create a PostgreSQL user and a database, for example in adJ/OpenBSD:
+
+```sh
+createdb -Ustablesl -h /var/www/var/run/postgresql stablesldes
+```
+
+Copy .env.template in .env and fill the variables.  Note that 
+* You will need an RPC node for testnet,  we have noticed that the free plan
+  of Alchemy allows more transactions per hour than Infura.
+* You will need the private key of the wallet that will have the
+  cUSD (or USDC in the case of testnet). For development use a 
+  develoment wallet.
+
+After create the database with:
+
+```
+npx drizzle-kit push
+```
+
+
+
+## Running in production mode
 To run it in production from adJ/OpenBSD we have been using the following
 `/etc/rc.d/stablesl`:
 
@@ -31,4 +56,3 @@ The logs are overwritten each time it starts, we check them with:
 ```sh
 % tail -f prod.log
 ```
-And we check the logs in 
