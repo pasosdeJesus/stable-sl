@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "./bin/dev",
     "build": "next build",
-    "start": "next start -p3023",
+    "start": "./bin/start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
