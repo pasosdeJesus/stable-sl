@@ -6,7 +6,7 @@ import { getQuoteToBuy } from '@/services/sle'
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
-    const quoteId = searchParams.get("quoteId")
+    const token= searchParams.get("token")
     const buyerName = searchParams.get("buyerName")
     const wallet = searchParams.get("wallet")
     const phone = searchParams.get("phone")
@@ -39,11 +39,11 @@ export async function GET(req: NextRequest) {
     } else {
       try {
         //Validate wallet and phone should be of a KYC user
-        const quote = await getQuoteToBuy(String(quoteId), buyerName, wallet, phone)
-        console.log(quote)
+        const q = await getQuoteToBuy(String(token), buyerName, wallet, phone)
+        console.log(q)
 
         return NextResponse.json(
-          quote,
+          q,
           {status: 200}
         )
       } catch (error) {

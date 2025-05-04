@@ -1,5 +1,5 @@
 {
-  "id": "a2bd7303-4517-452b-9574-c083be78e10d",
+  "id": "3a110b50-dce3-407e-96e2-62aab69eb6ae",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -25,8 +25,8 @@
             "cycle": false
           }
         },
-        "quoteId": {
-          "name": "quoteId",
+        "token": {
+          "name": "token",
           "type": "varchar(32)",
           "primaryKey": false,
           "notNull": false
@@ -66,46 +66,10 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.testcount": {
-      "name": "testcount",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "testcount_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
         },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "lastAddress": {
-          "name": "lastAddress",
-          "type": "varchar(255)",
+        "timestamp": {
+          "name": "timestamp",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": false
         }

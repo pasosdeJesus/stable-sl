@@ -10,7 +10,7 @@ export interface QuoteToBuy {
   /**
    * The ID of the quote.
    */
-  quoteId: string
+  token: string
 
   /**
    * Phone of buyer
@@ -60,7 +60,7 @@ export async function delay(ms: number): Promise<any> {
  * Asynchronously retrieves a quote for SLE cryptocurrency.
  * @returns A promise that resolves to a QuoteToBuy object.
  */
-export async function getQuoteToBuy(quote: string, buyerName: string, wallet: string, phone: string): Promise<QuoteToBuy> {
+export async function getQuoteToBuy(token: string, buyerName: string, wallet: string, phone: string): Promise<QuoteToBuy> {
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
@@ -68,9 +68,9 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
   const db = await drizzle(process.env.DATABASE_URL!)
   console.log("Después de drizzle")
 
-  console.log("quote es", quote)
+  console.log("token es", token)
   let reg =  {
-    quoteId: "",
+    token: "",
     timestamp: 0,
     usdPriceInSle: 0,
     maximum: 0,
@@ -79,9 +79,9 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
     senderPhone: "",
     senderName: ""
   }
-  if (quote === "" || quote === "null") {
+  if (token === "" || token === "null") {
     reg =  {
-      quoteId: Math.random().toString(36).slice(2),
+      token: Math.random().toString(36).slice(2),
       timestamp: Date.now(),
       usdPriceInSle: 22.64,
       maximum: 1000,
@@ -94,10 +94,10 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
   } else {
     console.log("Antes de select")
     debugger
-    const regs = await db.select().from(quotesToBuy).where(eq(quotesToBuy.quoteId, quote))
+    const regs = await db.select().from(quotesToBuy).where(eq(quotesToBuy.token, token))
     console.log("Después regs=", regs)
     delete regs[0]["id"]
-    /* Call API to get new quote if it is newer update with new quoteId */
+    /* Call API to get new quote if it is newer update with new quote */
     reg = Object.assign(regs[0])
     reg["timestamp"] = Date.now()
   }

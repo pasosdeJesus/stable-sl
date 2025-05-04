@@ -1,1 +1,0 @@
-ALTER TABLE "buyquotes" ADD COLUMN "timestamp" integer;
