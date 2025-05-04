@@ -6,7 +6,7 @@
 Create a PostgreSQL user and a database, for example in adJ/OpenBSD:
 
 ```sh
-createdb -Ustablesl -h /var/www/var/run/postgresql stablesldes
+createdb -Ustablesl -h /var/www/var/run/postgresql stablesldev
 ```
 
 Copy .env.template in .env and fill the variables.  Note that 
@@ -19,7 +19,7 @@ Copy .env.template in .env and fill the variables.  Note that
 After create the database with:
 
 ```
-npx drizzle-kit push
+yarn migrate:up
 ```
 
 

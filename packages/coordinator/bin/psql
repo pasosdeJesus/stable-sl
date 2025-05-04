@@ -1,0 +1,4 @@
+#!/bin/sh
+
+. ./.env
+psql -h $DB_SOCKET -U $DB_DEV_USER $DB_DEV

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "./bin/start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate:up": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -22,15 +24,19 @@
     "ethers": "^6.13.7",
     "next": "^15.2.2",
     "pg": "^8.15.6",
+    "pg-hstore": "^2.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
+    "reflect-metadata": "^0.2.2",
+    "sequelize": "^6.37.7",
     "tsx": "^4.19.3",
+    "typeorm": "^0.3.22",
     "viem": "^2.23.11",
     "wagmi": "^2.14.11"
   },
   "devDependencies": {
-    "@types/node": "^22.7.9",
+    "@types/node": "^22.15.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.4.20",
@@ -39,6 +45,7 @@
     "eslint-config-next": "^15.0.1",
     "pino-pretty": "^13.0.0",
     "postcss": "^8.5.1",
+    "sequelize-cli": "^6.6.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.6.3"
   },

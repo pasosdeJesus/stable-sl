@@ -1,7 +1,7 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { count, eq } from 'drizzle-orm';
+import { DataTypes, Model, Op, Sequelize } from 'sequelize';
 
-import { quotesToBuy } from '@/db/schema';
+import 'dotenv/config'
+import '../sequelize/models/buyquote'
 
 /**
  * Represents a quote for SLE cryptocurrency.
@@ -64,33 +64,44 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
-  const db = drizzle(process.env.DATABASE_URL!)
+  try {
+    console.log("Antes se, DB_URL=", process.env.DB_URL)
+    const sequelize = new Sequelize(process.env.DB_URL, {
+      define: {
+        freezeTableName: true, // model and table with same name
+      },
+    });
+    console.log("Despues se=", sequelize)
 
-  let reg = {}
-  if (quote === "") {
-    reg =  {
-      quoteId: Math.random().toString(36).slice(2),
-      timestamp: Date.now(),
-      usdPriceInSle: 22.64,
-      maximum: 1000,
-      minimum: 10,
-      senderWallet: wallet,
-      senderPhone: phone,
-      senderName: buyerName,
-    }
-    await db.insert(quotesToBuy).values(reg)
-  } else {
-    console.log("Ants de select")
-                 
-    const regs = await db.select({ quoteId: quote }).from(quotesToBuy)
-    console.log(regs)
-    if (regs == 0) {
-      throw new Error("Quote not found")
+
+    let reg = {}
+    if (quote === "") {
+      reg =  {
+        quoteId: Math.random().toString(36).slice(2),
+        timestamp: Date.now(),
+        usdPriceInSle: 22.64,
+        maximum: 1000,
+        minimum: 10,
+        senderWallet: wallet,
+        senderPhone: phone,
+        senderName: buyerName,
+      }
+      const newQuote = await Buyquote.create(reg);
+      //await db.insert(quotesToBuy).values(reg)
     } else {
-      reg = regs
+      console.log("Antes de select")
+      /*const regs = await db.select({ quoteId: quote }).from(quotesToBuy)
+        console.log(regs)
+        if (regs == 0) {
+        throw new Error("Quote not found")
+        } else {
+        reg = regs
+        } */
     }
-  }
 
-  return reg
+    return reg
+  } catch (error) {
+    console.error(error)
+  }
 }
 
