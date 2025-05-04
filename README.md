@@ -17,9 +17,9 @@ this in Sierra Leone.
     people of Sierra Leone.
 * Educate the people in the usage of stable cryptocoins and saving and 
     investment opportunities.
-* In march 2025 we proposed to FonBnk to be their partners in Sierra Leone, but later
-  they told us that they already had a team.  Anyway after some time they still
-  don't support the currency,  neither payment methods of Sierra Leone not even in thier sandbox.
+* Motivated by Divvi (see ), in march 2025 we proposed to FonBnk to be their partners in Sierra Leone, but later
+  they told us that they already had a team there.  Anyway after some time they still
+  don't support the currency,  neither payment methods of Sierra Leone not even in their sandbox.
 * So at least while FonBnk or another group offers an on-ramp/off-ramp solution
   we have started building one, operating with a local team based on the Mission Hope
   School located in Kabala (the school is lead by the pastor Zechariah Conteh who is
@@ -69,8 +69,7 @@ The architecutre is presented in the following diagram:
 
 ### Sequence diagram for on-ramping
 
-![image](https://github.com/user-attachments/assets/47ee74e5-a307-43b8-9a24-412ebb7b0fa9)
-
+![image](https://github.com/user-attachments/assets/5dfa4e46-2945-4feb-90f3-dec01e0b8501)
 
 
 ## Status of Implementation
