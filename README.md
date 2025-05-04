@@ -69,7 +69,8 @@ The architecutre is presented in the following diagram:
 
 ### Sequence diagram for on-ramping
 
-![image](https://github.com/user-attachments/assets/5d84f0e1-3154-4ee9-8c06-c9a5e90471c4)
+![image](https://github.com/user-attachments/assets/47ee74e5-a307-43b8-9a24-412ebb7b0fa9)
+
 
 
 ## Status of Implementation
