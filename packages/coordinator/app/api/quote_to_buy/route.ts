@@ -1,8 +1,5 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
 
-import { testcountTable } from '@/db/schema';
 import { getQuoteToBuy } from '@/services/sle'
 
 export async function GET(req: NextRequest) {
@@ -42,22 +39,6 @@ export async function GET(req: NextRequest) {
         //Validate wallet and phone should be of a KYC user
         const quote = await getQuoteToBuy(String(quoteId), buyerName, wallet, phone)
         console.log(quote)
-
-        const db = drizzle(process.env.DATABASE_URL!);
-        const regs = await db.select({ count: count() }).from(testcountTable);
-        console.log('regs=', regs)
-        if (regs[0].count == 0) {
-          const count1: typeof testcountTable.$inferInsert = {
-            count: 0
-          }
-          await db.insert(testcountTable).values(count1);
-        }
-
-        await db.update(testcountTable).set({
-          lastAddress: wallet
-        }).where(eq(
-          testcountTable.id, 1
-        ));
 
         return NextResponse.json(
           quote,

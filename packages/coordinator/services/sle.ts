@@ -1,7 +1,6 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { count, eq } from 'drizzle-orm';
-
-import { quotesToBuy } from '@/db/schema';
+import "reflect-metadata"
+import { BuyQuote } from "../entity/BuyQuote"
+import { AppDataSource } from "../data-source"
 
 /**
  * Represents a quote for SLE cryptocurrency.
@@ -15,17 +14,17 @@ export interface QuoteToBuy {
   /**
    * Phone of buyer
    */
-  senderPhone: string
+  buyerPhone: string
 
   /**
    * Buyer's name
    **/
-  senderName: string
+  buyerName: string
 
   /**
    * Buyer's wallet
    **/
-  senderWallet: string
+  buyerWallet: string
 
   /**
    * The timestamp of the quote.
@@ -64,30 +63,53 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
-  const db = drizzle(process.env.DATABASE_URL!)
+  console.log("Antes de getRepository")
+  const buyQuoteRepository = AppDataSource.getRepository(BuyQuote)
+  console.log("Después de getRepository")
 
-  let reg = {}
-  if (quote === "") {
+  let reg = {
+    quoteId: "",
+    timestamp: 0,
+    usdPriceInSle: 0,
+    maximum: 0,
+    minimum: 0,
+    buyerWallet: "",
+    buyerPhone: "",
+    buyerName: "",
+  }
+
+  console.log("Ojo quote es ", String(quote))
+  if (String(quote) === "") {
     reg =  {
       quoteId: Math.random().toString(36).slice(2),
       timestamp: Date.now(),
       usdPriceInSle: 22.64,
       maximum: 1000,
       minimum: 10,
-      senderWallet: wallet,
-      senderPhone: phone,
-      senderName: buyerName,
+      buyerWallet: wallet,
+      buyerPhone: phone,
+      buyerName: buyerName,
     }
-    await db.insert(quotesToBuy).values(reg)
+    console.log("Antes de create")
+    await buyQuoteRepository.create(reg)
+    console.log("Después de create")
   } else {
-    console.log("Ants de select")
-                 
-    const regs = await db.select({ quoteId: quote }).from(quotesToBuy)
-    console.log(regs)
-    if (regs == 0) {
+    console.log("Antes de select")
+    const buyQuotes = await buyQuoteRepository.findBy({ quoteId: quote })
+    console.log(buyQuotes)
+    if (buyQuotes.length == 0) {
       throw new Error("Quote not found")
     } else {
-      reg = regs
+      reg = {
+        quoteId: buyQuotes[0].quoteId ,
+        timestamp: buyQuotes[0].timestamp ,
+        usdPriceInSle: buyQuotes[0].usdPriceInSle ,
+        maximum: buyQuotes[0].maximum ,
+        minimum: buyQuotes[0].minimum ,
+        buyerWallet: buyQuotes[0].buyerWallet ,
+        buyerPhone: buyQuotes[0].buyerPhone ,
+        buyerName: buyQuotes[0].buyerName ,
+      }
     }
   }
 

@@ -56,3 +56,11 @@ The logs are overwritten each time it starts, we check them with:
 ```sh
 % tail -f prod.log
 ```
+
+
+## Developing
+
+### Generate migration after changing entities
+
+yarn tsx ./node_modules/typeorm/cli.js migration:generate -d data-source.ts migration/CreateBuyQuote
+
