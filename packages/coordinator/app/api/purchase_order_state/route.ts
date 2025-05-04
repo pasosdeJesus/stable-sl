@@ -1,22 +1,22 @@
+import 'dotenv/config'
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { ethers } from 'ethers'
+import ERC20_ABI from 'erc-20-abi' assert { type: 'json' }
 import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
-import { testcountTable } from '@/db/schema';
 
-import { ethers } from 'ethers'
-import 'dotenv/config'
-import ERC20_ABI from 'erc-20-abi' assert { type: 'json' }
+import { purchaseOrder } from '@/db/schema';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
-  const quoteId = searchParams.get("quoteId")
+  const token = searchParams.get("token")
 
-  if (!quoteId) {
+  if (!token) {
     return NextResponse.json(
       {error: 'Missing quote'},
       {status: 400}
     )
-  } else if (quoteId != 'sdk34ss123') {
+  } else if (token != 'sdk34ss123') {
     return NextResponse.json(
       {error: 'Unknown quote'},
       {status: 400}

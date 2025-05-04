@@ -21,7 +21,7 @@ export default function Home() {
     signTransaction,
   } = useWeb3();
 
-  const [quoteId, setQuoteId] = useState("")
+  const [quoteToken, setQuoteToken] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
   const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
   const [quoteMinimum, setQuoteMinimum] = useState(0)
@@ -57,7 +57,7 @@ export default function Home() {
         case 2:
         case 3:
           setTimeout(() => {
-            fetchQuoteToBuy()
+            fetchPurchaseQuote()
             setCountdown(10)
           }, 1000) // 1 second delay
           break
@@ -76,22 +76,23 @@ export default function Home() {
   const isAlfajores = () => (typeof ethereum != "undefined") && 
     ethereum.networkVersion === '44787'
 
-  const fetchQuoteToBuy = async () => {
+  const fetchPurchaseQuote = async () => {
     try {
      if (address && phoneNumber && buyerName) {
-       const apiQuoteToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/quote_to_buy?wallet=${address}&phone=${phoneNumber}&buyerName=${buyerName}`
-        axios.get(apiQuoteToBuyUrl)
+       let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
+       const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/purchase_quote?${tokenParam}wallet=${address}&phone=${phoneNumber}&buyerName=${buyerName}`
+        axios.get(apiPurchaseQuoteUrl)
         .then(response => {
           if (response.data) {
             let data = response.data
-            if (data.id !== undefined &&
+            if (data.token!== undefined &&
               data.timestamp !== undefined &&
               data.usdPriceInSle !== undefined &&
               data.minimum !== undefined &&
               data.maximum !== undefined
             ) {
-              setQuoteId(data.id)
+              setQuoteToken(data.token)
               setQuoteTimestamp(data.timestamp)
               setQuoteUsdPriceInSle(data.usdPriceInSle)
               setQuoteMinimum(data.minimum)
@@ -127,7 +128,7 @@ export default function Home() {
     switch (step) {
       case 1:
         if (phoneNumber && /^0\d{8}$/.test(phoneNumber) && address && buyerName) {
-          fetchQuoteToBuy()
+          fetchPurchaseQuote()
           setStep(2)
         } else if (!address) {
           alert('Please connect your wallet')
@@ -173,20 +174,20 @@ export default function Home() {
 
   const handleConfirm = () => {
     try {
-      const apiOrderToBuyUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/order_to_buy?quoteId=${quoteId}`
-      axios.get(apiOrderToBuyUrl)
+      const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/purchase_order?token=${quoteToken}`
+      axios.get(apiPurchaseOrderUrl)
       .then(response => {
         if (response.data) {
           let data = response.data
-          if (data.quoteId !== undefined &&
+          if (data.token !== undefined &&
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
             data.amountUsd !== undefined &&
             data.phoneNumberToPay !== undefined &&
             data.nameOfReceiver !== undefined
            ) {
-             /* TODO: if (data.quoteId !== quoteId ||
+             /* TODO: if (data.token !== token ||
                  data.amountSle !== amount ||
                    data.amountUsd !== amountUsd) {
                alert("Mismatch in information of this app and coordinator")
@@ -215,12 +216,12 @@ export default function Home() {
       .then(response => {
         if (response.data) {
           let data = response.data
-          if (data.quoteId !== undefined &&
+          if (data.token !== undefined &&
               data.amountSle !== undefined &&
               data.senderPhone !== undefined &&
               data.senderName !== undefined
           ) {
-            console.log("quoteId=", data.quoteId)
+            console.log("token=", data.token)
             console.log("amountSle=", data.amountSle)
             console.log("senderPhone=", data.senderPhone)
             console.log("senderName=", data.senderName)
@@ -244,10 +245,10 @@ export default function Home() {
 
   const fetchOrderState = async () => {
     try {
-     if (quoteId) {
-       const apiBuyOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/buy_order_state?quoteId=${quoteId}`
-        axios.get(apiBuyOrderStateUrl)
+     if (quoteToken) {
+       const apiPurchasOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/pruchase_order_state?token=${quoteToken}`
+        axios.get(apiPurchaseOrderStateUrl)
         .then(response => {
           if (response.data) {
             let data = response.data
@@ -281,7 +282,7 @@ export default function Home() {
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL</CardTitle>
           <CardDescription>
-            <p>Buying USD in Sierra Leone</p>
+            <p>Buy cUSD in Sierra Leone</p>
             <p>Step {step} of 5</p>
           </CardDescription>
         </CardHeader>
@@ -311,7 +312,7 @@ export default function Home() {
               <Input
                 id="phoneNumber"
                 type="tel"
-                maxlengt=14
+                maxLength={14}
                 placeholder="Sierra Leone number e.g 075232442"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -323,7 +324,7 @@ export default function Home() {
                <Input
                 id="buyerName"
                 value={buyerName}
-                maxlengt=80
+                maxLength={80}
                 onChange={(e) => setBuyerName(e.target.value)}
                 aria-label="Name linked to Orange Money"
               />

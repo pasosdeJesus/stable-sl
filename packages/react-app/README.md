@@ -19,3 +19,9 @@ To build in directory `out`:
 make
 ```
 
+
+## Development
+
+```
+make syntax
+```

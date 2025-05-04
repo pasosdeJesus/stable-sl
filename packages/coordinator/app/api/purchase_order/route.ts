@@ -2,19 +2,19 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
 
-import { testcountTable } from '@/db/schema';
+import { purchaseQuote } from '@/db/schema';
 
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
-    const quoteId = searchParams.get("quoteId")
+    const token = searchParams.get("token")
 
-    if (!quoteId) {
+    if (!token) {
       return NextResponse.json(
         {error: 'Missing quote'},
         {status: 400}
       )
-    } else if (quoteId != 'sdk34ss123') {
+    } else if (token != 'sdk34ss123') {
       return NextResponse.json(
         {error: 'Unknown quote'},
         {status: 400}
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       // If they are succeed if not fail
       return NextResponse.json(
         {
-          quoteId: quoteId,
+          token: token,
           seconds: 15*60,
           amountSle: 10,
           amountUsd: 0.1,

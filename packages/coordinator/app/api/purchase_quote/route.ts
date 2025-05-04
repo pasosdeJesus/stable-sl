@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getQuoteToBuy } from '@/services/sle'
+import { getPurchaseQuote } from '@/services/sle'
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     } else {
       try {
         //Validate wallet and phone should be of a KYC user
-        const q = await getQuoteToBuy(String(token), buyerName, wallet, phone)
+        const q = await getPurchaseQuote(String(token), buyerName, wallet, phone)
         console.log(q)
 
         return NextResponse.json(

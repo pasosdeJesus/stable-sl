@@ -1,12 +1,12 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { count, eq } from 'drizzle-orm';
 
-import { quotesToBuy } from '@/db/schema';
+import { purchaseQuote } from '@/db/schema';
 
 /**
  * Represents a quote for SLE cryptocurrency.
  */
-export interface QuoteToBuy {
+export interface PurchaseQuote {
   /**
    * The ID of the quote.
    */
@@ -58,9 +58,11 @@ export async function delay(ms: number): Promise<any> {
 
 /**
  * Asynchronously retrieves a quote for SLE cryptocurrency.
- * @returns A promise that resolves to a QuoteToBuy object.
+ * @returns A promise that resolves to a PurchaseQuote object.
  */
-export async function getQuoteToBuy(token: string, buyerName: string, wallet: string, phone: string): Promise<QuoteToBuy> {
+export async function getPurchaseQuote(
+  token: string, buyerName: string, wallet: string, phone: string
+): Promise<PurchaseQuote> {
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
@@ -90,11 +92,13 @@ export async function getQuoteToBuy(token: string, buyerName: string, wallet: st
       senderPhone: phone,
       senderName: buyerName,
     }
-    await db.insert(quotesToBuy).values(reg)
+    await db.insert(purchaseQuote).values(reg)
   } else {
     console.log("Antes de select")
     debugger
-    const regs = await db.select().from(quotesToBuy).where(eq(quotesToBuy.token, token))
+    const regs = await db.select().from(purchaseQuote).where(
+      eq(purchaseQuote.token, token)
+    )
     console.log("Después regs=", regs)
     delete regs[0]["id"]
     /* Call API to get new quote if it is newer update with new quote */

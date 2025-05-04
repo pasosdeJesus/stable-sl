@@ -1,13 +1,15 @@
-import { bigint, integer, pgTable, real, varchar } from "drizzle-orm/pg-core";
+import { pgTable, integer, varchar, real, bigint } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 
-export const quotesToBuy = pgTable("buyquotes", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  token: varchar({length: 32}),
-  senderPhone: varchar({length: 15}),
-  senderName: varchar({length: 80}),
-  senderWallet: varchar({length: 50}),
+export const purchaseQuote = pgTable("purchasequote", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "buyquotes_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+  senderPhone: varchar({ length: 15 }),
+  senderName: varchar({ length: 80 }),
+  senderWallet: varchar({ length: 50 }),
   usdPriceInSle: real(),
-  maximum: integer(),
-  minimum: integer(),
-  timestamp:  bigint({mode: "number"}),
+  maximum: real(),
+  minimum: real(),
+  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+  timestamp: bigint({ mode: "number" }),
+  token: varchar({ length: 32 }),
 });
