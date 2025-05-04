@@ -15,4 +15,5 @@ export const quotesToBuy = pgTable("buyquotes", {
   usdPriceInSle: real(),
   maximum: integer(),
   minimum: integer(),
+  timestamp:  integer(),
 });

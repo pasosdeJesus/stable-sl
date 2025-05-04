@@ -64,10 +64,22 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
-  const db = drizzle(process.env.DATABASE_URL!)
+  console.log("Antes de drizzle")
+  const db = await drizzle(process.env.DATABASE_URL!)
+  console.log("Después de drizzle")
 
-  let reg = {}
-  if (quote === "") {
+  console.log("quote es", quote)
+  let reg =  {
+    quoteId: "",
+    timestamp: 0,
+    usdPriceInSle: 0,
+    maximum: 0,
+    minimum: 0,
+    senderWallet: "",
+    senderPhone: "",
+    senderName: ""
+  }
+  if (quote === "" || quote === "null") {
     reg =  {
       quoteId: Math.random().toString(36).slice(2),
       timestamp: Date.now(),
@@ -80,15 +92,14 @@ export async function getQuoteToBuy(quote: string, buyerName: string, wallet: st
     }
     await db.insert(quotesToBuy).values(reg)
   } else {
-    console.log("Ants de select")
-                 
-    const regs = await db.select({ quoteId: quote }).from(quotesToBuy)
-    console.log(regs)
-    if (regs == 0) {
-      throw new Error("Quote not found")
-    } else {
-      reg = regs
-    }
+    console.log("Antes de select")
+    debugger
+    const regs = await db.select().from(quotesToBuy).where(eq(quotesToBuy.quoteId, quote))
+    console.log("Después regs=", regs)
+    delete regs[0]["id"]
+    /* Call API to get new quote if it is newer update with new quoteId */
+    reg = Object.assign(regs[0])
+    reg["timestamp"] = Date.now()
   }
 
   return reg

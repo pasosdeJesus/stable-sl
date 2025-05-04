@@ -56,3 +56,21 @@ The logs are overwritten each time it starts, we check them with:
 ```sh
 % tail -f prod.log
 ```
+
+
+## Developing
+
+### Migrations
+
+Modify `db/schema.ts` and then run:
+```
+yarn drizzle-kit generate
+```
+To generate new migration in db/
+
+Add it to git.
+
+Run it with
+```
+yarn drizzle-kit migrate
+```
