@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
         const q = await getPurchaseQuote(String(token), buyerName, wallet, phone)
         console.log(q)
 
+        delete q.id
         return NextResponse.json(
           q,
           {status: 200}

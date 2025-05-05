@@ -1,16 +1,20 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { count, eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
-import { purchaseQuote } from '@/db/schema';
+import {  purchaseOrder, purchaseQuote, smsLog } from '@/db/schema';
 
 /**
  * Represents a quote for SLE cryptocurrency.
  */
 export interface PurchaseQuote {
+
+  id?: number
+
   /**
    * The ID of the quote.
    */
   token: string
+
 
   /**
    * Phone of buyer
@@ -48,6 +52,59 @@ export interface PurchaseQuote {
   minimum: number
 }
 
+export interface PurchaseOrder {
+  id?: number
+
+  quoteId: number
+
+  /**
+   * The ID of the quote.
+   */
+  token: string
+
+  /**
+   * State: pending, received, paid, cancelled, expired
+   */
+  state: string
+
+  /**
+   * Seconds to wait for payment of buyer
+   */
+  seconds: number
+
+  /**
+   * Buyer's name
+   **/
+  amountSle: number
+
+  /**
+   * Buyer's wallet
+   **/
+  amountUsd: number
+
+  /**
+   * phone where to pay
+   */
+  phoneNumberToPay: string
+
+  /**
+   * Name of receiver
+   */
+  receiverName: string
+
+  transactionUrl: string | null
+
+  timestampTx: number | null
+
+  timestampExpired: number | null
+
+  timestampSms: number | null
+
+  messageSms: string | null
+
+}
+
+
 /**
  * Delays execution some milliseconds
  * Use to wait 1 second with `await delay(1000)`
@@ -55,6 +112,116 @@ export interface PurchaseQuote {
 export async function delay(ms: number): Promise<any> {
  return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+
+/** 
+ * Returns the existing order
+ */
+export async function getExistingPurchaseQuote(token: string): Promise<PurchaseQuote | null> {
+  const db = await drizzle(process.env.DATABASE_URL!)
+  console.log("Antes de select")
+  const regs = await db.select().from(purchaseQuote).where(
+    eq(purchaseQuote.token, token)
+  )
+  console.log("Después regs=", regs)
+  if (regs.length == 0) {
+    return null
+  }
+  if (regs.length > 1) {
+    throw new Error(`More than one quote with same token ${token}`)
+  }
+  /* Call API to get new quote if it is newer update with new quote */
+  return Object.assign(regs[0])
+}
+
+export async function getExistingPurchaseOrder(token: string): Promise<PurchaseOrder | null> {
+  const db = await drizzle(process.env.DATABASE_URL!)
+  const regs = await db.select().from(purchaseOrder).where(
+    eq(purchaseOrder.token, token)
+  )
+  if (regs.length == 0) {
+    return null
+  }
+  if (regs.length > 1) {
+    throw new Error("More than one order with same token")
+  }
+  /* Call API to get new quote if it is newer update with new quote */
+  return Object.assign(regs[0])
+}
+
+export async function addSmsLog(timestamp: number, ip:string, phoneNumber: string, message: string) {
+  const db = await drizzle(process.env.DATABASE_URL!)
+  let reg =  {
+      timestamp: timestamp,
+      ip: ip,
+      phoneNumber: phoneNumber,
+      message: message
+  }
+  await db.insert(smsLog).values(reg)
+}
+
+export function extractInfoSms(message: string) {
+  let e= /Transaction Id ([0-9A-Z.]*) Transfer Succesful from ([0-9]*) transaction amount SLE([0-9.]*) net credit amount SLE([0-9.]*) your new balance is SLE([0-9.])/.exec(message)
+  if (e != null) {
+    return {
+      transactionId: e[1],
+      from: e[2],
+      amount: +e[3],
+      balance: +e[4]
+    }
+  }
+  return null
+}
+
+export async function searchPendingPurchaseOrderBySms(phoneNumber:string):Promise<PurchaseOrder | null> {
+
+  const db = await drizzle(process.env.DATABASE_URL!)
+  const regs = await db.select().from(purchaseOrder).
+    innerJoin(purchaseQuote, eq(purchaseOrder.quoteId, purchaseQuote.id)).
+    where(
+      and(
+        eq(purchaseQuote.senderPhone, phoneNumber),
+        eq(purchaseOrder.state, "pending")
+      )
+  )
+  if (regs.length == 0) {
+    return null
+  }
+  if (regs.length > 1) {
+    throw new Error("More than one pending order from that phone")
+  }
+  return regs[0].purchaseorder
+}
+
+
+export async function updatePurchaseOrder(
+  orderId:number, state: string, details: string, timestamp: number
+):Promise<string> {
+  const db = await drizzle(process.env.DATABASE_URL!)
+  if (state == "received") {
+    await db.update(purchaseOrder).set({
+      state: state,
+      messageSms: details,
+      timestampSms: timestamp
+    }).
+      where(eq(purchaseOrder.id, orderId))
+  } else if (state == "paid") {
+    await db.update(purchaseOrder).set({
+      state: state,
+      transactionUrl: details,
+      timestampTx: timestamp
+    }).
+      where(eq(purchaseOrder.id, orderId))
+  } else { // "expired"
+    await db.update(purchaseOrder).set({
+      state: state,
+      timestampExpired: timestamp
+    }).
+      where(eq(purchaseOrder.id, orderId))
+  }
+  return state
+}
+
 
 /**
  * Asynchronously retrieves a quote for SLE cryptocurrency.
@@ -71,7 +238,7 @@ export async function getPurchaseQuote(
   console.log("Después de drizzle")
 
   console.log("token es", token)
-  let reg =  {
+  let reg:PurchaseQuote =  {
     token: "",
     timestamp: 0,
     usdPriceInSle: 0,
@@ -82,30 +249,67 @@ export async function getPurchaseQuote(
     senderName: ""
   }
   if (token === "" || token === "null") {
+    let ntoken = ""
+    do {
+      ntoken = Math.random().toString(36).slice(2)
+    } while (await getExistingPurchaseQuote(ntoken) != null)
     reg =  {
-      token: Math.random().toString(36).slice(2),
+      token: ntoken,
+      senderPhone: phone,
+      senderName: buyerName,
+      senderWallet: wallet,
       timestamp: Date.now(),
       usdPriceInSle: 22.64,
       maximum: 1000,
       minimum: 10,
-      senderWallet: wallet,
-      senderPhone: phone,
-      senderName: buyerName,
     }
-    await db.insert(purchaseQuote).values(reg)
-  } else {
-    console.log("Antes de select")
-    debugger
-    const regs = await db.select().from(purchaseQuote).where(
-      eq(purchaseQuote.token, token)
+    let rid = await db.insert(purchaseQuote).values(reg).returning(
+      { insertedId: purchaseQuote.id }
     )
-    console.log("Después regs=", regs)
-    delete regs[0]["id"]
-    /* Call API to get new quote if it is newer update with new quote */
-    reg = Object.assign(regs[0])
+    reg.id = rid[0].insertedId
+  } else {
+    let reg2 = await getExistingPurchaseQuote(token)
+    if (reg2 == null) {
+      throw new Error("There is not a quote with the given token")
+    }
+    reg = reg2
     reg["timestamp"] = Date.now()
+    await db.update(purchaseQuote).set({timestamp: reg["timestamp"]}).
+      where(eq(purchaseQuote.id, Number(reg.id)))
   }
 
   return reg
 }
+
+
+/**
+ * Asynchronously creates a purchase order, token has a quote
+ * @returns A promise that resolves to a PurchaseOrder object
+ */
+export async function createPurchaseOrder(
+  quote: PurchaseQuote, token: string, amountSle: number
+): Promise<PurchaseOrder> {
+  const db = await drizzle(process.env.DATABASE_URL!)
+
+  console.log("token=", token)
+  let reg:PurchaseOrder =  {
+    state: "pending",
+    transactionUrl: "",
+    timestampTx: 0,
+    timestampExpired: 0 ,
+    timestampSms: 0,
+    messageSms: "",
+    quoteId: Number(quote.id),
+    token: token,
+    seconds: 15*60,
+    amountSle: amountSle,
+    amountUsd: Math.round(amountSle * quote.usdPriceInSle * 100) / 100,
+    phoneNumberToPay: String(process.env?.RECEIVER_PHONE_1),
+    receiverName: String(process.env?.RECEIVER_NAME_1)
+  }
+  let res = await db.insert(purchaseOrder).values(reg)
+  console.log("res=", res)
+  return reg
+}
+
 
