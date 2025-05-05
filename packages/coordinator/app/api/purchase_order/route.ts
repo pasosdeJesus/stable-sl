@@ -20,14 +20,15 @@ export async function GET(req: NextRequest) {
             {status: 400}
           )
         }
-        if (amountSle <= 0) {
+        if (amountSle <= 0 || isNaN(amountSle) ) {
           return NextResponse.json(
             {error: 'Wrong amount'},
             {status: 400}
           )
         }
-        let order = getExistingPurchaseOrder(token)
+        let order = await getExistingPurchaseOrder(token)
         if (order != null) {
+          console.log("order=", order)
           return NextResponse.json(
             {error: "Order already exists"},
             {status: 200}
@@ -40,13 +41,14 @@ export async function GET(req: NextRequest) {
             {status: 200}
           )
         }
-        if (quote.timestamp + 10 < Date.now()) {
+        if (quote.timestamp + 10*1000 < Date.now()) { //timestamp in ms
           return NextResponse.json(
             {error: "Quote expired"},
             {status: 200}
           )
         }
-        order = createPurchaseOrder(quote, token, amountSle)
+        order = await createPurchaseOrder(quote, token, amountSle)
+        console.log("order=",order)
         return NextResponse.json(
           order,
           {status: 200}
@@ -54,7 +56,7 @@ export async function GET(req: NextRequest) {
       }
       catch (error) {
           return NextResponse.json(
-            {error: error},
+            {error: error.message},
             {status: 400}
           )
       }

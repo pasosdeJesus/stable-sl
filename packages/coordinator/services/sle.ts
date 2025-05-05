@@ -238,17 +238,21 @@ export async function getPurchaseQuote(
   console.log("Después de drizzle")
 
   console.log("token es", token)
-  let reg:PurchaseQuote =  {
-    token: "",
-    timestamp: 0,
-    usdPriceInSle: 0,
-    maximum: 0,
-    minimum: 0,
-    senderWallet: "",
-    senderPhone: "",
-    senderName: ""
-  }
-  if (token === "" || token === "null") {
+  let reg:PurchaseQuote
+  if (token != null && token != "" && token != "null") {
+    let reg2 = await getExistingPurchaseQuote(token)
+    if (reg2 == null) {
+      throw new Error("There is not a quote with the given token")
+    }
+    let order = await getExistingPurchaseOrder(token)
+    if (order != null) {
+      throw new Error("There is an order with the given token")
+    }
+    reg = reg2
+    reg["timestamp"] = Date.now()
+    await db.update(purchaseQuote).set({timestamp: reg["timestamp"]}).
+      where(eq(purchaseQuote.id, Number(reg.id)))
+  } else {
     let ntoken = ""
     do {
       ntoken = Math.random().toString(36).slice(2)
@@ -267,17 +271,7 @@ export async function getPurchaseQuote(
       { insertedId: purchaseQuote.id }
     )
     reg.id = rid[0].insertedId
-  } else {
-    let reg2 = await getExistingPurchaseQuote(token)
-    if (reg2 == null) {
-      throw new Error("There is not a quote with the given token")
-    }
-    reg = reg2
-    reg["timestamp"] = Date.now()
-    await db.update(purchaseQuote).set({timestamp: reg["timestamp"]}).
-      where(eq(purchaseQuote.id, Number(reg.id)))
   }
-
   return reg
 }
 
@@ -303,10 +297,11 @@ export async function createPurchaseOrder(
     token: token,
     seconds: 15*60,
     amountSle: amountSle,
-    amountUsd: Math.round(amountSle * quote.usdPriceInSle * 100) / 100,
+    amountUsd: Math.round(amountSle * 100 / quote.usdPriceInSle) / 100,
     phoneNumberToPay: String(process.env?.RECEIVER_PHONE_1),
     receiverName: String(process.env?.RECEIVER_NAME_1)
   }
+  console.log("reg=", reg)
   let res = await db.insert(purchaseOrder).values(reg)
   console.log("res=", res)
   return reg

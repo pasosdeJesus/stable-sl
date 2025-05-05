@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
     const token = searchParams.get("token")
+    let secondsRemaining = NaN
 
     if (!token) {
       return NextResponse.json(
@@ -31,14 +32,16 @@ export async function GET(req: NextRequest) {
       )
     }
     let state = order.state
-    if (quote.timestamp + 10 < Date.now()) {
+    secondsRemaining = Date.now() - (quote.timestamp + order.seconds)
+    if (secondsRemaining > 0) {
+      secondsRemaining = NaN
       state = await updatePurchaseOrder(
         order.id, "expired", "", Date.now()
       )
     }
 
     return NextResponse.json(
-      {state: state},
+      {state: state, secondsRemaining: seconds},
       {status: 200}
     )
   }

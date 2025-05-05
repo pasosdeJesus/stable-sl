@@ -208,7 +208,10 @@ export default function Home() {
   }
 
   const handleSupposePaid = () => {
-    document.getElementById('suppose-I-paid').disabled = true;
+    let e = document.getElementById('suppose-I-paid')
+    if (e) {
+      e.setAttribute("disabled", "true");
+    }
     try {
       const apiGwPaymentReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/gw_payment_received?phone=012345678&amountSle=${amount}`
@@ -246,7 +249,7 @@ export default function Home() {
   const fetchOrderState = async () => {
     try {
      if (quoteToken) {
-       const apiPurchasOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
+       const apiPurchaseOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/pruchase_order_state?token=${quoteToken}`
         axios.get(apiPurchaseOrderStateUrl)
         .then(response => {
