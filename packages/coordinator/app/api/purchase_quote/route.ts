@@ -51,9 +51,9 @@ export async function GET(req: NextRequest) {
       )
     }
   } catch (error) {
-    console.error("Excepción error=", error.message)
+    console.error("Excepción error=", error)
     return NextResponse.json(
-      {error: error.message},
+      {error: error},
       {status: 500}
     )
   }

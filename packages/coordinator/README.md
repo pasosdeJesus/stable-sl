@@ -22,6 +22,10 @@ After create the database with:
 npx drizzle-kit push
 ```
 
+Start development server with
+```
+yarn dev
+```
 
 
 ## Running in production mode
@@ -60,17 +64,17 @@ The logs are overwritten each time it starts, we check them with:
 
 ## Developing
 
-### Migrations
+### Updating database
 
-Modify `db/schema.ts` and then run:
-```
-yarn drizzle-kit generate
-```
-To generate new migration in db/
+Migrations don't work with drizzle at the moment of this writing, check:
 
-Add it to git.
+https://github.com/drizzle-team/drizzle-orm/discussions/1339
 
-Run it with
+For now you need to run
 ```
-yarn drizzle-kit migrate
+yarn drizzle-kit push
 ```
+
+And with some luck in the answers you will end with an updated Database.
+
+

@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
   }
   catch (error) {
     return NextResponse.json(
-      {error: error.message},
+      {error: error},
       {status: 400}
     )
   }
