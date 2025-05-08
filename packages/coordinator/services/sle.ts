@@ -149,7 +149,9 @@ export async function getExistingPurchaseOrder(token: string): Promise<PurchaseO
   return Object.assign(regs[0])
 }
 
-export async function addSmsLog(timestamp: number, ip:string, phoneNumber: string, message: string) {
+export async function addSmsLog(
+  timestamp: number, ip:string, phoneNumber: string, message: string
+) {
   const db = await drizzle(process.env.DATABASE_URL!)
   let reg =  {
       timestamp: timestamp,
@@ -157,6 +159,7 @@ export async function addSmsLog(timestamp: number, ip:string, phoneNumber: strin
       phoneNumber: phoneNumber,
       message: message
   }
+  console.log("OJO reg=", reg)
   await db.insert(smsLog).values(reg)
 }
 

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     console.log("OJO quote.id=", quote.id)
     let state = order.state
     console.log("OJO state", state)
-    secondsRemaining = (quote.timestamp + order.seconds*1000) - Date.now()
+    secondsRemaining = ((quote.timestamp + order.seconds*1000) - Date.now())/1000
     console.log("OJO secondsRemaining", secondsRemaining)
     let transactionUrl = order.transactionUrl
 

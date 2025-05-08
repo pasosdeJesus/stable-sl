@@ -402,10 +402,15 @@ export default function Home() {
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for the payment. We transfered {amountUsd}USD to your wallet.</p>
-              <p className="text-sm">If you need contact our support team.</p>
+              <p className="text-sm">Thanks for your payment. We transfered {amountUsd}USD to your wallet.</p>
             </div>
           }
+          {step == 5 && isAlfajores() &&
+            <div className="space-y-2">
+              <p className="text-sm">(Well in reality since this is testnet we sent 0.1USDC...)</p>
+            </div>
+          }
+
           {step == 6 &&
             <div className="space-y-2">
               <p className="text-sm">stable-sl didn't receive your payment. Order cancelled</p>

@@ -33,7 +33,7 @@ export const purchaseOrder = pgTable("purchaseorder", {
 export const smsLog = pgTable("smslog", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   timestamp: bigint({ mode: "number" }),
-  ip: varchar({ length: 12}),
+  ip: varchar({ length: 16}),
   phoneNumber: varchar({ length: 12}),
   message: varchar({ length: 1024})
 })
