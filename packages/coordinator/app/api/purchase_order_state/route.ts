@@ -2,13 +2,19 @@ import 'dotenv/config'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { 
-  getExistingPurchaseOrder, getExistingPurchaseQuote, updatePurchaseOrder 
+  getExistingPurchaseOrder,
+  getExistingPurchaseQuote,
+  updateExpiredPurchaseOrders,
+  updatePurchaseOrder,
 } from '@/services/sle';
 
 export async function GET(req: NextRequest) {
   try {
+    console.log("OJO GET of purchase_order_state")
+    await updateExpiredPurchaseOrders()
     const { searchParams } = req.nextUrl
     const token = searchParams.get("token")
+    console.log("OJO token=", token)
     let secondsRemaining = NaN
 
     if (!token) {
@@ -24,6 +30,7 @@ export async function GET(req: NextRequest) {
         {status: 200}
       )
     }
+    console.log("OJO order.id=", order.id)
     let quote = await getExistingPurchaseQuote(token)
     if (quote == null) {
       return NextResponse.json(
@@ -31,21 +38,29 @@ export async function GET(req: NextRequest) {
         {status: 200}
       )
     }
+    console.log("OJO quote.id=", quote.id)
     let state = order.state
-    secondsRemaining = Date.now() - (quote.timestamp + order.seconds)
-    if (secondsRemaining > 0) {
-      secondsRemaining = NaN
-      state = await updatePurchaseOrder(
-        order.id, "expired", "", Date.now()
-      )
-    }
+    console.log("OJO state", state)
+    secondsRemaining = (quote.timestamp + order.seconds*1000) - Date.now()
+    console.log("OJO secondsRemaining", secondsRemaining)
+    let transactionUrl = order.transactionUrl
 
+    console.log(
+      "OJO retornando state=", state, 
+      " seconsRemainging=", secondsRemaining,
+      " transactionUrl=", transactionUrl
+    )
     return NextResponse.json(
-      {state: state, secondsRemaining: seconds},
+      {
+        state: state, 
+        transactionUrl: transactionUrl, 
+        secondsRemaining: secondsRemaining
+      },
       {status: 200}
     )
   }
   catch (error) {
+    console.log("OJO error=", error)
     return NextResponse.json(
       {error: error},
       {status: 400}

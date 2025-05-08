@@ -7,7 +7,7 @@ const nextConfig = {
     };
     return config;
   },
-  allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app", "stable-sl-coordinator.pdj.app"],
+  allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app", "stable-sl-coordinator.pdj.app", "stable-sl-coordinator.pdJ.app"],
 };
 
 export default nextConfig

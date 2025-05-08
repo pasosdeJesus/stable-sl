@@ -27,14 +27,14 @@ export default function Home() {
   const [quoteMinimum, setQuoteMinimum] = useState(0)
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(1)
-  const [amount, setAmount] = useState('')
+  const [amountSle, setAmountSle] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [buyerName, setBuyerName] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
-  const [phoneNumberToPay, setPhoneNumberToPay] = useState("")
-  const [nameOfReceiver, setNameOfReceiver] = useState("")
+  const [receiverPhone, setReceiverPhone] = useState("")
+  const [receiverName, setReceiverName] = useState("")
   const [transactionUrl, setTransactionUrl] = useState("")
 
   useEffect(() => {
@@ -98,9 +98,9 @@ export default function Home() {
               setQuoteMinimum(data.minimum)
               setQuoteMaximum(data.maximum)
 
-              if (amount && parseFloat(amount)>0) {
+              if (amountSle && parseFloat(amountSle)>0) {
                 setAmountUsd(
-                  calculateAmountUsd(parseFloat(amount), data.usdPriceInSle)
+                  calculateAmountUsd(parseFloat(amountSle), data.usdPriceInSle)
                 )
               }
             } else {
@@ -139,13 +139,13 @@ export default function Home() {
         }
       break
       case 2:
-        if (+amount < quoteMinimum) {
+        if (+amountSle < quoteMinimum) {
           alert('Amount should be greather than lower limit')
         } else if (+quoteMaximum == 0) {
           alert('Seems there is a problem with the backend, try again later')
-        } else if (+amount > quoteMaximum) {
+        } else if (+amountSle > quoteMaximum) {
           alert('Amount should be less than upper limit')
-        } else if (amount && parseFloat(amount) > 0) {
+        } else if (amountSle && parseFloat(amountSle) > 0) {
           setStep(3)
         } else {
           alert('Please enter valid values.')
@@ -175,7 +175,7 @@ export default function Home() {
   const handleConfirm = () => {
     try {
       const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_order?token=${quoteToken}`
+        `/api/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
       axios.get(apiPurchaseOrderUrl)
       .then(response => {
         if (response.data) {
@@ -184,24 +184,28 @@ export default function Home() {
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
             data.amountUsd !== undefined &&
-            data.phoneNumberToPay !== undefined &&
-            data.nameOfReceiver !== undefined
+            data.receiverPhone !== undefined &&
+            data.receiverName !== undefined
            ) {
              /* TODO: if (data.token !== token ||
-                 data.amountSle !== amount ||
+                 data.amountSle !== amountSle ||
                    data.amountUsd !== amountUsd) {
                alert("Mismatch in information of this app and coordinator")
              } else { */
              setSecondsWaitingPayment(data.seconds)
-             setPhoneNumberToPay(data.phoneNumberToPay)
-             setNameOfReceiver(data.nameOfReceiver)
+             setReceiverPhone(data.receiverPhone)
+             setReceiverName(data.receiverName)
              setStep(4)
            }
            else {
-            alert('Insufficient information to make order')
+            alert('Incorrect information to make order. ' + data)
            }
+        } else {
+          alert("No reponse data");
         }
-      })
+      }).catch(function (error) {
+        alert("Problem with axios" + error);
+      });
     } catch (error) {
      alert('Error making order:' + error)
     }
@@ -213,27 +217,21 @@ export default function Home() {
       e.setAttribute("disabled", "true");
     }
     try {
-      const apiGwPaymentReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/gw_payment_received?phone=012345678&amountSle=${amount}`
-      axios.get(apiGwPaymentReceivedUrl)
+      let msg= `Transaction Id AB0123CD.45EF Transfer Succesful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
+
+      const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/sms_received?phoneNumber=${phoneNumber}&message=${msg}`
+      axios.get(apiSmsReceivedUrl)
       .then(response => {
         if (response.data) {
           let data = response.data
-          if (data.token !== undefined &&
-              data.amountSle !== undefined &&
-              data.senderPhone !== undefined &&
-              data.senderName !== undefined
-          ) {
-            console.log("token=", data.token)
-            console.log("amountSle=", data.amountSle)
-            console.log("senderPhone=", data.senderPhone)
-            console.log("senderName=", data.senderName)
-          } else {
-            alert('Received information is incomplete supposing payment')
-          }
+          alert(`Sent, answer from coordinator: ${JSON.stringify(data)}`)
         } else {
             alert('No data in response')
         }
+      })
+      .catch(error => {
+         alert(`Problem sending: ${error}`)
       })
     } catch (error) {
       alert('Error supposing payment:' + error)
@@ -250,7 +248,7 @@ export default function Home() {
     try {
      if (quoteToken) {
        const apiPurchaseOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/pruchase_order_state?token=${quoteToken}`
+        `/api/purchase_order_state?token=${quoteToken}`
         axios.get(apiPurchaseOrderStateUrl)
         .then(response => {
           if (response.data) {
@@ -259,7 +257,7 @@ export default function Home() {
               switch (data.state) {
                case "pending":
                  break
-               case "timeout":
+               case "expired":
                  setStep(6)
                  break
                case "paid":
@@ -304,7 +302,7 @@ export default function Home() {
                   Test with &nbsp;
                   <div className="bg-gray-50">
                     012456789 &nbsp;
-                    <Input style={{display: "none"}} id="testPhone" value="012345478" disabled />
+                    <Input style={{display: "none"}} id="testPhone" value="012345678" disabled />
                     <Button
                       className="btn btn-sm bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={copyTestPhone}>Copy</Button>
@@ -340,16 +338,16 @@ export default function Home() {
 
           {step === 2 && (
             <div className="space-y-2">
-              <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE to pay</label>
+              <label htmlFor="amountSle" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE to pay</label>
               <Input
-                id="amount"
+                id="amountSle"
                 type="number"
                 placeholder="Enter amount"
-                value={amount}
+                value={amountSle}
                 min={quoteMinimum}
                 max={quoteMaximum}
                 onChange={(e) => {
-                  setAmount(e.target.value)
+                  setAmountSle(e.target.value)
                   setAmountUsd(
                     calculateAmountUsd(parseFloat(e.target.value),
                                        quoteUsdPriceInSle)
@@ -383,10 +381,10 @@ export default function Home() {
             <div className="space-y-2">
               <p className="text-2xl">Please confirm the details below:</p>
               <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
-              <p className="text-sm">Amount in SLE to spend: SLE${amount}</p>
+              <p className="text-sm">Amount in SLE to spend: SLE${amountSle}</p>
               <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
-              <p className="text-sm">Amount within limits: {+amount >= quoteMinimum &&
-                +amount <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
+                +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               {isAlfajores() &&
                 <div>
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
@@ -399,7 +397,7 @@ export default function Home() {
           {step == 4 &&
             <div className="space-y-2">
               <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
-              <p className="text-sm">Pay {amount}SLE to the phone {phoneNumberToPay} with the name {nameOfReceiver}</p>
+              <p className="text-sm">Pay {amountSle}SLE to the phone {receiverPhone} with the name {receiverName}</p>
             </div>
           }
           {step == 5 &&

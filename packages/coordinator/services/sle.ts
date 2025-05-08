@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import {  purchaseOrder, purchaseQuote, smsLog } from '@/db/schema';
 
@@ -85,7 +85,7 @@ export interface PurchaseOrder {
   /**
    * phone where to pay
    */
-  phoneNumberToPay: string
+  receiverPhone: string
 
   /**
    * Name of receiver
@@ -184,6 +184,7 @@ export async function searchPendingPurchaseOrderBySms(phoneNumber:string):Promis
         eq(purchaseOrder.state, "pending")
       )
   )
+  console.log("OJO search regs=", regs)
   if (regs.length == 0) {
     return null
   }
@@ -298,7 +299,7 @@ export async function createPurchaseOrder(
     seconds: 15*60,
     amountSle: amountSle,
     amountUsd: Math.round(amountSle * 100 / quote.usdPriceInSle) / 100,
-    phoneNumberToPay: String(process.env?.RECEIVER_PHONE_1),
+    receiverPhone: String(process.env?.RECEIVER_PHONE_1),
     receiverName: String(process.env?.RECEIVER_NAME_1)
   }
   console.log("reg=", reg)
@@ -308,3 +309,31 @@ export async function createPurchaseOrder(
 }
 
 
+export async function updateExpiredPurchaseOrders() {
+  return // TODO
+  console.log("OJO updateExpiredPurchaseOrders")
+  const db = await drizzle(process.env.DATABASE_URL!)
+  console.log("OJO db")
+  const regs = await db.select({oid: purchaseOrder.id}).from(purchaseOrder).
+    innerJoin(purchaseQuote, eq(purchaseOrder.quoteId, purchaseQuote.id)).
+    where(
+      and(
+        sql`${purchaseOrder.state}='pending'`,
+          sql`${purchaseQuote.timestamp}+${purchaseOrder.seconds}*1000 < ${Date.now()}`
+      )
+  )
+  console.log("OJO search regs.length=", regs.length)
+  console.log("OJO regs=", regs)
+  if (regs.length > 0) {
+    let ids = regs.map((r) => r.oid)
+    console.log("OJO ids=", ids)
+    let resu = await db.update(purchaseOrder).set({
+      state: "expired",
+      timestampExpired: Date.now() 
+    }).where(inArray(
+      purchaseOrder.id, ids
+    ))
+    console.log("OJO resu=", resu)
+  }
+
+}

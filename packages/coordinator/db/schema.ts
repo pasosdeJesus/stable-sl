@@ -21,7 +21,7 @@ export const purchaseOrder = pgTable("purchaseorder", {
   seconds: integer().notNull(),
   amountSle: real().notNull(),
   amountUsd: real().notNull(),
-  phoneNumberToPay: varchar({ length: 12 }).notNull(),
+  receiverPhone: varchar({ length: 12 }).notNull(),
   receiverName: varchar({ length: 80}).notNull(),
   transactionUrl: varchar({ length: 1024}),
   timestampTx: bigint({ mode: "number" }),

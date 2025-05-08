@@ -2,9 +2,12 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getPurchaseQuote } from '@/services/sle'
+import { getPurchaseQuote, updateExpiredPurchaseOrders } from '@/services/sle'
 
 export async function GET(req: NextRequest) {
+
+  try {
+    await updateExpiredPurchaseOrders()
     const { searchParams } = req.nextUrl
     const token= searchParams.get("token")
     const buyerName = searchParams.get("buyerName")
@@ -37,22 +40,22 @@ export async function GET(req: NextRequest) {
         {status: 400}
       )
     } else {
-      try {
-        //Validate wallet and phone should be of a KYC user
-        const q = await getPurchaseQuote(String(token), buyerName, wallet, phone)
-        console.log(q)
+      //Validate wallet and phone should be of a KYC user
+      const q = await getPurchaseQuote(String(token), buyerName, wallet, phone)
+      console.log(q)
 
-        delete q.id
-        return NextResponse.json(
-          q,
-          {status: 200}
-        )
-      } catch (error) {
-        console.error("Excepción error=", error.message)
-        return NextResponse.json(
-          {error: error.message},
-          {status: 500}
-        )
-      }
+      delete q.id
+      return NextResponse.json(
+        q,
+        {status: 200}
+      )
     }
+  } catch (error) {
+    console.error("Excepción error=", error.message)
+    return NextResponse.json(
+      {error: error.message},
+      {status: 500}
+    )
+  }
+
 }

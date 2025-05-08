@@ -27,8 +27,10 @@ export async function GET(req: NextRequest) {
   try {
     const timestamp = Date.now()
     const { searchParams } = req.nextUrl
-    const phoneNumber = searchParams.get("phoneNumbe")
+    const phoneNumber = searchParams.get("phoneNumber")
     const message = searchParams.get("message")
+    console.log('OJO phoneNumber=', phoneNumber)
+    console.log('OJO message=', message)
 
     if (!phoneNumber) {
       return NextResponse.json(
@@ -46,10 +48,13 @@ export async function GET(req: NextRequest) {
     if (!ip && req.headers.get('x-forwarded-for')) {
       ip = String(req.headers.get('x-forwarded-for')?.split(',').at(0));
     }
+    console.log('OJO ip=', ip)
     await addSmsLog(timestamp, String(ip), phoneNumber, message)
     let isms = extractInfoSms(message)
+    console.log('OJO isms=', isms)
     if (isms != null && isms.from == phoneNumber) {
       let order = await searchPendingPurchaseOrderBySms(phoneNumber)
+      console.log('OJO order=', order)
       if (order && order.id) {
         if (isms.amount >= order.amountSle) {
           updatePurchaseOrder(order.id, "received", String(message), timestamp)
@@ -111,7 +116,8 @@ export async function GET(req: NextRequest) {
         const receipt = await transactionResponse.wait()
         const transactionUrl = `${process.env.EXPLORER_TX}${receipt?.hash}`
         console.log(`Approval Confirmed!$ ${transactionUrl}`)
-        updatePurchaseOrder(order.id, "paid", transactionUrl, Date.now())
+        let state = await updatePurchaseOrder(order.id, "paid", transactionUrl, Date.now())
+        console.log("OJO state=", state)
 
         return NextResponse.json(
           {thanks: "thanks, payment processed"},
@@ -129,6 +135,7 @@ export async function GET(req: NextRequest) {
       {status: 200}
     )
   } catch (error) {
+    console.log("OJO enviando error:", error)
     return NextResponse.json(
       {error: error},
       {status: 400}
