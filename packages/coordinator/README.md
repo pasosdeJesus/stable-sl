@@ -27,6 +27,8 @@ Start development server with
 yarn dev
 ```
 
+Check that it works  checking https://my.domain:9001
+
 
 ## Running in production mode
 To run it in production from adJ/OpenBSD we have been using the following
@@ -55,6 +57,8 @@ rc_stop() {
 
 rc_cmd $1
 ```
+
+Check that it works  checking https://my.domain:9001
 
 The logs are overwritten each time it starts, we check them with:
 ```sh

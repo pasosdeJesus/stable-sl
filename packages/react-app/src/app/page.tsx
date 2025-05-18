@@ -28,7 +28,7 @@ export default function Home() {
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(1)
   const [amountSle, setAmountSle] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('012345678')
   const [buyerName, setBuyerName] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
@@ -198,7 +198,7 @@ export default function Home() {
              setStep(4)
            }
            else {
-            alert('Incorrect information to make order. ' + data)
+            alert('Incorrect information to make order. ' + JSON.stringify(data))
            }
         } else {
           alert("No reponse data");
@@ -220,14 +220,21 @@ export default function Home() {
       let msg= `Transaction Id AB0123CD.45EF Transfer Succesful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
 
       const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sms_received?phoneNumber=${phoneNumber}&message=${msg}`
-      axios.get(apiSmsReceivedUrl)
-      .then(response => {
+        `/api/sms_received`
+
+      axios.post(apiSmsReceivedUrl, { 
+        sender: phoneNumber, 
+        msg: msg 
+      }/*, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        // Trying to avoid prefligth OPTIONS request
+      }*/)
+      .then(function (response) {
         if (response.data) {
           let data = response.data
           alert(`Sent, answer from coordinator: ${JSON.stringify(data)}`)
         } else {
-            alert('No data in response')
+          alert('No data in response')
         }
       })
       .catch(error => {

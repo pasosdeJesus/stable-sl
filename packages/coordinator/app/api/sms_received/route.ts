@@ -24,21 +24,29 @@ async function cancelAndRespond(
 }
 
 export async function GET(req: NextRequest) {
+  console.log("OJO inicio GET inesperado")
+}
+
+export async function POST(req: NextRequest) {
+  console.log("OJO inicio POST")
   try {
     const timestamp = Date.now()
-    const { searchParams } = req.nextUrl
-    const phoneNumber = searchParams.get("phoneNumber")
-    const message = searchParams.get("message")
-    console.log('OJO phoneNumber=', phoneNumber)
-    console.log('OJO message=', message)
+    console.log("OJO timestamp=", timestamp)
+    const requestJson = await req.json()
+    console.log("OJO request.json()=", requestJson)
+    const sender = requestJson['sender'] ?? ''
+    const msg = requestJson['msg'] ?? ''
+    console.log('OJO sender =', sender)
+    console.log('OJO msg =', msg)
 
-    if (!phoneNumber) {
+    
+    /*if (!sender) {
       return NextResponse.json(
         {error: 'Missing number'},
         {status: 400}
       )
-    }
-    if (!message) {
+    } */
+    if (!msg || msg == "") {
       return NextResponse.json(
         {error: 'Missing message'},
         {status: 400}
@@ -49,15 +57,15 @@ export async function GET(req: NextRequest) {
       ip = String(req.headers.get('x-forwarded-for')?.split(',').at(0));
     }
     console.log('OJO ip=', ip)
-    await addSmsLog(timestamp, String(ip), phoneNumber, message)
-    let isms = extractInfoSms(message)
+    await addSmsLog(timestamp, String(ip), sender, msg)
+    let isms = extractInfoSms(msg)
     console.log('OJO isms=', isms)
-    if (isms != null && isms.from == phoneNumber) {
-      let order = await searchPendingPurchaseOrderBySms(phoneNumber)
+    if (isms != null && isms.from == sender) {
+      let order = await searchPendingPurchaseOrderBySms(sender)
       console.log('OJO order=', order)
       if (order && order.id) {
         if (isms.amount >= order.amountSle) {
-          updatePurchaseOrder(order.id, "received", String(message), timestamp)
+          updatePurchaseOrder(order.id, "received", String(msg), timestamp)
         } else {
           return cancelAndRespond(
             order.id, `Received ${isms.amount} that is` + 
@@ -125,7 +133,7 @@ export async function GET(req: NextRequest) {
         )
       }
       return NextResponse.json(
-        {thanks: "Thanks. We couldn't identify the order. Please contact support team"},
+        {problem: "Problem. We couldn't identify the order. Please contact support team"},
         {status: 200}
       )
 
@@ -134,10 +142,21 @@ export async function GET(req: NextRequest) {
       {thanks: "Thanks"},
       {status: 200}
     )
-  } catch (error) {
-    console.log("OJO enviando error:", error)
+  } catch (error:any) {
+    let ret:string = "error"
+    if (typeof error == "string") {
+      ret = error
+    } else if (error != null && error.hasOwnProperty("message")) {
+      console.log("OJO error.message")
+      ret = error.message ?? "error"
+    } else {
+      console.log("OJO typeof error=", typeof error)
+      console.log("OJO error=", error)
+      ret = JSON.stringify(error)
+    }
+    console.log("OJO sms_received enviando error:", ret, typeof ret)
     return NextResponse.json(
-      {error: error},
+      {error: ret},
       {status: 400}
     )
   }
