@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
     let isms = extractInfoSms(msg)
     console.log('OJO isms=', isms)
     if (isms != null && isms.from == sender) {
+      console.log("OJO buscando")
       let order = await searchPendingPurchaseOrderBySms(sender)
       console.log('OJO order=', order)
       if (order && order.id) {
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
         }
         console.log(`The balance of the sender (${signer.address}) is: ${formattedBalance} USD`);
 
-        const usdAmount = ethers.parseUnits('0.1', usdDecimals)
+        const usdAmount = ethers.parseUnits(order.amountUsd.toString(), usdDecimals)
 
         const pop = await usdContract.transfer.populateTransaction(
           destAddress, usdAmount
@@ -139,7 +140,7 @@ export async function POST(req: NextRequest) {
 
     }
     return NextResponse.json(
-      {thanks: "Thanks"},
+      {thanks: "Thanks. Order not completed"},
       {status: 200}
     )
   } catch (error:any) {

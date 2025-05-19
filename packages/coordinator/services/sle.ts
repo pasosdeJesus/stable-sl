@@ -1,5 +1,9 @@
+import { stableTokenABI }  from '@celo/abis'
+//import { stableTokenABI } from '@celo/abis/StableToken'
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql, sum } from 'drizzle-orm';
+import { createPublicClient, formatUnits, http } from 'viem'
+import { celo, celoAlfajores } from 'viem/chains'
 
 import {  purchaseOrder, purchaseQuote, smsLog } from '@/db/schema';
 
@@ -105,6 +109,46 @@ export interface PurchaseOrder {
 }
 
 
+export async function getUsdBalance(address: string): Promise<number> {
+  if (address.slice(0,2) != "0x") {
+    throw new Error(`address is not an address: ${address}` )
+  }
+
+  if (process.env.RPC_URL == null) {
+    throw new Error("RPC_URL not defined")
+  }
+  const publicClient = createPublicClient({
+    chain: celo,
+    transport: http(process.env.RPC_URL),
+  })
+  if (process.env.USD_CONTRACT == null) {
+    throw new Error("USD_CONTRACT not defined")
+  }
+  if (process.env.USD_DECIMALS == null) {
+    throw new Error("USD_DECIMALS not defined")
+  }
+
+  if (process.env.USD_CONTRACT.slice(0,2) != "0x") {
+    throw new Error(`USD_CONTRACT is not an address: ${process.env.USD_CONTRACT}` )
+  }
+
+  const preBalance = Number(
+    await publicClient.readContract({
+      abi: stableTokenABI,
+      address: `0x${process.env.USD_CONTRACT.slice(2)}`,
+      functionName: 'balanceOf',
+      args: [`0x${address.slice(2)}`],
+    })
+  )
+  const balance = formatUnits(preBalance, process.env.USD_DECIMALS)
+
+  console.log(`OJO balanceOf(${address})=${balance}`)
+  return balance
+}
+
+
+
+
 /**
  * Delays execution some milliseconds
  * Use to wait 1 second with `await delay(1000)`
@@ -164,6 +208,7 @@ export async function addSmsLog(
 }
 
 export function extractInfoSms(message: string) {
+  console.log(`OJO function extractInfoSms(${message})`)
   let e= /Transaction Id ([0-9A-Z.]*) Transfer Succesful from ([0-9]*) transaction amount SLE([0-9.]*) net credit amount SLE([0-9.]*) your new balance is SLE([0-9.])/.exec(message)
   if (e != null) {
     return {
@@ -237,44 +282,79 @@ export async function getPurchaseQuote(
   // TODO: Implement this by calling an API and saving the quote 
   // The name should be in the database as part of the KYC
 
+  let reg:PurchaseQuote
+  let existing = null
+
+  console.log("Function getPurchaseQuote")
   console.log("Antes de drizzle")
   const db = await drizzle(process.env.DATABASE_URL!)
   console.log("Después de drizzle")
 
   console.log("token es", token)
-  let reg:PurchaseQuote
   if (token != null && token != "" && token != "null") {
-    let reg2 = await getExistingPurchaseQuote(token)
-    if (reg2 == null) {
+    let existing = await getExistingPurchaseQuote(token)
+    if (existing == null) {
       throw new Error("There is not a quote with the given token")
     }
     let order = await getExistingPurchaseOrder(token)
     if (order != null) {
       throw new Error("There is an order with the given token")
     }
-    reg = reg2
-    reg["timestamp"] = Date.now()
-    await db.update(purchaseQuote).set({timestamp: reg["timestamp"]}).
-      where(eq(purchaseQuote.id, Number(reg.id)))
-  } else {
+  }
+
+  if (process.env.PUBLIC_ADDRESS == null) {
+    throw new Error("Missing PUBLIC_ADDRESS")
+  }
+  if (process.env.MIN_LIMIT_ORDER == null) {
+    throw new Error("Missing MIN_LIMIT_ORDER")
+  }
+  if (process.env.MAX_LIMIT_ORDER == null) {
+    throw new Error("Missing MAX_LIMIT_ORDER")
+  }
+
+  let balance = await getUsdBalance(process.env.PUBLIC_ADDRESS)
+  //let balance = 
+
+  const regs = await db.select({value: sum(purchaseOrder.amountUsd)}).
+    from(purchaseOrder).where(
+      eq(purchaseOrder.state, 'pending')
+  )
+  console.log(`OJO regs=${JSON.stringify(regs[0])}`)
+  const toPay = regs && regs[0] && regs[0].value ? +regs[0].value : 0
+  console.log(`OJO toPay=${toPay}`)
+
+  let price = 24.26
+  let maxLimit = Math.min(+process.env.MAX_LIMIT_ORDER, balance - toPay)
+  let minLimit = +process.env.MIN_LIMIT_ORDER
+  if (existing == null) {
     let ntoken = ""
     do {
       ntoken = Math.random().toString(36).slice(2)
     } while (await getExistingPurchaseQuote(ntoken) != null)
-    reg =  {
-      token: ntoken,
-      senderPhone: phone,
-      senderName: buyerName,
-      senderWallet: wallet,
-      timestamp: Date.now(),
-      usdPriceInSle: 22.64,
-      maximum: 1000,
-      minimum: 10,
-    }
-    let rid = await db.insert(purchaseQuote).values(reg).returning(
-      { insertedId: purchaseQuote.id }
-    )
-    reg.id = rid[0].insertedId
+
+      reg =  {
+        token: ntoken,
+        senderPhone: phone,
+        senderName: buyerName,
+        senderWallet: wallet,
+        timestamp: Date.now(),
+        usdPriceInSle: price,
+        maximum: maxLimit,
+        minimum: minLimit
+      }
+      let rid = await db.insert(purchaseQuote).values(reg).returning(
+        { insertedId: purchaseQuote.id }
+      )
+      reg.id = rid[0].insertedId
+  } else {
+    reg = existing 
+    reg["timestamp"] = Date.now()
+    reg["usdPriceInSle"] = price
+    reg["maximum"] = maxLimit
+    reg["minimum"] = minLimit
+
+    await db.update(purchaseQuote).set({timestamp: reg["timestamp"]}).
+      where(eq(purchaseQuote.id, Number(reg.id)))
   }
   return reg
 }

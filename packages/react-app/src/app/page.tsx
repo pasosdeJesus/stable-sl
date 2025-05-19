@@ -28,7 +28,7 @@ export default function Home() {
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(1)
   const [amountSle, setAmountSle] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('012345678')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [buyerName, setBuyerName] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
@@ -321,7 +321,7 @@ export default function Home() {
                 id="phoneNumber"
                 type="tel"
                 maxLength={14}
-                placeholder="Sierra Leone number e.g 075232442"
+                placeholder="Sierra Leone number e.g 075934442"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"

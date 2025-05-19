@@ -28,12 +28,12 @@ const connectors = connectorsForWallets(
     },
   ],
   {
-    appName: 'Celo Composer',
+    appName: 'stable-sl',
     projectId: process.env.WC_PROJECT_ID ?? '044601f65212332475a09bc14ceb3c34',
   }
 );
 
-const config = createConfig({
+var config = createConfig({
   connectors,
   chains: [celo, celoAlfajores],
   transports: {
@@ -45,6 +45,10 @@ const config = createConfig({
 const queryClient = new QueryClient();
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  if (process.env.NEXT_PUBLIC_NETWORK != null && 
+      process.env.NEXT_PUBLIC_NETWORK == "CELO") {
+    config.chain = [celo]
+  }
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
