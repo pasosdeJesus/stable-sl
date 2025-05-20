@@ -404,7 +404,7 @@ export default function Home() {
           {step == 4 &&
             <div className="space-y-2">
               <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
-              <p className="text-sm">Pay {amountSle}SLE to the phone {receiverPhone} with the name {receiverName}</p>
+              <p className="text-sm">From your phone {phoneNumber} ({buyerName}), pay {amountSle}SLE to the phone {receiverPhone} ({receiverName})</p>
             </div>
           }
           {step == 5 &&

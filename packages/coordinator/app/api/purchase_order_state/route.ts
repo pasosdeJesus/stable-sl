@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
     console.log(
       "OJO retornando state=", state, 
-      " seconsRemainging=", secondsRemaining,
+      " secondsRemainging=", secondsRemaining,
       " transactionUrl=", transactionUrl
     )
     return NextResponse.json(

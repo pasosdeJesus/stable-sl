@@ -393,7 +393,6 @@ export async function createPurchaseOrder(
 
 
 export async function updateExpiredPurchaseOrders() {
-  return // TODO
   console.log("OJO updateExpiredPurchaseOrders")
   const db = await drizzle(process.env.DATABASE_URL!)
   console.log("OJO db")
