@@ -140,10 +140,10 @@ export async function getUsdBalance(address: string): Promise<number> {
       args: [`0x${address.slice(2)}`],
     })
   )
-  const balance = formatUnits(preBalance, process.env.USD_DECIMALS)
+  const balance = formatUnits(BigInt(preBalance), +process.env.USD_DECIMALS)
 
   console.log(`OJO balanceOf(${address})=${balance}`)
-  return balance
+  return +balance
 }
 
 
