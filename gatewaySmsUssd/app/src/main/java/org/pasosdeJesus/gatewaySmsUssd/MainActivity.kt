@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun App(name: String, activity: MainActivity?, modifier: Modifier = Modifier) {
         var recentLogs by remember { mutableStateOf("") }
-        var ussdToDial by remember { mutableStateOf("#144#") }
+        var ussdToDial by remember { mutableStateOf("#144#k") }
         var smsNumber by remember { mutableStateOf("23275234565") }
         var smsMessage by remember { mutableStateOf("Testing SMS") }
 
