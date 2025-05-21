@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun App(name: String, activity: MainActivity?, modifier: Modifier = Modifier) {
         var recentLogs by remember { mutableStateOf("") }
-        var ussdToDial by remember { mutableStateOf("#144*") }
+        var ussdToDial by remember { mutableStateOf("#144#") }
         var smsNumber by remember { mutableStateOf("23275234565") }
         var smsMessage by remember { mutableStateOf("Testing SMS") }
 
@@ -123,7 +123,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         } else {
-                            startService(Intent(applicationContext, BgService::class.java))
+
                             val br = object : BroadcastReceiver() {
                                 override fun onReceive(p0: Context?, p1: Intent?) {
                                     for (sms in Telephony.Sms.Intents.getMessagesFromIntent(
@@ -152,6 +152,8 @@ class MainActivity : ComponentActivity() {
                                 IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
                                 ContextCompat.RECEIVER_EXPORTED
                             )
+
+                            startService(Intent(applicationContext, BgService::class.java))
 
                         }
                     }
