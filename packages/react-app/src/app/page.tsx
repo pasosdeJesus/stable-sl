@@ -198,7 +198,7 @@ export default function Home() {
              setStep(4)
            }
            else {
-            alert('Incorrect information to make order. ' + data)
+            alert('Incorrect information to make order. ' + JSON.stringify(data))
            }
         } else {
           alert("No reponse data");
@@ -220,14 +220,21 @@ export default function Home() {
       let msg= `Transaction Id AB0123CD.45EF Transfer Succesful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
 
       const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sms_received?phoneNumber=${phoneNumber}&message=${msg}`
-      axios.get(apiSmsReceivedUrl)
-      .then(response => {
+        `/api/sms_received`
+
+      axios.post(apiSmsReceivedUrl, { 
+        sender: phoneNumber, 
+        msg: msg 
+      }/*, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        // Trying to avoid prefligth OPTIONS request
+      }*/)
+      .then(function (response) {
         if (response.data) {
           let data = response.data
           alert(`Sent, answer from coordinator: ${JSON.stringify(data)}`)
         } else {
-            alert('No data in response')
+          alert('No data in response')
         }
       })
       .catch(error => {
@@ -314,7 +321,7 @@ export default function Home() {
                 id="phoneNumber"
                 type="tel"
                 maxLength={14}
-                placeholder="Sierra Leone number e.g 075232442"
+                placeholder="Sierra Leone number e.g 075934442"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 aria-label="Phone Number"
@@ -397,7 +404,7 @@ export default function Home() {
           {step == 4 &&
             <div className="space-y-2">
               <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
-              <p className="text-sm">Pay {amountSle}SLE to the phone {receiverPhone} with the name {receiverName}</p>
+              <p className="text-sm">From your phone {phoneNumber} ({buyerName}), pay {amountSle}SLE to the phone {receiverPhone} ({receiverName})</p>
             </div>
           }
           {step == 5 &&

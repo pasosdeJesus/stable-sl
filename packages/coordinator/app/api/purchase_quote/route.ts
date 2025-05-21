@@ -2,7 +2,11 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { count, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getPurchaseQuote, updateExpiredPurchaseOrders } from '@/services/sle'
+import { 
+  getPurchaseQuote,
+  searchPendingPurchaseOrderBySms,
+  updateExpiredPurchaseOrders
+} from '@/services/sle'
 
 export async function GET(req: NextRequest) {
 
@@ -37,6 +41,11 @@ export async function GET(req: NextRequest) {
     } else if (!buyerName || buyerName == "") {
       return NextResponse.json(
         {error: 'Missing buyer\'s name'},
+        {status: 400}
+      )
+    } else if  (await searchPendingPurchaseOrderBySms(phone) != null) {
+      return NextResponse.json(
+        {error: `There is a pending order from the phone number ${phone}`},
         {status: 400}
       )
     } else {
