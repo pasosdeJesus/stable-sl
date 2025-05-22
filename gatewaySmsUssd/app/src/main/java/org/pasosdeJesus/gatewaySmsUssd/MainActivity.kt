@@ -382,7 +382,7 @@ class MainActivity : ComponentActivity() {
             val scope = CoroutineScope(Dispatchers.IO)
             scope.launch {
                 try {
-                    res = post(url = "https://stable-sl.pdJ.app/api/sms_received",
+                    res = post(url = "https://stable-sl-coordinator.pdJ.app/api/sms_received",
                         json = "{\"sender\": \"${sender}\", \"msg\": \"${msg}\"}")
                     recentLogs2 = addLog(
                         recentLogs,
