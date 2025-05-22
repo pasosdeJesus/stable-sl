@@ -1,6 +1,18 @@
+import {
+  Address,
+  encodeFunctionData,
+  getContract,
+  createWalletClient,
+  formatEther,
+  formatUnits,
+  http,
+  parseEther,
+  parseUnits,
+  publicActions,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts"; 
+import { celo, celoAlfajores } from "viem/chains";
 import 'dotenv/config'
-import { ethers } from 'ethers'
-import ERC20_ABI from 'erc-20-abi' assert { type: 'json' }
 import { NextRequest, NextResponse } from 'next/server'
 
 import {
@@ -11,6 +23,12 @@ import {
   searchPendingPurchaseOrderBySms,
   updatePurchaseOrder
 } from '@/services/sle';
+
+import {
+  getUsdBalance,
+  getCryptoParams,
+  transferUsd
+} from '@/services/scrypto';
 
 
 async function cancelAndRespond(
@@ -24,22 +42,24 @@ async function cancelAndRespond(
 }
 
 export async function GET(req: NextRequest) {
-  console.log("OJO inicio GET inesperado")
+  return NextResponse.json(
+    {error: "Expecting POST request"},
+    {status: 400}
+  )
 }
 
 export async function POST(req: NextRequest) {
-  console.log("OJO inicio POST")
+  console.log("OJO starting POST")
   try {
     const timestamp = Date.now()
     console.log("OJO timestamp=", timestamp)
     const requestJson = await req.json()
     console.log("OJO request.json()=", requestJson)
     const sender = requestJson['sender'] ?? ''
-    const msg = requestJson['msg'] ?? ''
     console.log('OJO sender =', sender)
+    const msg = requestJson['msg'] ?? ''
     console.log('OJO msg =', msg)
 
-    
     /*if (!sender) {
       return NextResponse.json(
         {error: 'Missing number'},
@@ -79,65 +99,66 @@ export async function POST(req: NextRequest) {
         if (quote == null) {
           return cancelAndRespond(order.id, "Quote not found", timestamp)
         }
-        let destAddress = quote.senderWallet
+        let destAddress = quote.senderWallet as Address
 
-        console.log("RPC_URL=", process.env.RPC_URL)
-        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
-        if (process.env.PRIVATE_KEY == undefined) {
+
+        // Convert the private key to an account object
+        if (process.env.PRIVATE_KEY == undefined || 
+           process.env.PRIVATE_KEY.slice(0,2) != '0x') {
           return cancelAndRespond(order.id, "Missing private key", timestamp)
         }
-        const signer =  new ethers.Wallet(process.env.PRIVATE_KEY, provider)
-
-        if (process.env.USD_CONTRACT == undefined) {
-          return cancelAndRespond(order.id, "Missing [USD] contract", timestamp)
+        const account = privateKeyToAccount(process.env.PRIVATE_KEY as Address)
+        let myAddress, blockchain, rpcUrl, usdAddress, usdDecimals
+ 
+        try {
+          [ 
+            myAddress, blockchain, rpcUrl, usdAddress, usdDecimals 
+          ] = await getCryptoParams()
+        } catch (error: any) {
+          return cancelAndRespond(order.id, error.toString(), timestamp)
         }
-        const usdAddress = process.env.USD_CONTRACT
-        if (process.env.USD_DECIMALS == undefined) {
-          return cancelAndRespond(order.id, "Missing [USD] decimals", timestamp)
-        }
-        const usdDecimals = +process.env.USD_DECIMALS
 
+        // Create a wallet client with the specified account, chain, and HTTP transport
+        const walletClient = createWalletClient({
+          account,
+          chain: blockchain,
+          transport: http(rpcUrl),
+        }).extend(publicActions);
 
-        console.log("signer.address=", signer.address)
-
-        const usdContract = new ethers.Contract(usdAddress, ERC20_ABI, signer)
-        console.log("usdContract.target=", usdContract.target)
-        const dataBalance = await usdContract.balanceOf(signer.address)
-        console.log("dataBalance=", dataBalance)
-        const formattedBalance = +ethers.formatUnits(dataBalance, usdDecimals)
-        console.log("formattedBalance=", formattedBalance)
-
-        if (formattedBalance < 0.2) {
-          return cancelAndRespond(
-            order.id, "Insufficiente [USD] balance", timestamp
-          )
-        }
-        console.log(`The balance of the sender (${signer.address}) is: ${formattedBalance} USD`);
-
-        const usdAmount = ethers.parseUnits(order.amountUsd.toString(), usdDecimals)
-
-        const pop = await usdContract.transfer.populateTransaction(
-          destAddress, usdAmount
+        const balance = await getUsdBalance(
+          usdAddress, usdDecimals, walletClient, myAddress
         )
 
-        const transactionResponse = await signer.sendTransaction(pop)
-        console.log(`Approval Sent: ${transactionResponse.hash}`)
-        const receipt = await transactionResponse.wait()
-        const transactionUrl = `${process.env.EXPLORER_TX}${receipt?.hash}`
-        console.log(`Approval Confirmed!$ ${transactionUrl}`)
-        let state = await updatePurchaseOrder(order.id, "paid", transactionUrl, Date.now())
+        if (balance < order.amountUsd) {
+          return cancelAndRespond(
+            order.id, 
+            `Insufficient USD balance: ${balance}, needed: ${order.amountUsd}`,
+            timestamp
+          )
+        }
+        console.log(`My balance is: ${balance} USD`);
+
+        const transactionUrl = await transferUsd(
+          myAddress, account, 
+          usdAddress, usdDecimals, 
+          walletClient, destAddress,
+          order.amountUsd
+        )
+        console.log(`Transfer confirmed: ${transactionUrl}`)
+        let state = await updatePurchaseOrder(
+          order.id, "paid", transactionUrl, Date.now()
+        )
         console.log("OJO state=", state)
 
         return NextResponse.json(
-          {thanks: "thanks, payment processed"},
+          {thanks: "Thanks. Payment processed"},
           {status: 200}
         )
       }
       return NextResponse.json(
-        {problem: "Problem. We couldn't identify the order. Please contact support team"},
+        {problem: "Couldn't identify the order. Please contact support team"},
         {status: 200}
       )
-
     }
     return NextResponse.json(
       {thanks: "Thanks. Order not completed"},
