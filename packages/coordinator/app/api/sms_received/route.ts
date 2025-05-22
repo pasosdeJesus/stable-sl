@@ -1,5 +1,3 @@
-import { stableTokenABI }  from '@celo/abis'
-import { getDataSuffix, submitReferral } from '@divvi/referral-sdk'
 import {
   Address,
   encodeFunctionData,
@@ -11,10 +9,9 @@ import {
   parseEther,
   parseUnits,
   publicActions,
-  writeContract,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts"; 
-import { celo } from "viem/chains";
+import { celo, celoAlfajores } from "viem/chains";
 import 'dotenv/config'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -28,7 +25,8 @@ import {
 } from '@/services/sle';
 
 import {
-  checkUsdBalance,
+  getUsdBalance,
+  getCryptoParams,
   transferUsd
 } from '@/services/scrypto';
 
@@ -101,41 +99,33 @@ export async function POST(req: NextRequest) {
         if (quote == null) {
           return cancelAndRespond(order.id, "Quote not found", timestamp)
         }
-        let destAddress = quote.senderWallet
+        let destAddress = quote.senderWallet as Address
 
 
         // Convert the private key to an account object
-        if (process.env.PRIVATE_KEY == undefined) {
+        if (process.env.PRIVATE_KEY == undefined || 
+           process.env.PRIVATE_KEY.slice(0,2) != '0x') {
           return cancelAndRespond(order.id, "Missing private key", timestamp)
         }
-        const account = privateKeyToAccount(PRIVATE_KEY)
-        if (process.env.PUBLIC_ADDRESS == undefined) {
-          return cancelAndRespond(order.id, "Missing PUBLIC_ADDRESS", timestamp)
+        const account = privateKeyToAccount(process.env.PRIVATE_KEY as Address)
+        let myAddress, blockchain, rpcUrl, usdAddress, usdDecimals
+ 
+        try {
+          [ 
+            myAddress, blockchain, rpcUrl, usdAddress, usdDecimals 
+          ] = await getCryptoParams()
+        } catch (error: any) {
+          return cancelAndRespond(order.id, error.toString(), timestamp)
         }
-        const myAddress = process.env.PUBLIC_ADDRESS as Address
-        console.log("myAddress=", myAddress)
 
         // Create a wallet client with the specified account, chain, and HTTP transport
-        if (process.env.RPC_URL == undefined) {
-          return cancelAndRespond(order.id, "Missing RPC_URL", timestamp)
-        }
-        console.log("RPC_URL=", process.env.RPC_URL)
         const walletClient = createWalletClient({
           account,
-          chain: celo,
-          transport: http(RPC_URL),
+          chain: blockchain,
+          transport: http(rpcUrl),
         }).extend(publicActions);
 
-        if (process.env.USD_CONTRACT == undefined) {
-          return cancelAndRespond(order.id, "Missing [USD] contract", timestamp)
-        }
-        const usdAddress = process.env.USD_CONTRACT
-        if (process.env.USD_DECIMALS == undefined) {
-          return cancelAndRespond(order.id, "Missing [USD] decimals", timestamp)
-        }
-        const usdDecimals = +process.env.USD_DECIMALS
-
-        const balance = getUsdBalance(
+        const balance = await getUsdBalance(
           usdAddress, usdDecimals, walletClient, myAddress
         )
 
@@ -148,8 +138,10 @@ export async function POST(req: NextRequest) {
         }
         console.log(`My balance is: ${balance} USD`);
 
-        const transactionUrl = transferUsd(
-          myAddress, usdAddress, usdDecimals, walletClient, destAddress,
+        const transactionUrl = await transferUsd(
+          myAddress, account, 
+          usdAddress, usdDecimals, 
+          walletClient, destAddress,
           order.amountUsd
         )
         console.log(`Transfer confirmed: ${transactionUrl}`)

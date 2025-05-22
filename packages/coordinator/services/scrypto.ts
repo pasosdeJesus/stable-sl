@@ -4,24 +4,19 @@ import {
   Address,
   encodeFunctionData,
   getContract,
-  createWalletClient,
-  formatEther,
   formatUnits,
-  http,
-  parseEther,
   parseUnits,
-  publicActions,
-  writeContract,
 } from "viem";
+import { celo, celoAlfajores } from 'viem/chains'
 
 
-// Function to check the USDT balance
+// Returns USD balance
 export async function getUsdBalance(
-  usdAddress: Address, usdDecimals: number, walletClient, address: Address
+  usdAddress: Address, usdDecimals: number, client:any, address: Address
 ) {
 
   const preBalance = Number(
-    await walletClient.readContract({
+    await client.readContract({
       abi: stableTokenABI,
       address: usdAddress,
       functionName: 'balanceOf',
@@ -33,13 +28,43 @@ export async function getUsdBalance(
   return +balance
 }
 
+// Initialization
+export async function getCryptoParams() {
+  if (process.env.PUBLIC_ADDRESS == undefined) {
+    throw new Error("Missing env. var PUBLIC_ADDRESS")
+  }
+  const myAddress = process.env.PUBLIC_ADDRESS as Address
+  console.log("myAddress=", myAddress)
 
+  if (process.env.RPC_URL == undefined) {
+    throw new Error("Missing env. var RPC_URL")
+  }
+  const rpcUrl = process.env.RPC_URL
+  let blockchain:any = celo
+  if (process.env.RPC_URL.includes('alfajores')) {
+    blockchain = celoAlfajores
+  }
+  if (process.env.USD_CONTRACT == undefined || 
+      process.env.USD_CONTRACT.slice(0,2) != '0x') {
+    throw new Error("Missing env. var USD_CONTRACT")
+  }
+  const usdAddress = process.env.USD_CONTRACT as Address
+  if (process.env.USD_DECIMALS == undefined) {
+    throw new Error("Missing env. var USD_DECIMALS")
+  }
+  const usdDecimals = +process.env.USD_DECIMALS
+  return [myAddress, blockchain, rpcUrl, usdAddress, usdDecimals]
+}
+
+
+// 
 export async function transferUsd(
   myAddress: Address,
+  account:any,
   usdAddress: Address,
   usdDecimals: number,
-  walletClient,
-  address:String,
+  walletClient:any,
+  address: Address,
   amount: number
 ) {
   const usdContract = getContract({
@@ -79,6 +104,7 @@ export async function transferUsd(
     to: usdContract.address,
     data: txData,
   });
+  console.log("hash=", hash)
 
   const receipt = await walletClient.waitForTransactionReceipt({hash});
   console.log("receipt=", receipt)
@@ -87,15 +113,16 @@ export async function transferUsd(
   console.log(transactionUrl)
 
   const chainId = await walletClient.getChainId()
-  console.log("hash=", hash)
   console.log("chainId=", chainId)
 
-  const sr = await submitReferral({
-    txHash: hash,
-    chainId: chainId,
-  })
+  if (chainId == 42220) { // Celo mainnet
+    const sr = await submitReferral({
+      txHash: hash,
+      chainId: chainId,
+    })
 
-  console.log("sr=", sr)
+    console.log("sr=", sr)
+  }
 
   return transactionUrl
 }

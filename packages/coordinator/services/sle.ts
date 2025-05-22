@@ -1,11 +1,10 @@
-import { stableTokenABI }  from '@celo/abis'
-//import { stableTokenABI } from '@celo/abis/StableToken'
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { and, eq, inArray, sql, sum } from 'drizzle-orm';
-import { createPublicClient, formatUnits, http } from 'viem'
+import { createPublicClient, http } from 'viem'
 import { celo, celoAlfajores } from 'viem/chains'
 
 import {  purchaseOrder, purchaseQuote, smsLog } from '@/db/schema';
+import { getUsdBalance, getCryptoParams } from '@/services/scrypto'
 
 /**
  * Represents a quote for SLE cryptocurrency.
@@ -107,46 +106,6 @@ export interface PurchaseOrder {
   messageSms: string | null
 
 }
-
-
-export async function getUsdBalance(address: string): Promise<number> {
-  if (address.slice(0,2) != "0x") {
-    throw new Error(`address is not an address: ${address}` )
-  }
-
-  if (process.env.RPC_URL == null) {
-    throw new Error("RPC_URL not defined")
-  }
-  const publicClient = createPublicClient({
-    chain: celo,
-    transport: http(process.env.RPC_URL),
-  })
-  if (process.env.USD_CONTRACT == null) {
-    throw new Error("USD_CONTRACT not defined")
-  }
-  if (process.env.USD_DECIMALS == null) {
-    throw new Error("USD_DECIMALS not defined")
-  }
-
-  if (process.env.USD_CONTRACT.slice(0,2) != "0x") {
-    throw new Error(`USD_CONTRACT is not an address: ${process.env.USD_CONTRACT}` )
-  }
-
-  const preBalance = Number(
-    await publicClient.readContract({
-      abi: stableTokenABI,
-      address: `0x${process.env.USD_CONTRACT.slice(2)}`,
-      functionName: 'balanceOf',
-      args: [`0x${address.slice(2)}`],
-    })
-  )
-  const balance = formatUnits(BigInt(preBalance), +process.env.USD_DECIMALS)
-
-  console.log(`OJO balanceOf(${address})=${balance}`)
-  return +balance
-}
-
-
 
 
 /**
@@ -302,9 +261,6 @@ export async function getPurchaseQuote(
     }
   }
 
-  if (process.env.PUBLIC_ADDRESS == null) {
-    throw new Error("Missing PUBLIC_ADDRESS")
-  }
   if (process.env.MIN_LIMIT_ORDER == null) {
     throw new Error("Missing MIN_LIMIT_ORDER")
   }
@@ -312,8 +268,21 @@ export async function getPurchaseQuote(
     throw new Error("Missing MAX_LIMIT_ORDER")
   }
 
-  let balance = await getUsdBalance(process.env.PUBLIC_ADDRESS)
-  //let balance = 
+  let [
+    myAddress, blockchain, rpcUrl, usdAddress, usdDecimals
+  ] = await getCryptoParams()
+
+   const publicClient = createPublicClient({
+    chain: blockchain,
+    transport: http(rpcUrl),
+  })
+
+  let balance = await getUsdBalance(
+    usdAddress,
+    usdDecimals,
+    publicClient,
+    myAddress
+  )
 
   const regs = await db.select({value: sum(purchaseOrder.amountUsd)}).
     from(purchaseOrder).where(
