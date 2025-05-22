@@ -1,6 +1,21 @@
+import { stableTokenABI }  from '@celo/abis'
+import { getDataSuffix, submitReferral } from '@divvi/referral-sdk'
+import {
+  Address,
+  encodeFunctionData,
+  getContract,
+  createWalletClient,
+  formatEther,
+  formatUnits,
+  http,
+  parseEther,
+  parseUnits,
+  publicActions,
+  writeContract,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts"; 
+import { celo } from "viem/chains";
 import 'dotenv/config'
-import { ethers } from 'ethers'
-import ERC20_ABI from 'erc-20-abi' assert { type: 'json' }
 import { NextRequest, NextResponse } from 'next/server'
 
 import {
@@ -11,6 +26,11 @@ import {
   searchPendingPurchaseOrderBySms,
   updatePurchaseOrder
 } from '@/services/sle';
+
+import {
+  checkUsdBalance,
+  transferUsd
+} from '@/services/scrypto';
 
 
 async function cancelAndRespond(
@@ -24,22 +44,24 @@ async function cancelAndRespond(
 }
 
 export async function GET(req: NextRequest) {
-  console.log("OJO inicio GET inesperado")
+  return NextResponse.json(
+    {error: "Expecting POST request"},
+    {status: 400}
+  )
 }
 
 export async function POST(req: NextRequest) {
-  console.log("OJO inicio POST")
+  console.log("OJO starting POST")
   try {
     const timestamp = Date.now()
     console.log("OJO timestamp=", timestamp)
     const requestJson = await req.json()
     console.log("OJO request.json()=", requestJson)
     const sender = requestJson['sender'] ?? ''
-    const msg = requestJson['msg'] ?? ''
     console.log('OJO sender =', sender)
+    const msg = requestJson['msg'] ?? ''
     console.log('OJO msg =', msg)
 
-    
     /*if (!sender) {
       return NextResponse.json(
         {error: 'Missing number'},
@@ -81,12 +103,28 @@ export async function POST(req: NextRequest) {
         }
         let destAddress = quote.senderWallet
 
-        console.log("RPC_URL=", process.env.RPC_URL)
-        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
+
+        // Convert the private key to an account object
         if (process.env.PRIVATE_KEY == undefined) {
           return cancelAndRespond(order.id, "Missing private key", timestamp)
         }
-        const signer =  new ethers.Wallet(process.env.PRIVATE_KEY, provider)
+        const account = privateKeyToAccount(PRIVATE_KEY)
+        if (process.env.PUBLIC_ADDRESS == undefined) {
+          return cancelAndRespond(order.id, "Missing PUBLIC_ADDRESS", timestamp)
+        }
+        const myAddress = process.env.PUBLIC_ADDRESS as Address
+        console.log("myAddress=", myAddress)
+
+        // Create a wallet client with the specified account, chain, and HTTP transport
+        if (process.env.RPC_URL == undefined) {
+          return cancelAndRespond(order.id, "Missing RPC_URL", timestamp)
+        }
+        console.log("RPC_URL=", process.env.RPC_URL)
+        const walletClient = createWalletClient({
+          account,
+          chain: celo,
+          transport: http(RPC_URL),
+        }).extend(publicActions);
 
         if (process.env.USD_CONTRACT == undefined) {
           return cancelAndRespond(order.id, "Missing [USD] contract", timestamp)
@@ -97,47 +135,38 @@ export async function POST(req: NextRequest) {
         }
         const usdDecimals = +process.env.USD_DECIMALS
 
-
-        console.log("signer.address=", signer.address)
-
-        const usdContract = new ethers.Contract(usdAddress, ERC20_ABI, signer)
-        console.log("usdContract.target=", usdContract.target)
-        const dataBalance = await usdContract.balanceOf(signer.address)
-        console.log("dataBalance=", dataBalance)
-        const formattedBalance = +ethers.formatUnits(dataBalance, usdDecimals)
-        console.log("formattedBalance=", formattedBalance)
-
-        if (formattedBalance < 0.2) {
-          return cancelAndRespond(
-            order.id, "Insufficiente [USD] balance", timestamp
-          )
-        }
-        console.log(`The balance of the sender (${signer.address}) is: ${formattedBalance} USD`);
-
-        const usdAmount = ethers.parseUnits(order.amountUsd.toString(), usdDecimals)
-
-        const pop = await usdContract.transfer.populateTransaction(
-          destAddress, usdAmount
+        const balance = getUsdBalance(
+          usdAddress, usdDecimals, walletClient, myAddress
         )
 
-        const transactionResponse = await signer.sendTransaction(pop)
-        console.log(`Approval Sent: ${transactionResponse.hash}`)
-        const receipt = await transactionResponse.wait()
-        const transactionUrl = `${process.env.EXPLORER_TX}${receipt?.hash}`
-        console.log(`Approval Confirmed!$ ${transactionUrl}`)
-        let state = await updatePurchaseOrder(order.id, "paid", transactionUrl, Date.now())
+        if (balance < order.amountUsd) {
+          return cancelAndRespond(
+            order.id, 
+            `Insufficient USD balance: ${balance}, needed: ${order.amountUsd}`,
+            timestamp
+          )
+        }
+        console.log(`My balance is: ${balance} USD`);
+
+        const transactionUrl = transferUsd(
+          myAddress, usdAddress, usdDecimals, walletClient, destAddress,
+          order.amountUsd
+        )
+        console.log(`Transfer confirmed: ${transactionUrl}`)
+        let state = await updatePurchaseOrder(
+          order.id, "paid", transactionUrl, Date.now()
+        )
         console.log("OJO state=", state)
 
         return NextResponse.json(
-          {thanks: "thanks, payment processed"},
+          {thanks: "Thanks. Payment processed"},
           {status: 200}
         )
       }
       return NextResponse.json(
-        {problem: "Problem. We couldn't identify the order. Please contact support team"},
+        {problem: "Couldn't identify the order. Please contact support team"},
         {status: 200}
       )
-
     }
     return NextResponse.json(
       {thanks: "Thanks. Order not completed"},
