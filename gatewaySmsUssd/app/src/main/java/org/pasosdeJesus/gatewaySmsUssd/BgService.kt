@@ -2,6 +2,8 @@ package org.pasosdeJesus.gatewaySmsUssd
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -18,35 +20,22 @@ class BgService : Service() {
 
     private val CHANNEL_ID = "ForegroundServiceChannel"
 
-    private fun startForeground() {
-        // Before starting the service as foreground check that the app has the
-        // appropriate runtime permissions. In this case, verify that the user has
-        // granted the CAMERA permission.
-
-        try {
-            val notification = NotificationCompat.Builder(this, "CHANNEL_ID")
-                // Create the notification to display while the service is running
-                .build()
-            ServiceCompat.startForeground(
-                /* service = */ this,
-                /* id = */ 100, // Cannot be 0
-                /* notification = */ notification,
-                /* foregroundServiceType = */
-                FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            )
-        } catch (e: Exception) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && e is ForegroundServiceStartNotAllowedException
-            ) {
-                // App not in a valid state to start foreground service
-                // (e.g. started from bg)
-            }
-        }
-    }
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
-        //createNotificationChannel()
+        //startForeground()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel.
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
+            mChannel.description = descriptionText
+            // Register the channel with the system. You can't change the importance
+            // or other notification behaviors after this.
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
+        }
+
         val notificationIntent = Intent(this, MainActivity::class.java) // Replace MainActivity with your app's main activity
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -56,7 +45,7 @@ class BgService : Service() {
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Foreground Service")
             .setContentText("Your app is running in the foreground.")
-            //.setSmallIcon(R.drawable.ic_notification) // Replace with your notification icon
+            .setSmallIcon(R.drawable.ic_notification) // Replace with your notification icon
             .setContentIntent(pendingIntent)
             .build()
 
