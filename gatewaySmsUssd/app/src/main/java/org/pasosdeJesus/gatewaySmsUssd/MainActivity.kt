@@ -8,11 +8,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Telephony
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,6 +52,7 @@ const val RC_INTERNET = 1004
 
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -69,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
 
     //@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun App(name: String, activity: MainActivity?, modifier: Modifier = Modifier) {
         var recentLogs by remember { mutableStateOf("") }
@@ -152,8 +156,7 @@ class MainActivity : ComponentActivity() {
                                 IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
                                 ContextCompat.RECEIVER_EXPORTED
                             )
-
-                            startService(Intent(applicationContext, BgService::class.java))
+                            startForegroundService(Intent(applicationContext, BgService::class.java))
 
                         }
                     }
@@ -400,6 +403,7 @@ class MainActivity : ComponentActivity() {
 
 
     //@androidx.annotation.RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    @RequiresApi(Build.VERSION_CODES.O)
     @Preview(showBackground = true)
     @Composable
     fun GatewayPreview() {
