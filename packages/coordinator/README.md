@@ -74,7 +74,8 @@ Migrations don't work with drizzle at the moment of this writing, check:
 
 https://github.com/drizzle-team/drizzle-orm/discussions/1339
 
-For now you need to run
+For now you need to modify the schema at `db/schema.ts` commit and in each
+instance run of the database (development, production) run:
 ```
 yarn drizzle-kit push
 ```

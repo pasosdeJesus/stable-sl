@@ -292,7 +292,7 @@ export async function getPurchaseQuote(
   const toPay = regs && regs[0] && regs[0].value ? +regs[0].value : 0
   console.log(`OJO toPay=${toPay}`)
 
-  let price = 24.26
+  let price = +process.env.USD_IN_SLE
   let maxLimit = Math.min(+process.env.MAX_LIMIT_ORDER, balance - toPay)
   let minLimit = +process.env.MIN_LIMIT_ORDER
   if (existing == null) {

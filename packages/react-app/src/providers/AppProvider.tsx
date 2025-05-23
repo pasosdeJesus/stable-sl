@@ -35,7 +35,7 @@ const connectors = connectorsForWallets(
 
 var config = createConfig({
   connectors,
-  chains: [celo, celoAlfajores],
+  chains: (process.env.NEXT_PUBLIC_NETWORK == "CELO" ? [celo] : [celo, celoAlfajores]),
   transports: {
     [celo.id]: http(),
     [celoAlfajores.id]: http(),

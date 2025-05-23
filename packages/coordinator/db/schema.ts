@@ -21,7 +21,7 @@ export const purchaseOrder = pgTable("purchaseorder", {
   seconds: integer().notNull(),
   amountSle: real().notNull(),
   amountUsd: real().notNull(),
-  receiverPhone: varchar({ length: 12 }).notNull(),
+  receiverPhone: varchar({ length: 15 }).notNull(),
   receiverName: varchar({ length: 80}).notNull(),
   transactionUrl: varchar({ length: 1024}),
   timestampTx: bigint({ mode: "number" }),
@@ -34,7 +34,7 @@ export const smsLog = pgTable("smslog", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   timestamp: bigint({ mode: "number" }),
   ip: varchar({ length: 16}),
-  phoneNumber: varchar({ length: 12}),
+  phoneNumber: varchar({ length: 15}),
   message: varchar({ length: 1024})
 })
  
