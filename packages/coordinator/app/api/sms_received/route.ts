@@ -80,9 +80,9 @@ export async function POST(req: NextRequest) {
     await addSmsLog(timestamp, String(ip), sender, msg)
     let isms = extractInfoSms(msg)
     console.log('OJO isms=', isms)
-    if (isms != null && isms.from == sender) {
-      console.log("OJO buscando")
-      let order = await searchPendingPurchaseOrderBySms(sender)
+    if (isms != null && sender == "OrangeMoney") {
+      console.log(`OJO buscando from ${isms['from']}`)
+      let order = await searchPendingPurchaseOrderBySms(isms['from'])
       console.log('OJO order=', order)
       if (order && order.id) {
         if (isms.amount >= order.amountSle) {

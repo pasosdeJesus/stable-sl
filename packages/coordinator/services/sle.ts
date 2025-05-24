@@ -168,7 +168,7 @@ export async function addSmsLog(
 
 export function extractInfoSms(message: string) {
   console.log(`OJO function extractInfoSms(${message})`)
-  let e= /Transaction Id ([0-9A-Z.]*) Transfer Succesful from ([0-9]*) transaction amount SLE([0-9.]*) net credit amount SLE([0-9.]*) your new balance is SLE([0-9.])/.exec(message)
+  let e= /^Transaction Id  *([0-9A-Z.]*)  *Transfer Successful from ([0-9]*) transaction amount SLE([0-9.]*) net credit amount  *SLE([0-9.]*) your new balance is SLE([0-9.]) */.exec(message)
   if (e != null) {
     return {
       transactionId: e[1],
@@ -267,6 +267,10 @@ export async function getPurchaseQuote(
   if (process.env.MAX_LIMIT_ORDER == null) {
     throw new Error("Missing MAX_LIMIT_ORDER")
   }
+  if (process.env.USD_IN_SLE == undefined) {
+    throw new Error("Missing MAX_LIMIT_ORDER")
+  }
+
 
   let [
     myAddress, blockchain, rpcUrl, usdAddress, usdDecimals

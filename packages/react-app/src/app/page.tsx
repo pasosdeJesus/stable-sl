@@ -73,8 +73,16 @@ export default function Home() {
     }
   }, [countdown])
 
-  const isAlfajores = () => (typeof ethereum != "undefined") && 
+
+  const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
+  
+  const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
+
+  const isAlfajores = () => (typeof ethereum != "undefined") &&
     ethereum.networkVersion === '44787'
+
+  const isCelo= () => (typeof ethereum != "undefined") &&
+    ethereum.networkVersion === '42220'
 
   const fetchPurchaseQuote = async () => {
     try {
@@ -127,20 +135,24 @@ export default function Home() {
   const handleNext = () => {
     switch (step) {
       case 1:
-        if (phoneNumber && /^0\d{8}$/.test(phoneNumber) && address && buyerName) {
-          fetchPurchaseQuote()
-          setStep(2)
+        if (!phoneNumber || !/^0\d{8}$/.test(phoneNumber)) {
+          alert('Phone number should have 9 digits and start with 0')
+        } else if (runningProduction() && !isCelo()) {
+          alert('Switch to the Celo Blockchain')
         } else if (!address) {
           alert('Please connect your wallet')
         } else if (!buyerName) {
           alert('Please provide name linked to Orange Money')
         } else {
-          alert('Phone number should have 9 digits and start with 0')
+          fetchPurchaseQuote()
+          setStep(2)
         }
       break
       case 2:
         if (+amountSle < quoteMinimum) {
           alert('Amount should be greather than lower limit')
+        } else if (runningProduction() && !isCelo()) {
+          alert('Switch to the Celo Blockchain')
         } else if (+quoteMaximum == 0) {
           alert('Seems there is a problem with the backend, try again later')
         } else if (+amountSle > quoteMaximum) {
@@ -174,6 +186,11 @@ export default function Home() {
 
   const handleConfirm = () => {
     try {
+      if (runningProduction() && !isCelo()) {
+          alert('Switch to the Celo Blockchain')
+          return 
+      }
+ 
       const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
       axios.get(apiPurchaseOrderUrl)
@@ -290,21 +307,21 @@ export default function Home() {
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL</CardTitle>
           <CardDescription>
-            <p>Buy cUSD in Sierra Leone</p>
+            <p>Buy USDT in Sierra Leone</p>
             <p>Step {step} of 5</p>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {step === 1 && (
             <div className="space-y-2">
-              {address && isAlfajores() &&
+              {address && runningDevelopment() &&
                 <p className="text-sm">
                   Your wallet address: {getShortAddress()}
                 </p>
               }
               <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Phone Number with Orange Money
-              {isAlfajores() &&
+              {runningDevelopment() &&
                 <div className="flex items-center text-sm">
                   Test with &nbsp;
                   <div className="bg-gray-50">
@@ -392,7 +409,7 @@ export default function Home() {
               <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
               <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
                 +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
-              {isAlfajores() &&
+              {runningDevelopment() &&
                 <div>
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
                   <p className="text-sm">Your wallet address: {getShortAddress()}</p>
@@ -404,7 +421,7 @@ export default function Home() {
           {step == 4 &&
             <div className="space-y-2">
               <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
-              <p className="text-sm">From your phone {phoneNumber} ({buyerName}), pay {amountSle}SLE to the phone {receiverPhone} ({receiverName})</p>
+              <p className="text-sm">From your phone {phoneNumber} ({buyerName}) with Orange Money, pay {amountSle}SLE to the phone {receiverPhone} ({receiverName})</p>
             </div>
           }
           {step == 5 &&
@@ -412,7 +429,7 @@ export default function Home() {
               <p className="text-sm">Thanks for your payment. We transfered {amountUsd}USD to your wallet.</p>
             </div>
           }
-          {step == 5 && isAlfajores() &&
+          {step == 5 && runningDevelopment() &&
             <div className="space-y-2">
               <p className="text-sm">(Well in reality since this is testnet we sent 0.1USDC...)</p>
             </div>
@@ -448,7 +465,7 @@ export default function Home() {
                   <span>)</span>
               </Button>
             }
-            { step == 4 && isAlfajores() &&
+            { step == 4 && runningDevelopment() &&
               <Button id="suppose-I-paid" onClick={handleSupposePaid} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Suppose I paid
               </Button>

@@ -45,10 +45,6 @@ var config = createConfig({
 const queryClient = new QueryClient();
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  if (process.env.NEXT_PUBLIC_NETWORK != null && 
-      process.env.NEXT_PUBLIC_NETWORK == "CELO") {
-    config.chain = [celo]
-  }
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
