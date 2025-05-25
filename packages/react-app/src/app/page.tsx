@@ -472,7 +472,7 @@ export default function Home() {
             }
 
             { step == 5 &&
-              <a className="bg-primary text-primary-foreground hover:bg-primary/90 btn btn-sm" href={transactionUrl} target="_blank">Transaction Receipt</a>
+              <a href={transactionUrl} target="_blank">Transaction Receipt</a>
             }
 
           </div>
