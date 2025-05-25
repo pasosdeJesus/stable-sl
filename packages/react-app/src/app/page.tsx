@@ -261,7 +261,7 @@ export default function Home() {
         `/api/sms_received`
 
       axios.post(apiSmsReceivedUrl, {
-        sender: phoneNumber,
+        sender: "OrangeMoney",
         msg: msg
       }/*, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
