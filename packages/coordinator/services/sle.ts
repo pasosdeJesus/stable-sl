@@ -268,7 +268,7 @@ export async function getPurchaseQuote(
     throw new Error("Missing MAX_LIMIT_ORDER")
   }
   if (process.env.USD_IN_SLE == undefined) {
-    throw new Error("Missing MAX_LIMIT_ORDER")
+    throw new Error("Missing USD_IN_SLE")
   }
 
 
