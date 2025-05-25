@@ -438,7 +438,7 @@ export default function Home() {
           {step == 6 &&
             <div className="space-y-2">
               <p className="text-sm">stable-sl didn't receive your payment. Order cancelled</p>
-              <p className="text-sm">If you need contact our support team.</p>
+              <p className="text-sm">If you need support please in Telegram write to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a>.</p>
             </div>
           }
 
@@ -475,6 +475,9 @@ export default function Home() {
               <a className="bg-primary text-primary-foreground hover:bg-primary/90 btn btn-sm" href={transactionUrl} target="_blank">Transaction Receipt</a>
             }
 
+          </div>
+          <div>
+            <p className="text-sm">For support contact <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a> in Telegram.</p>
           </div>
         </CardContent>
       </Card>
