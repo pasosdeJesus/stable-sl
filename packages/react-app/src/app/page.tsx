@@ -6,8 +6,15 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button'
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle
+} from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from '@/components/ui/label'
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useWeb3 } from "@/contexts/useWeb3";
 
 export default function Home() {
@@ -75,7 +82,7 @@ export default function Home() {
 
 
   const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
-  
+
   const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
 
   const isAlfajores = () => (typeof ethereum != "undefined") &&
@@ -84,12 +91,23 @@ export default function Home() {
   const isCelo= () => (typeof ethereum != "undefined") &&
     ethereum.networkVersion === '42220'
 
+  const steps = [
+    { number: 1, title: "About you", description: "Wallet, name and orange money number" },
+    { number: 2, title: "Amount", description: "Amount of stable crypto to buy" },
+    { number: 3, title: "Review", description: "Review and confirm details" },
+    { number: 4, title: "Payment", description: "Pay with your Orange Money" },
+    { number: 5, title: "Complete", description: "Transaction processed" },
+  ]
+
   const fetchPurchaseQuote = async () => {
     try {
      if (address && phoneNumber && buyerName) {
        let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
        const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_quote?${tokenParam}wallet=${address}&phone=${phoneNumber}&buyerName=${buyerName}`
+        `/api/purchase_quote?${tokenParam}`+
+        `wallet=${address}&`+
+        `phone=${phoneNumber}&` +
+        `buyerName=${buyerName}`
         axios.get(apiPurchaseQuoteUrl)
         .then(response => {
           if (response.data) {
@@ -107,9 +125,9 @@ export default function Home() {
               setQuoteMaximum(data.maximum)
 
               if (amountSle && parseFloat(amountSle)>0) {
-                setAmountUsd(
-                  calculateAmountUsd(parseFloat(amountSle), data.usdPriceInSle)
-                )
+                setAmountUsd(calculateAmountUsd(
+                  parseFloat(amountSle), data.usdPriceInSle
+                ))
               }
             } else {
               console.error('Invalid data format from API:', data)
@@ -121,7 +139,6 @@ export default function Home() {
       console.error('Error fetching quote:', error)
     }
   }
-
 
   const calculateAmountUsd = (sle: number, slePerUsd: number) => {
     return slePerUsd && slePerUsd > 0 && sle && sle > 0 ?
@@ -188,9 +205,9 @@ export default function Home() {
     try {
       if (runningProduction() && !isCelo()) {
           alert('Switch to the Celo Blockchain')
-          return 
+          return
       }
- 
+
       const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
       axios.get(apiPurchaseOrderUrl)
@@ -229,19 +246,23 @@ export default function Home() {
   }
 
   const handleSupposePaid = () => {
+    if (runningProduction()) {
+      alert("This only works in development")
+      return 
+    }
     let e = document.getElementById('suppose-I-paid')
     if (e) {
       e.setAttribute("disabled", "true");
     }
     try {
-      let msg= `Transaction Id AB0123CD.45EF Transfer Succesful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
+      let msg= `Transaction Id AB0123CD.45EF Transfer Successful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
 
       const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/sms_received`
 
-      axios.post(apiSmsReceivedUrl, { 
-        sender: phoneNumber, 
-        msg: msg 
+      axios.post(apiSmsReceivedUrl, {
+        sender: phoneNumber,
+        msg: msg
       }/*, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         // Trying to avoid prefligth OPTIONS request
@@ -263,10 +284,6 @@ export default function Home() {
 
   }
 
-
-  const handleReceipt = () => {
-
-  }
 
   const fetchOrderState = async () => {
     try {
