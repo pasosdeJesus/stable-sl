@@ -1,7 +1,7 @@
 'use client'
 
 import axios from 'axios'
-import {ArrowLeft, RefreshCw} from "lucide-react"
+import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation';
 
@@ -319,14 +319,44 @@ export default function Home() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-secondary">
-      <Card className="w-full max-w-md p-4 rounded-lg shadow-md">
+    <div className="flex items-center justify-center mt-4 flex-wrap">
+      {/* Progress Steps */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          {steps.map((s, index) => (
+            <div key={s.number} className="flex items-center">
+              <div
+                className={`flex items-center justify-center w-9 h-9 rounded-full border-2 ${
+                  step >= s.number
+                    ? "bg-blue-600 border-blue-600 text-white"
+                    : "border-gray-300 text-gray-400"
+                }`}
+              >
+                {step > s.number ? <CheckCircle className="w-5 h-5" /> : s.number}
+              </div>
+              <div className="ml-3 hidden sm:block">
+                <p
+                  className={`text-sm font-medium ${step >= s.number ? "text-blue-600" : "text-gray-400"}`}
+                >
+                  {s.title}
+                </p>
+                <p className="text-xs text-gray-500">{s.description}</p>
+              </div>
+              {index < steps.length - 1 && (
+                <div className={`w-4 h-0.5 mx-3 ${step > s.number ? "bg-blue-600" : "bg-gray-300"}`} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Card className="w-full max-w-md p-2 rounded-lg shadow-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold tracking-tight">Stable-SL</CardTitle>
-          <CardDescription>
-            <p>Buy USDT in Sierra Leone</p>
-            <p>Step {step} of 5</p>
-          </CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-green-600" />
+            Step {step}: {steps[step - 1].title}
+          </CardTitle>
+          <CardDescription>{steps[step - 1].description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {step === 1 && (
@@ -492,9 +522,6 @@ export default function Home() {
               <a href={transactionUrl} target="_blank">Transaction Receipt</a>
             }
 
-          </div>
-          <div>
-            <p className="text-sm">For support contact <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a> in Telegram.</p>
           </div>
         </CardContent>
       </Card>
