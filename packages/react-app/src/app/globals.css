@@ -88,3 +88,6 @@ body {
   }
 }
 
+a {
+  text-decoration: underline;
+}
