@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { and, eq, inArray, sql, sum } from 'drizzle-orm';
+import { and, eq, gt, inArray, sql, sum } from 'drizzle-orm';
 import { createPublicClient, http } from 'viem'
 import { celo, celoAlfajores } from 'viem/chains'
 
@@ -287,6 +287,7 @@ export async function getPurchaseQuote(
     publicClient,
     myAddress
   )
+  console.log("OJO balance=", balance)
 
   const regs = await db.select({value: sum(purchaseOrder.amountUsd)}).
     from(purchaseOrder).where(
@@ -297,7 +298,33 @@ export async function getPurchaseQuote(
   console.log(`OJO toPay=${toPay}`)
 
   let price = +process.env.USD_IN_SLE
-  let maxLimit = Math.min(+process.env.MAX_LIMIT_ORDER, balance - toPay)
+  let maxForUser = +process.env.MAX_LIMIT_ORDER // For all users
+  if (process.env.KYC1 && wallet == process.env.KYC1) {
+    console.log("OJO posible promoción")
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    var todayStart = d.getTime() / 1000;
+    console.log("OJO todayStart", todayStart)
+    const boughtToday = await db.select({value: sum(purchaseOrder.amountUsd)}).
+      from(purchaseOrder).
+      innerJoin(purchaseQuote, eq(purchaseOrder.quoteId, purchaseQuote.id)).
+      where(
+        and(
+          and(
+            eq(purchaseOrder.state, 'paid'),
+            eq(purchaseQuote.senderWallet, wallet),
+          ),
+          gt(purchaseQuote.timestamp, todayStart)
+        )
+      )
+
+    console.log("boughtToday=", boughtToday)
+    if (boughtToday && boughtToday[0] && +boughtToday[0].value < 60) {
+      maxForUser = (60 - (+boughtToday[0].value))*price
+    }
+    console.log("maxForUser=", maxForUser)
+  }
+  let maxLimit = Math.min(maxForUser, (balance - toPay)*price)
   let minLimit = +process.env.MIN_LIMIT_ORDER
   if (existing == null) {
     let ntoken = ""
