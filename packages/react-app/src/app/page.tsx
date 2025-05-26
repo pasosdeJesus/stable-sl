@@ -86,10 +86,10 @@ export default function Home() {
   const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
 
   const isAlfajores = () => (typeof ethereum != "undefined") &&
-    ethereum.networkVersion === '44787'
+    ethereum.chainId=== '0xaef3'
 
   const isCelo= () => (typeof ethereum != "undefined") &&
-    ethereum.networkVersion === '42220'
+    ethereum.chainId === '0xa4ec'
 
   const steps = [
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },

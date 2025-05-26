@@ -28,8 +28,8 @@ export default function Header() {
               <div className="p-3">
                 <ConnectButton
                   showBalance={{
-                    smallScreen: true,
-                    largeScreen: false,
+                    smallScreen: false,
+                    largeScreen: true,
                   }}
                 />
               </div>
