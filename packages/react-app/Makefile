@@ -1,6 +1,6 @@
 
 all:
-	yarn build
+	pnpm build
 
 syntax:
-	yarn typecheck
+	pnpm typecheck
