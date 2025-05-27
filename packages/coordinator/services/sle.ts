@@ -324,7 +324,7 @@ export async function getPurchaseQuote(
     }
     console.log("maxForUser=", maxForUser)
   }
-  let maxLimit = Math.min(maxForUser, (balance - toPay)*price)
+  let maxLimit = Math.trunc(Math.min(maxForUser, (balance - toPay)*price))
   let minLimit = +process.env.MIN_LIMIT_ORDER
   if (existing == null) {
     let ntoken = ""

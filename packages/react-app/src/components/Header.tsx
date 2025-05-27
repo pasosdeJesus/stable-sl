@@ -23,7 +23,7 @@ export default function Header() {
             <div className="flex h-16 content-center justify-between">
               <div className="mb-8 text-center">
                 <h1 className="text-3xl font-bold text-gray-900">Stable SL</h1>
-                <p className="text-gray-600 mt-2">Buy USDT in Sierra Leone</p>
+                <p className="text-gray-600 mt-2">Buy USDT in Salone</p>
               </div>
               <div className="p-3">
                 <ConnectButton
