@@ -1,5 +1,0 @@
-
-#!/bin/sh
-
-. ./.env
-psql -h $DB_SOCKET -U $DB_USER $DB_NAME
