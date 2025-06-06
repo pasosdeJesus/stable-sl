@@ -1,27 +1,52 @@
-# Frontend for stable-ls
+# Frontend for stable-sl
 
 
-## How to run
+## Run in development mode
 Install dependencies with:
 ```
-yarn install
+pnpm install
 ```
 
-To run in development mode:
+Run with:
 ```
-yarn dev
+pnpm dev
 ```
 
 And open in port 9002
-
-To build in directory `out`:
-```
-make
-```
 
 
 ## Development
 
 ```
 make syntax
+```
+
+
+## Run in production mode
+
+Supposing your sources are at `/var/www/htdcos/stable-sl/` build 
+from that directory in `/var/www/htdcos/stable-sl/out` with:
+
+```
+make
+```
+
+Then configure `nginx` with a section like:
+```
+server {
+    listen      443 ssl;
+    listen       [::]:443 ssl;
+    server_name  stable-sl.pdJ.app ;
+    error_log  logs/stable-sl-error.log;
+    access_log  logs/stable-sl-access.log;
+
+    ssl_certificate      /etc/ssl/pdJ.app-cadena.crt;
+    ssl_certificate_key  /etc/ssl/private/pdJ.app.key;
+
+    root /htdocs/stable-sl/packages/react-app/out/;
+    index index.html;
+    location / {
+        try_files $uri /index.html;
+    }
+}
 ```

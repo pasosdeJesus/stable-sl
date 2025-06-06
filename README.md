@@ -26,7 +26,7 @@ about this in Sierra Leone.
   had a team there, but up to now they still don't support the currency,  
   neither payment methods of Sierra Leone not even in their sandbox.
 * So at least while FonBnk or another group offers an on-ramp/off-ramp solution
-  we have started building one, operating with a local team based on the 
+  we have started building one, operating with a team based on the 
   Mission Hope School located in Kabala (the school is lead by the pastor 
   Zechariah Conteh who is in the team).
 
@@ -42,7 +42,7 @@ application
 
 ## Running in development mode
 
-The frontend is better served in SSL with an nginx proxy.  See detailed 
+The frontend is better served in SSL with nginx.  See detailed 
 instructions in packages/react-app/README.md
 
 
@@ -70,8 +70,9 @@ The architecutre is presented in the following diagram:
 It is a prototype that:
 1. Shows how on-ramp works
 2. Still doesn't use an API for quotes
-3. It interacts with the gateway receiving the SMS with Oranage Money
-   notifications.
-4. Can make payments in mainnet in USDT limited to a small amount. In 
-   Alfajores makes payments of 0.1 USDC.
+3. It interacts with the gateway receiving the SMS with Orange Money
+   notifications --a method that has to be improved.
+4. The version in production can make payments in mainnet in USDT 
+   limited to small amounts while we test and get a license. 
+   The development version runs on Alfajores and makes payments of 0.1 USDC.
 
