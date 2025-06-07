@@ -6,7 +6,7 @@
     "rootDir": "src",
     "strict": false,
     "target": "es2022",
-    "moduleResolution": "node16",
+    "moduleResolution": "node",
     "noImplicitAny": false
   },
   "include": ["./src/**/*"],

@@ -1,36 +1,35 @@
 {
   "author": "pasosdeJesus",
   "bugs": {
-    "url": "https://github.com/celo-org/celo-composer/issues"
+    "url": "https://github.com/pasosdeJesus/stable-sl/issues"
   },
-  "description": "Custom Celo Composer project.",
-  "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
+  "description": "Frontend for on-ramp/off-ramp service for Sierra Leone.",
+  "homepage": "https://stable-sl.pdJ.app",
   "keywords": [
-    "celo-composer",
-    "celo"
+    "stable",
+    "Sierra Leone"
   ],
-  "license": "MIT",
+  "license": "ISC",
   "name": "stable-sl",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/celo-org/celo-composer.git"
+    "url": "https://github.com/pasosdeJesus/stable-sl/"
   },
   "scripts": {
-    "react-app:dev": "cd packages/react-app; yarn dev",
-    "react-app:build": "cd packages/react-app; yarn build",
-    "react-app:start": "cd packages/react-app; yarn start",
-    "react-app:lint": "cd packages/react-app; yarn lint",
-    "hardhat:postinstall": "cd packages/hardhat; yarn postinstall",
-    "hardhat:compile": "cd packages/hardhat; yarn compile",
-    "hardhat:tsc": "cd packages/hardhat; yarn tsc",
-    "hardhat:build": "cd packages/hardhat; yarn build",
-    "hardhat:clean": "cd packages/hardhat; yarn clean",
-    "hardhat:run:node": "cd packages/hardhat; yarn run:node",
-    "hardhat:test": "cd packages/hardhat; yarn test",
-    "hardhat:prettier": "cd packages/hardhat; yarn prettier",
-    "hardhat:sync:abis": "cd packages/hardhat; yarn sync:abis"
+    "react-app:dev": "cd packages/react-app; pnpm dev",
+    "react-app:build": "cd packages/react-app; pnpm build",
+    "react-app:start": "cd packages/react-app; pnpm start",
+    "react-app:lint": "cd packages/react-app; pnpm lint",
+    "hardhat:postinstall": "cd packages/hardhat; pnpm postinstall",
+    "hardhat:compile": "cd packages/hardhat; pnpm compile",
+    "hardhat:tsc": "cd packages/hardhat; pnpm tsc",
+    "hardhat:build": "cd packages/hardhat; pnpm build",
+    "hardhat:clean": "cd packages/hardhat; pnpm clean",
+    "hardhat:run:node": "cd packages/hardhat; pnpm run:node",
+    "hardhat:test": "cd packages/hardhat; pnpm test",
+    "hardhat:prettier": "cd packages/hardhat; pnpm prettier",
+    "hardhat:sync:abis": "cd packages/hardhat; pnpm sync:abis"
   },
   "version": "1.0.0",
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
