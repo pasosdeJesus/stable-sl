@@ -36,11 +36,12 @@ Sierra Leone
 
 ## Contents of this monorepo 
 
-This monorepo includes the frontend to interact with the customers 
-that initially can run as a web application and also as a MiniPay 
-application
+This monorepo includes:
+1. The frontend to interact with the customers that initially can run as a 
+   web application and also as a MiniPay application
+2. The APK of the Gateway application that runs in the phone.
 
-## Running in development mode
+## Running the frontend in development mode
 
 The frontend is better served in SSL with nginx.  See detailed 
 instructions in packages/react-app/README.md
