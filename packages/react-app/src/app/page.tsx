@@ -136,14 +136,11 @@ export default function Page() {
 
   const handleSell = () => {
     if (validate()) {
-      router.push({
-        pathname: '/sell',
-        query: {
-          sellerName: customerName,
-          phoneNumber: phoneNumber,
-          address1: address,
-        }
-      })
+      router.push('/sell' +
+                  `?sellerName=${encodeURIComponent(customerName)}`+
+                  `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
+                  `&address1=${encodeURIComponent(address)}`)
+
     }
   }
 

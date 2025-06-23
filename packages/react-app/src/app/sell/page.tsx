@@ -31,12 +31,12 @@ export default function Page() {
   const [amountUsd, setAmountUsd] = useState(0.0)
   const [countdown, setCountdown] = useState(0)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
-  const [receiverPhone, setReceiverPhone] = useState("")
-  const [receiverName, setReceiverName] = useState("")
+  const [senderPhone, setSenderPhone] = useState("")
+  const [receiverName, setSenderName] = useState("")
   const [transactionUrl, setTransactionUrl] = useState("")
 
   const phoneNumber = searchParams.get('phoneNumber')
-  const buyerName = searchParams.get('buyerName')
+  const sellerName = searchParams.get('sellerName')
   const address1 = searchParams.get('address1')
 
 
@@ -49,7 +49,7 @@ export default function Page() {
       alert("Missing Phone Number")
       return
     }
-    if (buyerName == "") {
+    if (sellerName == "") {
       alert("Missing Buyer Name")
       return
     }
@@ -79,9 +79,9 @@ export default function Page() {
         case 1:
         case 2:
         case 3:
-          fetchPurchaseQuote()
+          fetchSalesQuote()
           setTimeout(() => {
-            fetchPurchaseQuote()
+            fetchSalesQuote()
             setCountdown(10)
           }, 1000) // 1 second delay
           break
@@ -110,25 +110,25 @@ export default function Page() {
 
   const steps = [
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },
-    { number: 2, title: "Amount", description: "Amount of stable crypto to buy" },
-    { number: 3, title: "Review", description: "Review and confirm details" },
-    { number: 4, title: "Payment", description: "Pay with your Orange Money" },
+    { number: 2, title: "Amount", description: "Amount of stable crypto to sell" },
+    { number: 3, title: "Confirm", description: "Review and confirm details" },
+    { number: 4, title: "Wait Payment", description: "Wait for payment in Orange" },
     { number: 5, title: "Complete", description: "Transaction processed" },
   ]
 
-  const fetchPurchaseQuote = async () => {
-    if (address && phoneNumber && buyerName) {
+  const fetchSalesQuote = async () => {
+    if (address && phoneNumber && sellerName) {
       let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
-      const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_quote?${tokenParam}`+
+      const apiSalesQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/sales_quote?${tokenParam}`+
         `wallet=${address}&`+
         `phone=${phoneNumber}&` +
-        `buyerName=${buyerName}`
+        `sellerName=${sellerName}`
       //extractAPIErrorResponse(axios)
 
       try {
         axios.get(
-          apiPurchaseQuoteUrl, {
+          apiSalesQuoteUrl, {
             validateStatus: function (status) {
               return status < 500; // Reject only if the status code is greater than or equal to 500
             }
@@ -220,9 +220,9 @@ export default function Page() {
           return
       }
 
-      const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
-      axios.get(apiPurchaseOrderUrl)
+      const apiSalesOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/sales_order?token=${quoteToken}&amountSle=${amountSle}`
+      axios.get(apiSalesOrderUrl)
       .then(response => {
         if (response.data) {
           let data = response.data
@@ -230,7 +230,7 @@ export default function Page() {
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
             data.amountUsd !== undefined &&
-            data.receiverPhone !== undefined &&
+            data.senderPhone !== undefined &&
             data.receiverName !== undefined
            ) {
              /* TODO: if (data.token !== token ||
@@ -239,8 +239,8 @@ export default function Page() {
                alert("Mismatch in information of this app and coordinator")
              } else { */
              setSecondsWaitingPayment(data.seconds)
-             setReceiverPhone(data.receiverPhone)
-             setReceiverName(data.receiverName)
+             setSenderPhone(data.senderPhone)
+             setSenderName(data.receiverName)
              setStep(4)
            }
            else {
@@ -300,9 +300,9 @@ export default function Page() {
   const fetchOrderState = async () => {
     try {
      if (quoteToken) {
-       const apiPurchaseOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_order_state?token=${quoteToken}`
-        axios.get(apiPurchaseOrderStateUrl)
+       const apiSalesOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
+        `/api/sales_order_state?token=${quoteToken}`
+        axios.get(apiSalesOrderStateUrl)
         .then(response => {
           if (response.data) {
             let data = response.data
@@ -373,31 +373,31 @@ export default function Page() {
         <CardContent className="space-y-4">
           {step === 2 && (
             <div className="space-y-2">
-              <label htmlFor="amountSle" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of SLE to pay</label>
+              <label htmlFor="amountUsd" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of USDT to sell</label>
               <Input
-                id="amountSle"
+                id="amountUsd"
                 type="number"
                 placeholder="Enter amount"
-                value={amountSle}
+                value={amountUsd}
                 min={quoteMinimum}
                 max={quoteMaximum}
                 onChange={(e) => {
-                  setAmountSle(e.target.value)
-                  setAmountUsd(
-                    calculateAmountUsd(parseFloat(e.target.value),
+                  setAmountUsd(e.target.value)
+                  setAmountSle(
+                    calculateAmountSle(parseFloat(e.target.value),
                                        quoteUsdPriceInSle)
                   )
                 } }
-                aria-label="Amount of SLE"
+                aria-label="Amount of USD"
               />
               <p className="text-sm text-gray-500">
-                Amount of USD to receive: {amountUsd} USD
+                Amount of SLE to receive: {amountSle} SLE
               </p>
               <p className="text-sm text-gray-500">
                 Price of one USD: {quoteUsdPriceInSle} SLE
               </p>
               <p className="text-sm text-gray-500">
-                Order limits in SLE: {quoteMinimum} - {quoteMaximum}
+                Order limits in USD: {quoteMinimum} - {quoteMaximum}
               </p>
               <div className="flex text-sm text-gray-500">
                 <span>Seconds to update:&nbsp; </span>
@@ -416,10 +416,11 @@ export default function Page() {
             <div className="space-y-2">
               <p className="text-2xl">Please confirm the details below:</p>
               <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
-              <p className="text-sm">Amount in SLE to spend: SLE${amountSle}</p>
-              <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
-              <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
-                +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p className="text-sm">Amount in USD to sell: US${amountSle}</p>
+              <p className="text-sm">Amount of SLE to receive: amountSle}SLE</p>
+              <p className="text-sm">Amount within limits: {+amountUsd >= quoteMinimum &&
+                +amountUsd <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p className="text-sm">Once you confirm transfer from your wallet to ours, we will pay to you {amountSle}SLE in your Orange Money {phoneNumber} ({sellerName}). Expect payment from the phone {senderPhone} ({senderName})</p>
               {runningDevelopment() &&
                 <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
@@ -431,25 +432,24 @@ export default function Page() {
 
           {step == 4 &&
             <div className="space-y-2">
-              <p className="text-sm">Waiting for your payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
-              <p className="text-sm">From your phone {phoneNumber} ({buyerName}) with Orange Money, pay {amountSle}SLE to the phone {receiverPhone} ({receiverName})</p>
+              <p className="text-sm">Completing our payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
             </div>
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for your payment. We transfered {amountUsd}USD to your wallet.</p>
+              <p className="text-sm">Thanks for selling. We transfered {amountSle}SLE to your Orange Money.</p>
             </div>
           }
           {step == 5 && runningDevelopment() &&
             <div className="space-y-2">
-              <p className="text-sm">(Well in reality since this is testnet we sent 0.1USDC...)</p>
+              <p className="text-sm">(Well in reality since this is testnet we just sent an SMS...)</p>
             </div>
           }
 
           {step == 6 &&
             <div className="space-y-2">
-              <p className="text-sm">stable-sl didn't receive your payment. Order cancelled</p>
-              <p className="text-sm">If you need support please in Telegram write to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a>.</p>
+              <p className="text-sm">stable-sl couldn't send your payment.</p>
+              <p className="text-sm">Please contact support in Telegram by writting to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a>.</p>
             </div>
           }
 
