@@ -31,8 +31,6 @@ export default function Page() {
     console.log("addres=", address)
     console.log("phoneNumber=", phoneNumber)
     console.log("customerName=", customerName)
-    setDisabledAndValue("buyButton", true)
-    setDisabledAndValue("sellButton", true)
     if (address == null) {
       setDisabledAndValue("phoneNumber", true, "")
       setDisabledAndValue("customerName", true, "")
@@ -81,13 +79,7 @@ export default function Page() {
 
   const blurCustomerName = (c: string) => {
     setCustomerName(c)
-    if (validateCustomerName(c)) {
-      setDisabledAndValue("buyButton", false)
-      setDisabledAndValue("sellButton", false)
-    } else {
-      setDisabledAndValue("buyButton", true)
-      setDisabledAndValue("sellButton", true)
-    }
+    return  validateCustomerName(c)
   }
 
   const changeCustomerName = (n: string) => {
@@ -130,17 +122,18 @@ export default function Page() {
       router.push('/buy' +
                   `?buyerName=${encodeURIComponent(customerName)}`+
                   `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
-                  `&address1=${encodeURIComponent(address)}`)
+                  `&address1=${encodeURIComponent(address ?? '')}`)
     }
   }
 
   const handleSell = () => {
     if (validate()) {
-      router.push('/sell' +
-                  `?sellerName=${encodeURIComponent(customerName)}`+
-                  `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
-                  `&address1=${encodeURIComponent(address)}`)
-
+      router.push(
+        '/sell' +
+          `?sellerName=${encodeURIComponent(customerName)}`+
+          `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
+          `&address1=${encodeURIComponent(address ?? '')}`
+      )
     }
   }
 

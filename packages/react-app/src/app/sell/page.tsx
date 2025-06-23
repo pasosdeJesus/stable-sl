@@ -2,7 +2,6 @@
 
 import axios from 'axios'
 import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
-import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
@@ -17,8 +16,6 @@ import { Label } from '@/components/ui/label'
 
 export default function Page() {
 
-  const searchParams = useSearchParams()
-
   const { address, chainId } = useAccount()
 
   const [quoteToken, setQuoteToken] = useState("")
@@ -27,29 +24,39 @@ export default function Page() {
   const [quoteMinimum, setQuoteMinimum] = useState(0)
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(2)
-  const [amountSle, setAmountSle] = useState('')
-  const [amountUsd, setAmountUsd] = useState(0.0)
+  const [amountSle, setAmountSle] = useState(0)
+  const [amountUsd, setAmountUsd] = useState('')
   const [countdown, setCountdown] = useState(0)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [senderPhone, setSenderPhone] = useState("")
-  const [receiverName, setSenderName] = useState("")
+  const [senderName, setSenderName] = useState("")
   const [transactionUrl, setTransactionUrl] = useState("")
-
-  const phoneNumber = searchParams.get('phoneNumber')
-  const sellerName = searchParams.get('sellerName')
-  const address1 = searchParams.get('address1')
-
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [buyerName, setBuyerName] = useState("")
+  const [address1, setAddress1] = useState("")
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_COORDINATOR == undefined) {
       alert("Falta NEXT_PUBLIC_COORDINATOR")
       return
     }
-    if (phoneNumber == "") {
+    let lPhoneNumber = ""
+    let lBuyerName = ""
+    let lAddress1 = ""
+    if (typeof window != 'undefined' && typeof URLSearchParams != 'undefined') {
+      lPhoneNumber = searchParams.get('phoneNumber') ?? ""
+      setPhoneNumber(lPhoneNumber)
+      lBuyerName = searchParams.get('buyerName') ?? ""
+      setBuyerName(lBuyerName)
+      lAddress1 = searchParams.get('address1') ?? ""
+      setAddress1(lAddress1)
+    }
+
+    if (lPhoneNumber == "") {
       alert("Missing Phone Number")
       return
     }
-    if (sellerName == "") {
+    if (lSellerName == "") {
       alert("Missing Buyer Name")
       return
     }
@@ -57,7 +64,7 @@ export default function Page() {
       alert("Missing wallet address")
       return
     }
-    if (address1 != address) {
+    if (lAddress1 != address) {
       alert("Different addresses from identification and this step")
       return
     }
@@ -148,9 +155,9 @@ export default function Page() {
                    setQuoteMinimum(data.minimum)
                    setQuoteMaximum(data.maximum)
 
-                   if (amountSle && parseFloat(amountSle)>0) {
-                     setAmountUsd(calculateAmountUsd(
-                       parseFloat(amountSle), data.usdPriceInSle
+                   if (amountUsd && parseFloat(amountUsd)>0) {
+                     setAmountSle(calculateAmountSle(
+                       parseFloat(amountUsd), data.usdPriceInSle
                      ))
                    }
                  } else {
@@ -166,16 +173,15 @@ export default function Page() {
           })
       } catch (error) {
         console.error('Error fetching quote:', error)
-        alert(error.response)
         alert('Error. Possibly there is an order with the same number.\n' +
               'Wait 15 minutes and try again')
       }
     }
   }
 
-  const calculateAmountUsd = (sle: number, slePerUsd: number) => {
-    return slePerUsd && slePerUsd > 0 && sle && sle > 0 ?
-      Math.round(sle*100.0/slePerUsd)/100.0 : 0
+  const calculateAmountSle = (usd: number, slePerUsd: number) => {
+    return slePerUsd && usd ?
+      Math.round(usd*100.0*slePerUsd)/100.0 : 0
   }
 
   const secondsAsMinutes = (seconds: number):String => {
@@ -188,15 +194,15 @@ export default function Page() {
         alert("Should not")
       break
       case 2:
-        if (+amountSle < quoteMinimum) {
+        if (+amountUsd < quoteMinimum) {
           alert('Amount should be greather than lower limit')
         } else if (runningProduction() && !isCelo()) {
           alert('Switch to the Celo Blockchain')
         } else if (+quoteMaximum == 0) {
           alert('Seems there is a problem with the backend, try again later')
-        } else if (+amountSle > quoteMaximum) {
+        } else if (+amountUsd > quoteMaximum) {
           alert('Amount should be less than upper limit')
-        } else if (amountSle && parseFloat(amountSle) > 0) {
+        } else if (amountUsd && parseFloat(amountUsd) > 0) {
           setStep(3)
         } else {
           alert('Please enter valid values.')
@@ -382,7 +388,7 @@ export default function Page() {
                 min={quoteMinimum}
                 max={quoteMaximum}
                 onChange={(e) => {
-                  setAmountUsd(e.target.value)
+                  setAmountUsd(+e.target.value)
                   setAmountSle(
                     calculateAmountSle(parseFloat(e.target.value),
                                        quoteUsdPriceInSle)
@@ -415,16 +421,17 @@ export default function Page() {
           {step === 3 && (
             <div className="space-y-2">
               <p className="text-2xl">Please confirm the details below:</p>
+              
               <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
-              <p className="text-sm">Amount in USD to sell: US${amountSle}</p>
-              <p className="text-sm">Amount of SLE to receive: amountSle}SLE</p>
+              <p className="text-sm">Amount in USD to sell: US${amountUsd}</p>
+              <p className="text-sm">Amount of SLE to receive: {amountSle}SLE</p>
               <p className="text-sm">Amount within limits: {+amountUsd >= quoteMinimum &&
                 +amountUsd <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               <p className="text-sm">Once you confirm transfer from your wallet to ours, we will pay to you {amountSle}SLE in your Orange Money {phoneNumber} ({sellerName}). Expect payment from the phone {senderPhone} ({senderName})</p>
               {runningDevelopment() &&
                 <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
-                  <p className="text-sm">Your wallet address: {shortAddress(address)}</p>
+                  <p className="text-sm">Your wallet address: {shortAddress(address ?? '')}</p>
                 </div>
               }
             </div>

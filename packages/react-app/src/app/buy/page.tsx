@@ -2,8 +2,7 @@
 
 import axios from 'axios'
 import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState} from 'react'
 import { useAccount } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
 
@@ -17,8 +16,6 @@ import { Label } from '@/components/ui/label'
 
 export default function Page() {
 
-  const searchParams = useSearchParams()
-
   const { address, chainId } = useAccount()
 
   const [quoteToken, setQuoteToken] = useState("")
@@ -29,27 +26,42 @@ export default function Page() {
   const [step, setStep] = useState(2)
   const [amountSle, setAmountSle] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
-  const [countdown, setCountdown] = useState(0)
+  const [countdown, setCountdown] = useState(3)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [receiverPhone, setReceiverPhone] = useState("")
   const [receiverName, setReceiverName] = useState("")
   const [transactionUrl, setTransactionUrl] = useState("")
 
-  const phoneNumber = searchParams.get('phoneNumber')
-  const buyerName = searchParams.get('buyerName')
-  const address1 = searchParams.get('address1')
-
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [buyerName, setBuyerName]  = useState('')
+  const [address1, setAddress1]  = useState('')
 
   useEffect(() => {
+    console.log("** OJO useEffect")
     if (process.env.NEXT_PUBLIC_COORDINATOR == undefined) {
       alert("Falta NEXT_PUBLIC_COORDINATOR")
       return
     }
-    if (phoneNumber == "") {
+
+    let lPhoneNumber = ""
+    let lBuyerName = ""
+    let lAddress1 = ""
+    if (typeof window != 'undefined' && 
+        typeof URLSearchParams != 'undefined') {
+      let searchParams = new URLSearchParams(window.location.search)
+      lPhoneNumber = searchParams.get('phoneNumber') ?? ""
+      setPhoneNumber(lPhoneNumber)
+      lBuyerName = searchParams.get('buyerName') ?? ""
+      setBuyerName(lBuyerName)
+      lAddress1 = searchParams.get('address1') ?? ""
+      setAddress1(lAddress1)
+    }
+    if (lPhoneNumber == "") {
+      console.log("Missing phone number")
       alert("Missing Phone Number")
       return
     }
-    if (buyerName == "") {
+    if (lBuyerName == "") {
       alert("Missing Buyer Name")
       return
     }
@@ -57,7 +69,7 @@ export default function Page() {
       alert("Missing wallet address")
       return
     }
-    if (address1 != address) {
+    if (lAddress1 != address) {
       alert("Different addresses from identification and this step")
       return
     }
@@ -79,7 +91,6 @@ export default function Page() {
         case 1:
         case 2:
         case 3:
-          fetchPurchaseQuote()
           setTimeout(() => {
             fetchPurchaseQuote()
             setCountdown(10)
@@ -166,7 +177,6 @@ export default function Page() {
           })
       } catch (error) {
         console.error('Error fetching quote:', error)
-        alert(error.response)
         alert('Error. Possibly there is an order with the same number.\n' +
               'Wait 15 minutes and try again')
       }
@@ -194,6 +204,8 @@ export default function Page() {
           alert('Switch to the Celo Blockchain')
         } else if (+quoteMaximum == 0) {
           alert('Seems there is a problem with the backend, try again later')
+        } else if (+quoteMaximum < +quoteMinimum) {
+          alert('Seems there are not enough funds in our side, please contact support')
         } else if (+amountSle > quoteMaximum) {
           alert('Amount should be less than upper limit')
         } else if (amountSle && parseFloat(amountSle) > 0) {
@@ -415,7 +427,7 @@ export default function Page() {
           {step === 3 && (
             <div className="space-y-2">
               <p className="text-2xl">Please confirm the details below:</p>
-              <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
+                <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
               <p className="text-sm">Amount in SLE to spend: SLE${amountSle}</p>
               <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
               <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
@@ -423,7 +435,8 @@ export default function Page() {
               {runningDevelopment() &&
                 <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
-                  <p className="text-sm">Your wallet address: {shortAddress(address)}</p>
+                  <p className="text-sm">Your wallet address: {address ? 
+                    shortAddress(address) : ''}</p>
                 </div>
               }
             </div>
