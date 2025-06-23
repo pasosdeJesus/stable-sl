@@ -84,6 +84,7 @@ export default function Page() {
         case 1:
         case 2:
         case 3:
+          fetchPurchaseQuote()
           setTimeout(() => {
             fetchPurchaseQuote()
             setCountdown(10)
@@ -102,7 +103,7 @@ export default function Page() {
   }, [countdown])
 
 
-  const shortAddress = (a: string) => a.slice(0,4) + '...' + a.slice(-3)
+  const shortAddress = (a: string) => a.slice(0,4) + '...' + a.slice(-4)
 
   const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
 
@@ -120,44 +121,75 @@ export default function Page() {
     { number: 5, title: "Complete", description: "Transaction processed" },
   ]
 
+
+ /* const extractAPIErrorResponse = (axios: AxiosInstance) => {
+    axios.interceptors.response.use(undefined, function (error: AxiosError) {
+      (error as any).originalMessage = error.message;
+      console.log("**OJO in interceptor error=", error)
+      Object.defineProperty(error, "message", { get: function () {
+        if (!error.response) {
+          return (error as any).originalMessage;
+        }
+        return JSON.stringify(error.response.data);
+      }});
+      return Promise.reject(error);
+    })
+  } */
+
   const fetchPurchaseQuote = async () => {
-    try {
-     if (address && phoneNumber && buyerName) {
-       let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
-       const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+    if (address && phoneNumber && buyerName) {
+      let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
+      const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/purchase_quote?${tokenParam}`+
         `wallet=${address}&`+
         `phone=${phoneNumber}&` +
         `buyerName=${buyerName}`
-        axios.get(apiPurchaseQuoteUrl)
-        .then(response => {
-          if (response.data) {
-            let data = response.data
-            if (data.token!== undefined &&
-              data.timestamp !== undefined &&
-              data.usdPriceInSle !== undefined &&
-              data.minimum !== undefined &&
-              data.maximum !== undefined
-            ) {
-              setQuoteToken(data.token)
-              setQuoteTimestamp(data.timestamp)
-              setQuoteUsdPriceInSle(data.usdPriceInSle)
-              setQuoteMinimum(data.minimum)
-              setQuoteMaximum(data.maximum)
+      //extractAPIErrorResponse(axios)
 
-              if (amountSle && parseFloat(amountSle)>0) {
-                setAmountUsd(calculateAmountUsd(
-                  parseFloat(amountSle), data.usdPriceInSle
-                ))
-              }
-            } else {
-              console.error('Invalid data format from API:', data)
+      try {
+        axios.get(
+          apiPurchaseQuoteUrl, {
+            validateStatus: function (status) {
+              return status < 500; // Reject only if the status code is greater than or equal to 500
             }
-          }
-        })
+          })
+          .then( (response) => {
+            if (response.data) {
+              let data = response.data
+              if (data.token!== undefined &&
+                  data.timestamp !== undefined &&
+                    data.usdPriceInSle !== undefined &&
+                      data.minimum !== undefined &&
+                        data.maximum !== undefined
+                 ) {
+                   setQuoteToken(data.token)
+                   setQuoteTimestamp(data.timestamp)
+                   setQuoteUsdPriceInSle(data.usdPriceInSle)
+                   setQuoteMinimum(data.minimum)
+                   setQuoteMaximum(data.maximum)
+
+                   if (amountSle && parseFloat(amountSle)>0) {
+                     setAmountUsd(calculateAmountUsd(
+                       parseFloat(amountSle), data.usdPriceInSle
+                     ))
+                   }
+                 } else {
+                   console.error('Invalid data format from API:', data)
+                   alert('Invalid data format from API:' + data)
+                 }
+            }
+          })
+          .catch( (error) => {
+            console.error('Error fetching quote:', error.toJSON())
+            alert('Error. Possibly there is an order with the same number.\n' +
+                  'Wait 15 minutes and try again')
+          })
+      } catch (error) {
+        console.error('Error fetching quote:', error)
+        alert(error.response)
+        alert('Error. Possibly there is an order with the same number.\n' +
+              'Wait 15 minutes and try again')
       }
-    } catch (error) {
-      console.error('Error fetching quote:', error)
     }
   }
 
@@ -430,7 +462,7 @@ export default function Page() {
               <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
                 +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               {runningDevelopment() &&
-                <div>
+                <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
                   <p className="text-sm">Timestamp of quote: {quoteTimestamp}</p>
                   <p className="text-sm">Your wallet address: {shortAddress(address)}</p>
                 </div>
@@ -486,9 +518,14 @@ export default function Page() {
               </Button>
             }
             { step == 4 && runningDevelopment() &&
-              <Button id="suppose-I-paid" onClick={handleSupposePaid} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Suppose I paid
-              </Button>
+              <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
+                <Button 
+                  id="suppose-I-paid" 
+                  onClick={handleSupposePaid} 
+                  className="btn btn-sm bg-orange-500 text-primary-foreground hover:bg-primary/90">
+                 Suppose I paid
+                </Button>
+              </div>
             }
 
             { step == 5 &&
