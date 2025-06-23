@@ -32,7 +32,7 @@ export default function Page() {
   const [senderName, setSenderName] = useState("")
   const [transactionUrl, setTransactionUrl] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
-  const [buyerName, setBuyerName] = useState("")
+  const [sellerName, setSellerName] = useState("")
   const [address1, setAddress1] = useState("")
 
   useEffect(() => {
@@ -41,13 +41,14 @@ export default function Page() {
       return
     }
     let lPhoneNumber = ""
-    let lBuyerName = ""
+    let lSellerName = ""
     let lAddress1 = ""
     if (typeof window != 'undefined' && typeof URLSearchParams != 'undefined') {
+      let searchParams = new URLSearchParams(window.location.search)
       lPhoneNumber = searchParams.get('phoneNumber') ?? ""
       setPhoneNumber(lPhoneNumber)
-      lBuyerName = searchParams.get('buyerName') ?? ""
-      setBuyerName(lBuyerName)
+      lSellerName = searchParams.get('sellerName') ?? ""
+      setSellerName(lSellerName)
       lAddress1 = searchParams.get('address1') ?? ""
       setAddress1(lAddress1)
     }

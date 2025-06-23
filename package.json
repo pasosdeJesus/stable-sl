@@ -31,5 +31,5 @@
     "hardhat:prettier": "cd packages/hardhat; pnpm prettier",
     "hardhat:sync:abis": "cd packages/hardhat; pnpm sync:abis"
   },
-  "version": "1.0.0",
+  "version": "1.0.0"
 }
