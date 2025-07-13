@@ -11,6 +11,15 @@ import {
 } from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAccount } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
 
@@ -22,6 +31,7 @@ export default function Page() {
   const [previousAddress, setPreviousAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [customerName, setCustomerName] = useState('')
+  const [crypto, setCrypto] = useState('usdt')
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_COORDINATOR == undefined) {
@@ -31,9 +41,11 @@ export default function Page() {
     console.log("addres=", address)
     console.log("phoneNumber=", phoneNumber)
     console.log("customerName=", customerName)
+    console.log("crypto=", crypto)
     if (address == null) {
       setDisabledAndValue("phoneNumber", true, "")
       setDisabledAndValue("customerName", true, "")
+      setDisabledAndValue("crypto", true, "usdt")
       setPreviousAddress('')
     } else {
       if (address != previousAddress) {
@@ -113,7 +125,7 @@ export default function Page() {
       alert("Connect wallet please")
       return false
     }
-    return validatePhoneNumber(phoneNumber) && 
+    return validatePhoneNumber(phoneNumber) &&
       validateCustomerName(customerName)
   }
 
@@ -121,7 +133,8 @@ export default function Page() {
     if (validate()) {
       router.push('/buy' +
                   `?buyerName=${encodeURIComponent(customerName)}`+
-                  `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
+                  `&phoneNumber=${encodeURIComponent(phoneNumber)}` +
+                  `&crypto=${encodeURIComponent(crypto)}` +
                   `&address1=${encodeURIComponent(address ?? '')}`)
     }
   }
@@ -131,7 +144,8 @@ export default function Page() {
       router.push(
         '/sell' +
           `?sellerName=${encodeURIComponent(customerName)}`+
-          `&phoneNumber=${encodeURIComponent(phoneNumber)}` + 
+          `&phoneNumber=${encodeURIComponent(phoneNumber)}` +
+          `&crypto=${encodeURIComponent(crypto)}` +
           `&address1=${encodeURIComponent(address ?? '')}`
       )
     }
@@ -173,10 +187,10 @@ export default function Page() {
                 <div className="bg-gray-50">
                   012456789 &nbsp;
                 </div>
-                <Input 
-                    style={{display: "none"}} 
-                    id="testPhone" 
-                    value="012345678" 
+                <Input
+                    style={{display: "none"}}
+                    id="testPhone"
+                    value="012345678"
                     disabled />
                 <Button
                     className="btn btn-sm bg-orange-500 text-primary-foreground hover:bg-primary/90"
@@ -184,8 +198,8 @@ export default function Page() {
               </div>
             }
 
-            <label 
-              htmlFor="phoneNumber" 
+            <label
+              htmlFor="phoneNumber"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Phone Number with Orange Money
             </label>
@@ -200,8 +214,8 @@ export default function Page() {
                 aria-label="Phone Number"
                 disabled
               />
-            <label 
-              htmlFor="customerName" 
+            <label
+              htmlFor="customerName"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Name linked to Orange Money
             </label>
@@ -214,22 +228,34 @@ export default function Page() {
                 aria-label="Name linked to Orange Money"
                 disabled
             />
+            <Select onValueChange={setCrypto} defaultValue={crypto}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select crypto" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Crypto</SelectLabel>
+                  <SelectItem value="usdt">USDT</SelectItem>
+                  <SelectItem value="gooddollar">GoodDollar</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
 
           </div>
           <div className="flex justify-between">
             <Button
               id="buyButton"
-              onClick={handleBuy} 
+              onClick={handleBuy}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-              Buy USDT
+              Buy
             </Button>
-            <Button 
+            <Button
               id="sellButton"
-              onClick={handleSell} 
+              onClick={handleSell}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-              Sell USDT
+              Sell
             </Button>
           </div>
         </CardContent>

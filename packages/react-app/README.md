@@ -2,6 +2,7 @@
 
 
 ## Run in development mode
+
 Install dependencies with:
 ```
 pnpm install
@@ -9,7 +10,7 @@ pnpm install
 
 Run with:
 ```
-pnpm dev
+./bin/dev
 ```
 
 And open in port 9002
