@@ -16,6 +16,15 @@ import { Label } from '@/components/ui/label'
 
 export default function Page() {
 
+  const cryptoName = {
+    "usdt": "USDT",
+    "gooddollar": "GoodDollar",
+  }
+  const cryptoSymbol = {
+    "usdt": "USDT",
+    "gooddollar": "G$",
+  }
+
   const { address, chainId } = useAccount()
 
   const [quoteToken, setQuoteToken] = useState("")
@@ -35,6 +44,7 @@ export default function Page() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [buyerName, setBuyerName]  = useState('')
   const [address1, setAddress1]  = useState('')
+  const [crypto, setCrypto]  = useState('usdt')
 
   useEffect(() => {
     console.log("** OJO useEffect")
@@ -46,6 +56,7 @@ export default function Page() {
     let lPhoneNumber = ""
     let lBuyerName = ""
     let lAddress1 = ""
+    let lCrypto = ""
     if (typeof window != 'undefined' && 
         typeof URLSearchParams != 'undefined') {
       let searchParams = new URLSearchParams(window.location.search)
@@ -55,6 +66,8 @@ export default function Page() {
       setBuyerName(lBuyerName)
       lAddress1 = searchParams.get('address1') ?? ""
       setAddress1(lAddress1)
+      lCrypto= searchParams.get('crypto') ?? ""
+      setCrypto(lCrypto)
     }
     if (lPhoneNumber == "") {
       console.log("Missing phone number")
@@ -67,6 +80,10 @@ export default function Page() {
     }
     if (!address) { 
       alert("Missing wallet address")
+      return
+    }
+    if (!crypto || (crypto != "usdt" && crypto != "gooddollar")) { 
+      alert("Missing crypto")
       return
     }
     if (lAddress1 != address) {
@@ -134,6 +151,7 @@ export default function Page() {
         `/api/purchase_quote?${tokenParam}`+
         `wallet=${address}&`+
         `phone=${phoneNumber}&` +
+        `crypto=${crypto}&` +
         `buyerName=${buyerName}`
       //extractAPIErrorResponse(axios)
 
@@ -403,10 +421,10 @@ export default function Page() {
                 aria-label="Amount of SLE"
               />
               <p className="text-sm text-gray-500">
-                Amount of USD to receive: {amountUsd} USD
+                Amount of {cryptoName[crypto]} to receive: {amountUsd} {cryptoSymbol[crypto]}
               </p>
               <p className="text-sm text-gray-500">
-                Price of one USD: {quoteUsdPriceInSle} SLE
+                Price of one {cryptoSymbol[crypto]}: {quoteUsdPriceInSle} SLE
               </p>
               <p className="text-sm text-gray-500">
                 Order limits in SLE: {quoteMinimum} - {quoteMaximum}
@@ -429,7 +447,7 @@ export default function Page() {
               <p className="text-2xl">Please confirm the details below:</p>
                 <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
               <p className="text-sm">Amount in SLE to spend: SLE${amountSle}</p>
-              <p className="text-sm">Amount of USD to receive: US${amountUsd}</p>
+              <p className="text-sm">Amount of {cryptoName[crypto]} to receive: {cryptoSymbol[crypto]}{amountUsd}</p>
               <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
                 +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               {runningDevelopment() &&
@@ -450,7 +468,7 @@ export default function Page() {
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for your payment. We transfered {amountUsd}USD to your wallet.</p>
+              <p className="text-sm">Thanks for your payment. We transfered {amountUsd} {cryptoSymbol[crypto]} to your wallet.</p>
             </div>
           }
           {step == 5 && runningDevelopment() &&
