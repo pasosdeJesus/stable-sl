@@ -20,9 +20,13 @@ export default function Header() {
   return (
         <>
           <div className="flex h-16 content-center justify-between">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-900">Stable SL</h1>
-              <p className="text-gray-600 mt-2">Buy and sell USDT in Salone</p>
+            <div className="flex flex-row">
+              <img src="stable-sl-logo.png" 
+                className="h-auto max-w-[70px]"/>
+              <div className="flex flex-col">
+                <h1 className="text-3xl font-bold text-gray-900">Stable SL</h1>
+                <p className="text-gray-600 mt-2">Buy and sell USDT in Salone</p>
+              </div>
             </div>
             {!hideConnectBtn && (
               <div className="p-3">

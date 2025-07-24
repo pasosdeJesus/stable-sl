@@ -36,7 +36,7 @@ export default function Page() {
   const [step, setStep] = useState(2)
   const [amountSle, setAmountSle] = useState('')
   const [amountUsd, setAmountUsd] = useState(0.0)
-  const [countdown, setCountdown] = useState(3)
+  const [countdown, setCountdown] = useState(1)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [receiverPhone, setReceiverPhone] = useState("")
   const [receiverName, setReceiverName] = useState("")
