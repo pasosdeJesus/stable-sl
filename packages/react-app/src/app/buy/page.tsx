@@ -29,7 +29,8 @@ export default function Page() {
 
   const [quoteToken, setQuoteToken] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
-  const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
+  const [quoteCrypto, setQuoteCrypto] = useState("usdt")
+  const [quoteCryptoPriceInSle, setQuoteCryptoPriceInSle] = useState(0.0)
   const [quoteMinimum, setQuoteMinimum] = useState(0)
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(2)
@@ -167,19 +168,21 @@ export default function Page() {
               let data = response.data
               if (data.token!== undefined &&
                   data.timestamp !== undefined &&
-                    data.usdPriceInSle !== undefined &&
+                    data.crypto !== undefined &&
+                    data.cryptoPriceInSle !== undefined &&
                       data.minimum !== undefined &&
                         data.maximum !== undefined
                  ) {
                    setQuoteToken(data.token)
                    setQuoteTimestamp(data.timestamp)
-                   setQuoteUsdPriceInSle(data.usdPriceInSle)
+                   setQuoteCrypto(data.crypto)
+                   setQuoteCryptoPriceInSle(data.cryptoPriceInSle)
                    setQuoteMinimum(data.minimum)
                    setQuoteMaximum(data.maximum)
 
                    if (amountSle && parseFloat(amountSle)>0) {
-                     setAmountUsd(calculateAmountUsd(
-                       parseFloat(amountSle), data.usdPriceInSle
+                     setAmountUsd(calculateAmountCrypto(
+                       parseFloat(amountSle), data.cryptoPriceInSle
                      ))
                    }
                  } else {
@@ -201,9 +204,9 @@ export default function Page() {
     }
   }
 
-  const calculateAmountUsd = (sle: number, slePerUsd: number) => {
-    return slePerUsd && slePerUsd > 0 && sle && sle > 0 ?
-      Math.round(sle*100.0/slePerUsd)/100.0 : 0
+  const calculateAmountCrypto = (sle: number, slePerCrypto: number) => {
+    return slePerCrypto && slePerCrypto > 0 && sle && sle > 0 ?
+      Math.round(sle*100.0/slePerCrypto)/100.0 : 0
   }
 
   const secondsAsMinutes = (seconds: number):String => {
@@ -414,8 +417,8 @@ export default function Page() {
                 onChange={(e) => {
                   setAmountSle(e.target.value)
                   setAmountUsd(
-                    calculateAmountUsd(parseFloat(e.target.value),
-                                       quoteUsdPriceInSle)
+                    calculateAmountCrypto(parseFloat(e.target.value),
+                                       quoteCryptoPriceInSle)
                   )
                 } }
                 aria-label="Amount of SLE"
@@ -424,7 +427,7 @@ export default function Page() {
                 Amount of {cryptoName[crypto]} to receive: {amountUsd} {cryptoSymbol[crypto]}
               </p>
               <p className="text-sm text-gray-500">
-                Price of one {cryptoSymbol[crypto]}: {quoteUsdPriceInSle} SLE
+                Price of one {cryptoSymbol[crypto]}: {quoteCryptoPriceInSle} SLE
               </p>
               <p className="text-sm text-gray-500">
                 Order limits in SLE: {quoteMinimum} - {quoteMaximum}
