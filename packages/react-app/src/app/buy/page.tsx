@@ -138,7 +138,7 @@ export default function Page() {
 
   const steps = [
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },
-    { number: 2, title: "Amount", description: "Amount of stable crypto to buy" },
+    { number: 2, title: "Amount", description: "Amount of crypto to buy" },
     { number: 3, title: "Review", description: "Review and confirm details" },
     { number: 4, title: "Payment", description: "Pay with your Orange Money" },
     { number: 5, title: "Complete", description: "Transaction processed" },
@@ -473,7 +473,7 @@ export default function Page() {
           }
           {step == 5 && runningDevelopment() &&
             <div className="space-y-2">
-              <p className="text-sm">(Well in reality since this is testnet we sent 0.1USDC...)</p>
+              <p className="text-sm">(Well in reality since this is testnet we sent {amountUsd}USDC...)</p>
             </div>
           }
 
