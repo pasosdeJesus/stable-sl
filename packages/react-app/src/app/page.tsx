@@ -226,7 +226,6 @@ export default function Page() {
                 onChange={(e) => changeCustomerName(e.target.value)}
                 onBlur={(e) => blurCustomerName(e.target.value) }
                 aria-label="Name linked to Orange Money"
-                disabled
             />
             <Select onValueChange={setCrypto} defaultValue={crypto}>
               <SelectTrigger>

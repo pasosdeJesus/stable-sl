@@ -262,7 +262,8 @@ export default function Page() {
           if (data.token !== undefined &&
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
-            data.amountUsd !== undefined &&
+            data.crypto !== undefined &&
+            data.amountCrypto !== undefined &&
             data.receiverPhone !== undefined &&
             data.receiverName !== undefined
            ) {
@@ -399,7 +400,9 @@ export default function Page() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-600" />
-            Step {step}: {steps[step - 1].title}
+            Step {step}: 
+              { step > 1 && step <= steps.length ?
+                steps[step - 1].title : "" }
           </CardTitle>
           <CardDescription>{steps[step - 1].description}</CardDescription>
         </CardHeader>
