@@ -18,27 +18,34 @@ export default function Header() {
   }, [])
 
   return (
-        <>
-          <div className="flex h-16 content-center justify-between">
-            <div className="flex flex-row">
-              <img src="stable-sl-logo.png" 
-                className="h-auto max-w-[70px]"/>
-              <div className="flex flex-col">
-                <h1 className="text-3xl font-bold text-gray-900">Stable SL</h1>
-                <p className="text-gray-600 mt-2">Buy and sell USDT in Salone</p>
-              </div>
-            </div>
-            {!hideConnectBtn && (
-              <div className="p-3">
-                <ConnectButton
-                  showBalance={{
-                    smallScreen: false,
-                    largeScreen: true,
-                  }}
-                />
-              </div>
-            )}
+    <div className="sticky top-0 z-10 flex flex-col xs:rounded-t-xl justify-between bg-surface-100 dark:bg-surface-700">
+      <div className="flex items-center justify-between gap-3 sm:gap-5 px-5 py-3 sm:px-8 sm:py-3 w-full min-h-14 relative">
+
+        <div 
+          data-testid="headerLogo" 
+          className="absolute left-0 top-0 right-0 bottom-0 flex h-[inherit] pointer-events-none justify-center"
+        >
+          <span className="flex items-center justify-center gap-3 text-black text-lg font-extrabold">
+            <img 
+              src="stable-sl-logo.png" 
+              alt="logo" 
+              className="h-8" 
+              height="32"
+            />
+            Stable SL
+          </span>
+        </div>
+        {!hideConnectBtn && (
+          <div className="p-3">
+          <ConnectButton
+          showBalance={{
+            smallScreen: false,
+            largeScreen: false,
+          }}
+          />
           </div>
-        </>
+        )}
+      </div>
+    </div>
   )
 }

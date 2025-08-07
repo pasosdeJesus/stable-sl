@@ -1,9 +1,9 @@
 'use client'
 
 import axios from 'axios'
-import {Shield} from "lucide-react"
-import { useEffect, useState } from 'react'
+import { ChevronDown, MessageCircle, Shield } from "lucide-react"
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +32,7 @@ export default function Page() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [crypto, setCrypto] = useState('usdt')
+  const [isCryptoDrawerOpen, setIsCryptoDrawerOpen] = useState(false) 
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_COORDINATOR == undefined) {
@@ -68,7 +69,9 @@ export default function Page() {
     }
   }
 
-  const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
+  const runningDevelopment = () => {
+    return process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
+  }
 
   const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
 
@@ -162,47 +165,37 @@ export default function Page() {
   }
 
   return (
-    <div className="flex items-center justify-center mt-4 flex-wrap">
-
-      <Card className="w-full max-w-md p-2 rounded-lg shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-green-600" />
-            Identification
-          </CardTitle>
-          <CardDescription>
-            Provide your identification details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            {!address &&
-              <div className="border-2 border-dotted border-red-500">
-                Please connect your wallet
-              </div>
-            }
-            {runningDevelopment() &&
-              <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
-                Test with your name and &nbsp;
-                <div className="bg-gray-50">
-                  012456789 &nbsp;
-                </div>
-                <Input
-                    style={{display: "none"}}
-                    id="testPhone"
-                    value="012345678"
-                    disabled />
-                <Button
-                    className="btn btn-sm bg-orange-500 text-primary-foreground hover:bg-primary/90"
-                    onClick={copyTestPhone}>Copy</Button>
-              </div>
-            }
-
+    <div className="p-5 pb-10 sm:px-8 space-y-6">
+      <div className="mb-2 group">
+        {!address &&
+          <div className="border-2 border-dotted border-red-500">
+            Please connect your wallet
+          </div>
+        }
+        {runningDevelopment() &&
+          <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
+            Test with your name and &nbsp;
+            <div className="bg-gray-50">
+              012456789 &nbsp;
+            </div>
+            <Input
+                style={{display: "none"}}
+                id="testPhone"
+                value="012345678"
+                disabled />
+            <Button
+                className="btn btn-sm bg-orange-500 text-primary-foreground hover:bg-primary/90"
+                onClick={copyTestPhone}>Copy</Button>
+          </div>
+        }
+        <p className="mb-2 font-medium text-sm tracking-wide text-surface-600 dark:text-surface-200 transition-all">
             <label
               htmlFor="phoneNumber"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Phone Number with Orange Money
             </label>
+        </p>
+        <div className="relative flex items-center justify-end bg-surface-200 dark:bg-surface-800 border-2 border-surface-200 dark:border-surface-600 rounded-lg">
             <Input
                 id="phoneNumber"
                 type="tel"
@@ -214,11 +207,18 @@ export default function Page() {
                 aria-label="Phone Number"
                 disabled
               />
+        </div>
+      </div>
+
+      <div className="mb-2 group">
+        <p className="mb-2 font-medium text-sm tracking-wide text-surface-600 dark:text-surface-200 transition-all">
             <label
               htmlFor="customerName"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Name linked to Orange Money
             </label>
+        </p>
+        <div className="relative flex items-center justify-end bg-surface-200 dark:bg-surface-800 border-2 border-surface-200 dark:border-surface-600 rounded-lg">
             <Input
                 id="customerName"
                 value={customerName}
@@ -227,38 +227,54 @@ export default function Page() {
                 onBlur={(e) => blurCustomerName(e.target.value) }
                 aria-label="Name linked to Orange Money"
             />
-            <Select onValueChange={setCrypto} defaultValue={crypto}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select crypto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Crypto</SelectLabel>
-                  <SelectItem value="usdt">USDT</SelectItem>
-                  <SelectItem value="gooddollar">GoodDollar</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+        </div>
+      </div>
 
-          </div>
-          <div className="flex justify-between">
-            <Button
-              id="buyButton"
-              onClick={handleBuy}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-              Buy
-            </Button>
-            <Button
-              id="sellButton"
-              onClick={handleSell}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-              Sell
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mb-2 group">
+        <p className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Cryptocurrency</p>
+        <div className="relative flex items-center justify-end border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
+          <button
+            type="button"
+            tabIndex={4}
+            className="text-center font-medium flex justify-center items-center gap-2 py-3 px-2 bg-surface-100 dark:bg-surface-700 cursor-pointer absolute right-3 min-w-24 h-3/5 rounded-md hover:bg-surface-100/60 focus:!ring-0"
+            onClick={() => setIsCryptoDrawerOpen(true)}
+          >
+            <span className="flex gap-2 items-center justify-between text-surface-600 font-semibold tracking-widest text-xs uppercase">
+              <div className="relative flex-shrink-0" style={{ width: '22px', height: '22px' }}>
+                {/* Simple SVG Icon for USDT */}
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
+                  <circle cx="16" cy="16" r="14" fill="#50AF95" />
+                  <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
+                </svg>
+              </div>
+              {crypto}
+            </span>
+            <ChevronDown className="w-4 h-4 text-surface-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <div className="px-2 sm:px-2 py-2 sticky bottom-0 bg-background">
+        <Button
+          id="buyutton"
+          type="button"
+          tabIndex={5}
+          className="text-center font-medium w-full py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
+          onClick={handleBuy}
+        >
+          Buy
+        </Button>
+        <Button
+          id="sellButton"
+          type="button"
+          tabIndex={6}
+          className="text-center font-medium w-full py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
+          onClick={handleSell}
+          >
+            Sell
+        </Button>
+      </div>
     </div>
   )
 }
