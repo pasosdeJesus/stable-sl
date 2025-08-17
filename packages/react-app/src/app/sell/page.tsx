@@ -20,12 +20,14 @@ export default function Page() {
 
   const [quoteToken, setQuoteToken] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
-  const [quoteUsdPriceInSle, setQuoteUsdPriceInSle] = useState(0.0)
+  const [quoteCrypto, setQuoteCrypto] = useState("usdt")
+  const [quoteCryptoPriceInSle, setQuoteCryptoPriceInSle] = useState(0.0)
   const [quoteMinimum, setQuoteMinimum] = useState(0)
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(2)
+  const [crypto, setCrypto] = useState('usdt')
   const [amountSle, setAmountSle] = useState(0)
-  const [amountUsd, setAmountUsd] = useState('')
+  const [amountCrypto, setAmountCrypto] = useState(0)
   const [countdown, setCountdown] = useState(0)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [senderPhone, setSenderPhone] = useState("")
@@ -43,6 +45,7 @@ export default function Page() {
     let lPhoneNumber = ""
     let lSellerName = ""
     let lAddress1 = ""
+    let lCrypto = ""
     if (typeof window != 'undefined' && typeof URLSearchParams != 'undefined') {
       let searchParams = new URLSearchParams(window.location.search)
       lPhoneNumber = searchParams.get('phoneNumber') ?? ""
@@ -51,6 +54,12 @@ export default function Page() {
       setSellerName(lSellerName)
       lAddress1 = searchParams.get('address1') ?? ""
       setAddress1(lAddress1)
+      lCrypto = searchParams.get('crypto') ?? "usdt"
+      if (lCrypto != "usdt" && lCrypto != "gooddollar") {
+        alert("Unkown crypto: " + lCrypto)
+        return
+      }
+      setCrypto(lCrypto)
     }
 
     if (lPhoneNumber == "") {
@@ -118,7 +127,7 @@ export default function Page() {
 
   const steps = [
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },
-    { number: 2, title: "Amount", description: "Amount of stable crypto to sell" },
+    { number: 2, title: "Amount", description: "Amount of crypto to sell" },
     { number: 3, title: "Confirm", description: "Review and confirm details" },
     { number: 4, title: "Wait Payment", description: "Wait for payment in Orange" },
     { number: 5, title: "Complete", description: "Transaction processed" },
@@ -130,6 +139,7 @@ export default function Page() {
       const apiSalesQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
         `/api/sales_quote?${tokenParam}`+
         `wallet=${address}&`+
+        `crypto=${crypto}&`+
         `phone=${phoneNumber}&` +
         `sellerName=${sellerName}`
       //extractAPIErrorResponse(axios)
@@ -145,20 +155,22 @@ export default function Page() {
             if (response.data) {
               let data = response.data
               if (data.token!== undefined &&
-                  data.timestamp !== undefined &&
-                    data.usdPriceInSle !== undefined &&
-                      data.minimum !== undefined &&
-                        data.maximum !== undefined
-                 ) {
+                data.timestamp !== undefined &&
+                data.crypto !== undefined &&
+                data.cryptoPriceInSle !== undefined &&
+                data.minimum !== undefined &&
+                data.maximum !== undefined
+              ) {
                    setQuoteToken(data.token)
                    setQuoteTimestamp(data.timestamp)
-                   setQuoteUsdPriceInSle(data.usdPriceInSle)
+                   setQuoteCrypto(data.crypto)
+                   setQuoteCryptoPriceInSle(data.cryptoPriceInSle)
                    setQuoteMinimum(data.minimum)
                    setQuoteMaximum(data.maximum)
 
-                   if (amountUsd && parseFloat(amountUsd)>0) {
+                   if (amountCrypto && amountCrypto > 0) {
                      setAmountSle(calculateAmountSle(
-                       parseFloat(amountUsd), data.usdPriceInSle
+                       amountCrypto, data.cryptoPriceInSle
                      ))
                    }
                  } else {
@@ -180,9 +192,9 @@ export default function Page() {
     }
   }
 
-  const calculateAmountSle = (usd: number, slePerUsd: number) => {
-    return slePerUsd && usd ?
-      Math.round(usd*100.0*slePerUsd)/100.0 : 0
+  const calculateAmountSle = (_cryptoAmount: number, slePerCrypto: number) => {
+    return slePerCrypto && _cryptoAmount ?
+      Math.round(_cryptoAmount*100.0*slePerCrypto)/100.0 : 0
   }
 
   const secondsAsMinutes = (seconds: number):String => {
@@ -195,15 +207,15 @@ export default function Page() {
         alert("Should not")
       break
       case 2:
-        if (+amountUsd < quoteMinimum) {
+        if (+amountCrypto < quoteMinimum) {
           alert('Amount should be greather than lower limit')
         } else if (runningProduction() && !isCelo()) {
           alert('Switch to the Celo Blockchain')
         } else if (+quoteMaximum == 0) {
           alert('Seems there is a problem with the backend, try again later')
-        } else if (+amountUsd > quoteMaximum) {
+        } else if (+amountCrypto > quoteMaximum) {
           alert('Amount should be less than upper limit')
-        } else if (amountUsd && parseFloat(amountUsd) > 0) {
+        } else if (amountCrypto && amountCrypto > 0) {
           setStep(3)
         } else {
           alert('Please enter valid values.')
@@ -236,13 +248,15 @@ export default function Page() {
           if (data.token !== undefined &&
             data.seconds !== undefined &&
             data.amountSle !== undefined &&
-            data.amountUsd !== undefined &&
+            data.crypto !== undefined &&
+            data.amountCrypto !== undefined &&
             data.senderPhone !== undefined &&
             data.receiverName !== undefined
            ) {
              /* TODO: if (data.token !== token ||
                  data.amountSle !== amountSle ||
-                   data.amountUsd !== amountUsd) {
+                 data.crypto !== crypto ||
+                   data.amountCrypto !== amountCrypto) {
                alert("Mismatch in information of this app and coordinator")
              } else { */
              setSecondsWaitingPayment(data.seconds)
@@ -380,31 +394,31 @@ export default function Page() {
         <CardContent className="space-y-4">
           {step === 2 && (
             <div className="space-y-2">
-              <label htmlFor="amountUsd" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of USDT to sell</label>
+              <label htmlFor="amountCrypto" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of {crypto} to sell</label>
               <Input
-                id="amountUsd"
+                id="amountCrypto"
                 type="number"
                 placeholder="Enter amount"
-                value={amountUsd}
+                value={amountCrypto}
                 min={quoteMinimum}
                 max={quoteMaximum}
                 onChange={(e) => {
-                  setAmountUsd(+e.target.value)
+                  setAmountCrypto(+e.target.value)
                   setAmountSle(
                     calculateAmountSle(parseFloat(e.target.value),
-                                       quoteUsdPriceInSle)
+                                       quoteCryptoPriceInSle)
                   )
                 } }
-                aria-label="Amount of USD"
+                aria-label="Amount of {crypto}"
               />
               <p className="text-sm text-gray-500">
                 Amount of SLE to receive: {amountSle} SLE
               </p>
               <p className="text-sm text-gray-500">
-                Price of one USD: {quoteUsdPriceInSle} SLE
+                Price of one {crypto}: {quoteCryptoPriceInSle} SLE
               </p>
               <p className="text-sm text-gray-500">
-                Order limits in USD: {quoteMinimum} - {quoteMaximum}
+                Order limits in {crypto}: {quoteMinimum} - {quoteMaximum}
               </p>
               <div className="flex text-sm text-gray-500">
                 <span>Seconds to update:&nbsp; </span>
@@ -424,10 +438,10 @@ export default function Page() {
               <p className="text-2xl">Please confirm the details below:</p>
               
               <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
-              <p className="text-sm">Amount in USD to sell: US${amountUsd}</p>
+              <p className="text-sm">Amount in {crypto} to sell: {crypto}${amountCrypto}</p>
               <p className="text-sm">Amount of SLE to receive: {amountSle}SLE</p>
-              <p className="text-sm">Amount within limits: {+amountUsd >= quoteMinimum &&
-                +amountUsd <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
+              <p className="text-sm">Amount within limits: {+amountCrypto>= quoteMinimum &&
+                +amountCrypto <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               <p className="text-sm">Once you confirm transfer from your wallet to ours, we will pay to you {amountSle}SLE in your Orange Money {phoneNumber} ({sellerName}). Expect payment from the phone {senderPhone} ({senderName})</p>
               {runningDevelopment() &&
                 <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">

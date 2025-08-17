@@ -16,11 +16,11 @@ import { Label } from '@/components/ui/label'
 
 export default function Page() {
 
-  const cryptoName = {
+  const cryptoName:Record<string, string> = {
     "usdt": "USDT",
     "gooddollar": "GoodDollar",
   }
-  const cryptoSymbol = {
+  const cryptoSymbol:Record<string, string> = {
     "usdt": "USDT",
     "gooddollar": "G$",
   }
@@ -35,7 +35,7 @@ export default function Page() {
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(2)
   const [amountSle, setAmountSle] = useState('')
-  const [amountUsd, setAmountUsd] = useState(0.0)
+  const [amountCrypto, setAmountCrypto] = useState(0.0)
   const [countdown, setCountdown] = useState(1)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [receiverPhone, setReceiverPhone] = useState("")
@@ -181,7 +181,7 @@ export default function Page() {
                    setQuoteMaximum(data.maximum)
 
                    if (amountSle && parseFloat(amountSle)>0) {
-                     setAmountUsd(calculateAmountCrypto(
+                     setAmountCrypto(calculateAmountCrypto(
                        parseFloat(amountSle), data.cryptoPriceInSle
                      ))
                    }
@@ -269,7 +269,7 @@ export default function Page() {
            ) {
              /* TODO: if (data.token !== token ||
                  data.amountSle !== amountSle ||
-                   data.amountUsd !== amountUsd) {
+                   data.amountCrypto !== amountCrypto) {
                alert("Mismatch in information of this app and coordinator")
              } else { */
              setSecondsWaitingPayment(data.seconds)
@@ -419,7 +419,7 @@ export default function Page() {
                 max={quoteMaximum}
                 onChange={(e) => {
                   setAmountSle(e.target.value)
-                  setAmountUsd(
+                  setAmountCrypto(
                     calculateAmountCrypto(parseFloat(e.target.value),
                                        quoteCryptoPriceInSle)
                   )
@@ -427,7 +427,7 @@ export default function Page() {
                 aria-label="Amount of SLE"
               />
               <p className="text-sm text-gray-500">
-                Amount of {cryptoName[crypto]} to receive: {amountUsd} {cryptoSymbol[crypto]}
+                Amount of {cryptoName[crypto]} to receive: {amountCrypto} {cryptoSymbol[crypto]}
               </p>
               <p className="text-sm text-gray-500">
                 Price of one {cryptoSymbol[crypto]}: {quoteCryptoPriceInSle} SLE
@@ -453,7 +453,7 @@ export default function Page() {
               <p className="text-2xl">Please confirm the details below:</p>
                 <p className="text-sm">Phone Number with Orange Money: {phoneNumber}</p>
               <p className="text-sm">Amount in SLE to spend: SLE${amountSle}</p>
-              <p className="text-sm">Amount of {cryptoName[crypto]} to receive: {cryptoSymbol[crypto]}{amountUsd}</p>
+              <p className="text-sm">Amount of {cryptoName[crypto]} to receive: {cryptoSymbol[crypto]}{amountCrypto}</p>
               <p className="text-sm">Amount within limits: {+amountSle >= quoteMinimum &&
                 +amountSle <= quoteMaximum ? "Yes" : "No -- please go back"}</p>
               {runningDevelopment() &&
@@ -474,12 +474,12 @@ export default function Page() {
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for your payment. We transfered {amountUsd} {cryptoSymbol[crypto]} to your wallet.</p>
+              <p className="text-sm">Thanks for your payment. We transfered {amountCrypto} {cryptoSymbol[crypto]} to your wallet.</p>
             </div>
           }
           {step == 5 && runningDevelopment() &&
             <div className="space-y-2">
-              <p className="text-sm">(Well in reality since this is testnet we sent {amountUsd}USDC...)</p>
+              <p className="text-sm">(Well in reality since this is testnet we sent {amountCrypto}USDC...)</p>
             </div>
           }
 
