@@ -241,10 +241,19 @@ export default function Page() {
           >
             <span className="flex gap-2 items-center justify-between text-surface-600 font-semibold tracking-widest text-xs uppercase">
               <div className="relative flex-shrink-0" style={{ width: '22px', height: '22px' }}>
-                {/* Simple SVG Icon for USDT */}
+                {/* Simple SVG Icon for USDT or G$ */}
                 <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
-                  <circle cx="16" cy="16" r="14" fill="#50AF95" />
-                  <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
+                {crypto === 'usdt' ? (
+                  <>
+                    <circle cx="16" cy="16" r="14" fill="#50AF95" />
+                    <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
+                  </>
+                ) : (
+                  <>
+                    <circle cx="16" cy="16" r="14" fill="#FF6B00" />
+                    <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">G</text>
+                  </>
+                )}
                 </svg>
               </div>
               {crypto}
@@ -319,11 +328,11 @@ export default function Page() {
                   <div className="flex items-center gap-3">
                     <div className="relative flex-shrink-0" style={{ width: '24px', height: '24px' }}>
                       <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
-                        <circle cx="16" cy="16" r="14" fill="#50AF95" />
+                        <circle cx="16" cy="16" r="14" fill="#FF6B00" />
                         <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">G</text>
                       </svg>
                     </div>
-                    GoodDollar
+                    G$ (GoodDollar)
                   </div>
                 </Button>
                 {/* Add more cryptocurrencies as needed */}
