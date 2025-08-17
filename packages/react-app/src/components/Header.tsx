@@ -23,7 +23,7 @@ export default function Header() {
 
         <div 
           data-testid="headerLogo" 
-          className="absolute left-0 top-0 right-0 bottom-0 flex h-[inherit] pointer-events-none justify-center"
+          className="left-0 top-0 right-0 bottom-0 flex h-[inherit] pointer-events-none justify-center"
         >
           <span className="flex items-center justify-center gap-3 text-black text-lg font-extrabold">
             <img 

@@ -231,8 +231,8 @@ export default function Page() {
       </div>
 
       <div className="mb-2 group">
-        <p className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Cryptocurrency</p>
-        <div className="relative flex items-center justify-end border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
+        <div className="flex items-center justify-between border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
+          <div className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Cryptocurrency</div>
           <button
             type="button"
             tabIndex={4}
@@ -255,9 +255,9 @@ export default function Page() {
       </div>
 
       {/* Buttons */}
-      <div className="px-2 sm:px-2 py-2 sticky bottom-0 bg-background">
+      <div className="flex px-2 sm:px-2 py-2 sticky bottom-0 bg-background">
         <Button
-          id="buyutton"
+          id="buyButton"
           type="button"
           tabIndex={5}
           className="text-center font-medium w-full py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
@@ -275,6 +275,63 @@ export default function Page() {
             Sell
         </Button>
       </div>
-    </div>
+
+      {/* Crypto Selection Drawer (Modal Placeholder) */}
+      {isCryptoDrawerOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md rounded-lg shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">Select Cryptocurrency</h3>
+                <Button variant="ghost" size="icon" onClick={() => setIsCryptoDrawerOpen(false)}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              </div>
+              <div className="space-y-2">
+                <Button
+                  variant={crypto === 'usdt' ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setCrypto('usdt')
+                   setIsCryptoDrawerOpen(false)
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-shrink-0" style={{ width: '24px', height: '24px' }}>
+                      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
+                        <circle cx="16" cy="16" r="14" fill="#50AF95" />
+                        <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
+                      </svg>
+                    </div>
+                    USDT (Tether)
+                  </div>
+                </Button>
+                <Button
+                  variant={crypto === 'gooddollar' ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setCrypto('gooddollar')
+                    setIsCryptoDrawerOpen(false)
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-shrink-0" style={{ width: '24px', height: '24px' }}>
+                      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
+                        <circle cx="16" cy="16" r="14" fill="#50AF95" />
+                        <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">G</text>
+                      </svg>
+                    </div>
+                    GoodDollar
+                  </div>
+                </Button>
+                {/* Add more cryptocurrencies as needed */}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      </div>
   )
 }
