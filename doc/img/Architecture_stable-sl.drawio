@@ -4,98 +4,98 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-1" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-7" target="A9j_EMK6ovxgZcbHLVMY-8">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-1" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;startArrow=classic;startFill=1;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-7" target="A9j_EMK6ovxgZcbHLVMY-8" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="603" y="335" as="targetPoint" />
             <mxPoint x="534" y="335" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-2" value="&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" connectable="0" vertex="1" parent="A9j_EMK6ovxgZcbHLVMY-1">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-2" value="&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="A9j_EMK6ovxgZcbHLVMY-1" connectable="0" vertex="1">
           <mxGeometry x="-0.04" y="2" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-3" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-6" target="A9j_EMK6ovxgZcbHLVMY-5">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-3" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-6" target="A9j_EMK6ovxgZcbHLVMY-5" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="298.7027027027027" y="280" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-4" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-5">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-4" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-5" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="454" y="280" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <object placeholders="1" c4Name="Customer" c4Type="Person" c4Description="Buys or sells. Uses Orange Money and a web3 wallet." label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-5">
-          <mxCell style="html=1;dashed=0;whitespace=wrap;fillColor=#08427b;strokeColor=none;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;metaEdit=1;points=[[0.5,0,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0]];metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};" vertex="1" parent="1">
+          <mxCell style="html=1;dashed=0;whitespace=wrap;fillColor=#08427b;strokeColor=none;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;metaEdit=1;points=[[0.5,0,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0]];metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};" parent="1" vertex="1">
             <mxGeometry x="399" y="80" width="110.00000000000001" height="140" as="geometry" />
           </mxCell>
         </object>
         <object placeholders="1" c4Name="Orange Money" c4Type="Software System" c4Description="Sends and receives payments" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-6">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="1">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry y="420" width="160" height="110.00000000000001" as="geometry" />
           </mxCell>
         </object>
         <object placeholders="1" c4Name="Frontend" c4Type="Software System" c4Description="Receives and validates phone, wallet, amount to buy/sell, presentes quote, allow confirming and starts order" label="&lt;b style=&quot;font-size: 9px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 9px;&quot;&gt;[%c4Type%]&lt;/div&gt;&lt;br style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;font-size: 9px;&quot;&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-7">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1168BD;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#1168BD;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=9;" vertex="1" parent="1">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1168BD;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#1168BD;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=9;" parent="1" vertex="1">
             <mxGeometry x="380" y="280" width="150" height="110" as="geometry" />
           </mxCell>
         </object>
         <object placeholders="1" c4Name="Coordinator Backend, API based" c4Type="Software System" c4Description="Give quotes to customers, starts ordrs.&#xa;Executes orders by interacting with the SMS/USSD gateway and the blockchain." label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-8">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#999999;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#8A8A8A;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="1">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#999999;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#8A8A8A;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry x="375" y="440" width="160" height="160" as="geometry" />
           </mxCell>
         </object>
         <object placeholders="1" c4Name="SMS and USSD gateway" c4Type="Software System" c4Description="Application for phone that automatically receives and sends paymnts to Orange Money" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-9">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#999999;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#8A8A8A;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="1">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#999999;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#8A8A8A;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry x="380" y="660" width="160" height="110.00000000000001" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-10" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.463;entryY=-0.009;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-9">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-10" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.463;entryY=-0.009;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-9" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="465" y="503" as="targetPoint" />
             <mxPoint x="465" y="453" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
         <object placeholders="1" c4Type="Database" c4Technology="Technology" c4Description="Quotes, orders, SMS, payments, transactions" label="%c4Type%&lt;div style=&quot;font-size: 9px;&quot;&gt;[Container:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;font-size: 9px;&quot;&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-11">
-          <mxCell style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;rounded=1;labelBackgroundColor=none;fillColor=#999999;fontSize=10;fontColor=#ffffff;align=center;strokeColor=#8A8A8A;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};arcSize=10;" vertex="1" parent="1">
+          <mxCell style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;rounded=1;labelBackgroundColor=none;fillColor=#999999;fontSize=10;fontColor=#ffffff;align=center;strokeColor=#8A8A8A;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};arcSize=10;" parent="1" vertex="1">
             <mxGeometry x="180" y="430" width="150" height="110" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-12" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-12" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="380" y="490" as="targetPoint" />
             <mxPoint x="330" y="490" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-13" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;exitX=0.569;exitY=0.991;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-6" target="A9j_EMK6ovxgZcbHLVMY-9">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-13" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;exitX=0.569;exitY=0.991;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-6" target="A9j_EMK6ovxgZcbHLVMY-9" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="245" y="430" as="sourcePoint" />
             <mxPoint x="409" y="228" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-14" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-15">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-14" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-15" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="593" y="494.02" as="targetPoint" />
             <mxPoint x="540" y="494.5" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
         <object placeholders="1" c4Name="CELO Blockchain" c4Type="Software System" c4Description="Sends and receives payments with Meto stable tokens" label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-15">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="1">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry x="590" y="465" width="160" height="110.00000000000001" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-16" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;endArrow=classic;endFill=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.556;exitY=-0.018;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-15" target="A9j_EMK6ovxgZcbHLVMY-5">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-16" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#707070;strokeWidth=2;fontColor=#707070;startArrow=classic;startFill=1;endArrow=classic;endFill=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.556;exitY=-0.018;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-15" target="A9j_EMK6ovxgZcbHLVMY-5" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="153" y="430" as="sourcePoint" />
             <mxPoint x="409" y="208" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object placeholders="1" c4Name="API for quotes cUSD/SLE price" c4Type="Software System" c4Description="Returns good prices for customers and for the operators." label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-17">
-          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="1">
+        <object placeholders="1" c4Name="API for quotes USDT/SLE price" c4Type="Software System" c4Description="Returns good prices for customers and for the operators." label="&lt;b&gt;%c4Name%&lt;/b&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;%c4Description%&lt;/div&gt;" id="A9j_EMK6ovxgZcbHLVMY-17">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;align=center;arcSize=10;strokeColor=#d6b656;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry x="594" y="607" width="160" height="110.00000000000001" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="A9j_EMK6ovxgZcbHLVMY-18" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.031;entryY=0.591;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-17">
+        <mxCell id="A9j_EMK6ovxgZcbHLVMY-18" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#666666;strokeWidth=2;fillColor=#f5f5f5;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.031;entryY=0.591;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="A9j_EMK6ovxgZcbHLVMY-8" target="A9j_EMK6ovxgZcbHLVMY-17" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="600" y="530" as="targetPoint" />
             <mxPoint x="545" y="530" as="sourcePoint" />
