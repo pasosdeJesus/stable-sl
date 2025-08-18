@@ -22,6 +22,7 @@ export default function Page() {
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
   const [quoteCrypto, setQuoteCrypto] = useState("usdt")
   const [quoteCryptoPriceInSle, setQuoteCryptoPriceInSle] = useState(0.0)
+  const [quoteCryptoBalance, setQuoteCryptoBalance] = useState(0.0)
   const [quoteMinimum, setQuoteMinimum] = useState(0)
   const [quoteMaximum, setQuoteMaximum] = useState(0)
   const [step, setStep] = useState(2)
@@ -158,6 +159,7 @@ export default function Page() {
                 data.timestamp !== undefined &&
                 data.crypto !== undefined &&
                 data.cryptoPriceInSle !== undefined &&
+                data.cryptoBalance !== undefined &&
                 data.minimum !== undefined &&
                 data.maximum !== undefined
               ) {
@@ -165,6 +167,7 @@ export default function Page() {
                    setQuoteTimestamp(data.timestamp)
                    setQuoteCrypto(data.crypto)
                    setQuoteCryptoPriceInSle(data.cryptoPriceInSle)
+                   setQuoteCryptoBalance(data.cryptoBalance)
                    setQuoteMinimum(data.minimum)
                    setQuoteMaximum(data.maximum)
 
