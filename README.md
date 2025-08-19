@@ -54,7 +54,7 @@ instructions in packages/react-app/README.md
 ### Architecture
 
 The architecutre is presented in the following diagram:
-![image](https://github.com/user-attachments/assets/80ffc94c-3447-4024-881e-8c843a23b4ba)
+![Architecture](./doc/img/Architecture_stable-sl-Architecture.drawio.svg)
 
 ### Authentication
 
@@ -65,7 +65,12 @@ The architecutre is presented in the following diagram:
 
 ### Sequence diagram for on-ramping
 
-![image](https://github.com/user-attachments/assets/5dfa4e46-2945-4feb-90f3-dec01e0b8501)
+![On-ramp](./doc/img/seq_onramp-Sequence diagram.drawio.svg)
+
+
+### Sequence diagram for off-ramping
+
+![On-ramp](./doc/img/seq_offramp-Sequence diagram.drawio.svg)
 
 
 ## Status of Implementation
