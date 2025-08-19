@@ -42,8 +42,8 @@
         <mxCell id="XppZFFv2hi1EjOijFOD9-17" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" parent="XppZFFv2hi1EjOijFOD9-15" vertex="1">
           <mxGeometry x="45" y="62" width="10" height="238" as="geometry" />
         </mxCell>
-        <mxCell id="XppZFFv2hi1EjOijFOD9-4" value="Coordinator Backend" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
-          <mxGeometry x="390" y="79.5" width="280" height="1250" as="geometry" />
+        <mxCell id="XppZFFv2hi1EjOijFOD9-4" value="Coordinator&lt;div&gt;&amp;nbsp;Backend&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="390" y="80" width="100" height="1249.5" as="geometry" />
         </mxCell>
         <mxCell id="Dho1GyfbxvI-o1wHC3XA-14" value="loop" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="XppZFFv2hi1EjOijFOD9-4">
           <mxGeometry x="45" y="777" width="235" height="113" as="geometry" />
@@ -198,7 +198,7 @@
             <mxPoint x="652" y="912.884" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xNIwFuJ07ks_hvb9G1if-35" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;exitX=1.2;exitY=0.698;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1" source="xNIwFuJ07ks_hvb9G1if-39">
+        <mxCell id="xNIwFuJ07ks_hvb9G1if-35" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;exitX=0.4;exitY=0.796;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1" source="xNIwFuJ07ks_hvb9G1if-39">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="227" y="945" />
