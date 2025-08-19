@@ -356,36 +356,6 @@ export default function Page() {
 
   return (
     <div className="flex items-center justify-center mt-4 flex-wrap">
-      {/* Progress Steps */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          {steps.map((s, index) => (
-            <div key={s.number} className="flex items-center">
-              <div
-                className={`flex items-center justify-center w-9 h-9 rounded-full border-2 ${
-                  step >= s.number
-                    ? "bg-blue-600 border-blue-600 text-white"
-                    : "border-gray-300 text-gray-400"
-                }`}
-              >
-                {step > s.number ? <CheckCircle className="w-5 h-5" /> : s.number}
-              </div>
-              <div className="ml-3 hidden sm:block">
-                <p
-                  className={`text-sm font-medium ${step >= s.number ? "text-blue-600" : "text-gray-400"}`}
-                >
-                  {s.title}
-                </p>
-                <p className="text-xs text-gray-500">{s.description}</p>
-              </div>
-              {index < steps.length - 1 && (
-                <div className={`w-4 h-0.5 mx-3 ${step > s.number ? "bg-blue-600" : "bg-gray-300"}`} />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
       <Card className="w-full max-w-md p-2 rounded-lg shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -397,6 +367,9 @@ export default function Page() {
         <CardContent className="space-y-4">
           {step === 2 && (
             <div className="space-y-2">
+              <p className="text-sm text-gray-500">
+                Balance in your wallet: {quoteCryptoBalance} {crypto}
+              </p>
               <label htmlFor="amountCrypto" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of {crypto} to sell</label>
               <Input
                 id="amountCrypto"
