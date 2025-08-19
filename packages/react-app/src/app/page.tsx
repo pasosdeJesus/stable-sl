@@ -165,7 +165,7 @@ export default function Page() {
   }
 
   return (
-    <div className="p-5 pb-10 sm:px-8 space-y-6">
+    <div className="p-5 sm:px-8 space-y-6">
       <div className="mb-2 group">
         {!address &&
           <div className="border-2 border-dotted border-red-500">
@@ -264,12 +264,12 @@ export default function Page() {
       </div>
 
       {/* Buttons */}
-      <div className="flex px-2 sm:px-2 py-2 sticky bottom-0 bg-background">
+      <div className="flex justify-around px-2 sm:px-2 py-2 sticky bottom-0">
         <Button
           id="buyButton"
           type="button"
           tabIndex={5}
-          className="text-center font-medium w-full py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
+          className="text-center font-medium w-32 py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
           onClick={handleBuy}
         >
           Buy
@@ -278,7 +278,7 @@ export default function Page() {
           id="sellButton"
           type="button"
           tabIndex={6}
-          className="text-center font-medium w-full py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
+          className="text-center font-medium w-32 py-6 text-base text-white bg-primary hover:bg-primary/90 rounded-lg focus:!ring-0"
           onClick={handleSell}
           >
             Sell
