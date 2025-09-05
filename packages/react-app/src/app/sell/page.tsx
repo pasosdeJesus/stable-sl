@@ -170,6 +170,8 @@ export default function Page() {
                    setQuoteCryptoBalance(data.cryptoBalance)
                    setQuoteMinimum(data.minimum)
                    setQuoteMaximum(data.maximum)
+                   setSenderPhone(data.senderPhone)
+                   setSenderName(data.senderName)
 
                    if (amountCrypto && amountCrypto > 0) {
                      setAmountSle(calculateAmountSle(
@@ -197,7 +199,7 @@ export default function Page() {
 
   const calculateAmountSle = (_cryptoAmount: number, slePerCrypto: number) => {
     return slePerCrypto && _cryptoAmount ?
-      Math.round(_cryptoAmount*100.0*slePerCrypto)/100.0 : 0
+      Math.round(_cryptoAmount*slePerCrypto) : 0
   }
 
   const secondsAsMinutes = (seconds: number):String => {
@@ -254,17 +256,11 @@ export default function Page() {
             data.crypto !== undefined &&
             data.amountCrypto !== undefined &&
             data.senderPhone !== undefined &&
-            data.receiverName !== undefined
+            data.senderName !== undefined
            ) {
-             /* TODO: if (data.token !== token ||
-                 data.amountSle !== amountSle ||
-                 data.crypto !== crypto ||
-                   data.amountCrypto !== amountCrypto) {
-               alert("Mismatch in information of this app and coordinator")
-             } else { */
              setSecondsWaitingPayment(data.seconds)
              setSenderPhone(data.senderPhone)
-             setSenderName(data.receiverName)
+             setSenderName(data.senderName)
              setStep(4)
            }
            else {
