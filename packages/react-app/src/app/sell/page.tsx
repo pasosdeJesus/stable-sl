@@ -130,8 +130,8 @@ export default function Page() {
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },
     { number: 2, title: "Amount", description: "Amount of crypto to sell" },
     { number: 3, title: "Confirm", description: "Review and confirm details" },
-    { number: 4, title: "Wait Payment", description: "Wait for payment in Orange" },
-    { number: 5, title: "Complete", description: "Transaction processed" },
+    { number: 4, title: "Transfer crypto", description: "Pay with your wallet},
+    { number: 5, title: "Wait for payment", description: "Transaction processed" },
   ]
 
   const fetchSalesQuote = async () => {
