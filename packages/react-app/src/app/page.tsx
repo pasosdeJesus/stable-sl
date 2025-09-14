@@ -51,9 +51,6 @@ export default function Page() {
     } else {
       if (address != previousAddress) {
         setPreviousAddress(address)
-        let url = process.env.NEXT_PUBLIC_COORDINATOR +
-          `/api/wallet_connected?address=${address}`
-        console.log(`Fetching ${url}`)
         setDisabledAndValue("phoneNumber", false)
       }
     }
@@ -62,9 +59,11 @@ export default function Page() {
   const setDisabledAndValue = (id: string, disabled: boolean, value: any = null) => {
     const e = document.getElementById(id)
     if (e) {
+      //@ts-ignore
       e.disabled = disabled
     }
     if (e && value != null) {
+      //@ts-ignore
       e.value = value
     }
   }

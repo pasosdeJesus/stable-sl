@@ -3,9 +3,9 @@
 import axios from 'axios'
 import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useWriteContract } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
-
+import { Address, erc20Abi, http } from 'viem'
 import { Button } from '@/components/ui/button'
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
@@ -17,7 +17,8 @@ import { Label } from '@/components/ui/label'
 export default function Page() {
 
   const { address, chainId } = useAccount()
-
+  const { writeContractAsync, isPending } = useWriteContract()
+  //const { writeContractAsync } = useWriteContractAsync()
   const [quoteToken, setQuoteToken] = useState("")
   const [quoteTimestamp, setQuoteTimestamp] = useState(0)
   const [quoteCrypto, setQuoteCrypto] = useState("usdt")
@@ -29,7 +30,7 @@ export default function Page() {
   const [crypto, setCrypto] = useState('usdt')
   const [amountSle, setAmountSle] = useState(0)
   const [amountCrypto, setAmountCrypto] = useState(0)
-  const [countdown, setCountdown] = useState(0)
+  const [countdown, setCountdown] = useState(3)
   const [secondsWaitingPayment, setSecondsWaitingPayment] = useState(0)
   const [senderPhone, setSenderPhone] = useState("")
   const [senderName, setSenderName] = useState("")
@@ -83,12 +84,6 @@ export default function Page() {
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1)
-        if (step == 4) {
-          setSecondsWaitingPayment(secondsWaitingPayment - 1)
-          if (secondsWaitingPayment <= 0) {
-            setStep(6)
-          }
-        }
       }, 1000)
       return () => clearTimeout(timer) // Cleanup on unmount
     } else {
@@ -104,10 +99,6 @@ export default function Page() {
           }, 1000) // 1 second delay
           break
         case 4:
-          setTimeout(() => {
-            fetchOrderState()
-            setCountdown(10)
-          }, 1000) // 1 second delay
           break
         default:
           break
@@ -130,152 +121,205 @@ export default function Page() {
     { number: 1, title: "About you", description: "Wallet, name and orange money number" },
     { number: 2, title: "Amount", description: "Amount of crypto to sell" },
     { number: 3, title: "Confirm", description: "Review and confirm details" },
-    { number: 4, title: "Transfer crypto", description: "Pay with your wallet},
-    { number: 5, title: "Wait for payment", description: "Transaction processed" },
-  ]
+      { number: 4, title: "Approve transfer", description: "Pay with your wallet" },
+      { number: 5, title: "Wait for our payment", description: "In your Orange" },
+      { number: 6, title: "Done", description: "Transaction completed" },
+    ]
 
-  const fetchSalesQuote = async () => {
-    if (address && phoneNumber && sellerName) {
-      let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
-      const apiSalesQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sales_quote?${tokenParam}`+
-        `wallet=${address}&`+
-        `crypto=${crypto}&`+
-        `phone=${phoneNumber}&` +
-        `sellerName=${sellerName}`
-      //extractAPIErrorResponse(axios)
+    const fetchSalesQuote = async () => {
+      if (address && phoneNumber && sellerName) {
+        let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
+        const apiSalesQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+          `/api/sales_quote?${tokenParam}`+
+          `wallet=${address}&`+
+          `crypto=${crypto}&`+
+          `phone=${phoneNumber}&` +
+          `sellerName=${sellerName}`
+        //extractAPIErrorResponse(axios)
 
-      try {
-        axios.get(
-          apiSalesQuoteUrl, {
-            validateStatus: function (status) {
-              return status < 500; // Reject only if the status code is greater than or equal to 500
+        try {
+          axios.get(
+            apiSalesQuoteUrl, {
+              validateStatus: function (status) {
+                return status < 500; // Reject only if the status code is greater than or equal to 500
+              }
+            })
+            .then( (response) => {
+              if (response.data) {
+                let data = response.data
+                if (data.token!== undefined &&
+                  data.timestamp !== undefined &&
+                  data.crypto !== undefined &&
+                  data.cryptoPriceInSle !== undefined &&
+                  data.cryptoBalance !== undefined &&
+                  data.minimum !== undefined &&
+                  data.maximum !== undefined
+                ) {
+                    setQuoteToken(data.token)
+                    setQuoteTimestamp(data.timestamp)
+                    setQuoteCrypto(data.crypto)
+                    setQuoteCryptoPriceInSle(data.cryptoPriceInSle)
+                    setQuoteCryptoBalance(data.cryptoBalance)
+                    setQuoteMinimum(data.minimum)
+                    setQuoteMaximum(data.maximum)
+                    setSenderPhone(data.senderPhone)
+                    setSenderName(data.senderName)
+
+                    if (amountCrypto && amountCrypto > 0) {
+                      setAmountSle(calculateAmountSle(
+                        amountCrypto, data.cryptoPriceInSle
+                      ))
+                    }
+                  } else {
+                    console.error('Invalid data format from API:', data)
+                    alert('Invalid data format from API:' + data)
+                  }
+              }
+            })
+            .catch( (error) => {
+              console.error('Error fetching quote:', error.toJSON())
+              alert('Error. Possibly there is an order with the same number.\n' +
+                    'Wait 15 minutes and try again')
+            })
+        } catch (error) {
+          console.error('Error fetching quote:', error)
+          alert('Error. Possibly there is an order with the same number.\n' +
+                'Wait 15 minutes and try again')
+        }
+      }
+    }
+
+    const calculateAmountSle = (_cryptoAmount: number, slePerCrypto: number) => {
+      return slePerCrypto && _cryptoAmount ?
+        Math.round(_cryptoAmount*slePerCrypto) : 0
+    }
+
+    const secondsAsMinutes = (seconds: number):String => {
+      return `${Math.floor(seconds / 60)}:${seconds % 60}`
+    }
+
+    const handleNext = () => {
+      switch (step) {
+        case 1:
+          alert("Should not")
+        break
+        case 2:
+          if (+amountCrypto < quoteMinimum) {
+            alert('Amount should be greather than lower limit')
+          } else if (runningProduction() && !isCelo()) {
+            alert('Switch to the Celo Blockchain')
+          } else if (+quoteMaximum <= 0) {
+            alert('Maximum quote <= 0. Try again later')
+          } else if (+amountCrypto > quoteMaximum) {
+            alert('Amount should be less than upper limit')
+          } else if (amountCrypto && amountCrypto > 0) {
+            setStep(3)
+          } else {
+            alert('Please enter valid values.')
+          }
+          break
+        default:
+          alert('Please enter valid values.')
+      }
+    }
+
+    const handleBack = () => {
+      if (step > 2) {
+        setStep(step - 1)
+      }
+    }
+
+    const handleConfirm = async () => {
+
+      const transferFromWallet = async() => {
+        let erc20Address:Address = runningProduction() ?
+          '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e' : //USDT 
+          '0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B' //USDC Alfa
+        let decimals = 6
+        if (crypto == "gooddollar") {
+          erc20Address = runningProduction() ?
+            '0x62b8b11039fcfe5ab0c56e502b1c372a3d2a9c7a' :
+            '0xb4fF4DcbaC21ECBe3b0A313aFd031aF7279be142'
+          decimals = 18
+        }
+        const amountInWei = BigInt(amountCrypto * (10 ** decimals))
+        console.log("amountInWei=", amountInWei)
+        debugger
+        let txHash = await writeContractAsync({
+          address: erc20Address,
+          abi: erc20Abi,
+          functionName: 'transfer',
+          args: [
+            '0x6b3bc1b55b28380193733a2fd27f2639d92f14be',
+            amountInWei
+          ],
+        });
+        console.log('Transaction sent:', txHash);
+        if (txHash) {
+          const cryptoTransferredUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+            `/api/crypto_transferred`
+          axios.post(
+            cryptoTransferredUrl,
+            {
+              "token": quoteToken,
+              "tx": txHash
             }
-          })
-          .then( (response) => {
+          )
+          .then(response => {
             if (response.data) {
               let data = response.data
-              if (data.token!== undefined &&
-                data.timestamp !== undefined &&
-                data.crypto !== undefined &&
-                data.cryptoPriceInSle !== undefined &&
-                data.cryptoBalance !== undefined &&
-                data.minimum !== undefined &&
-                data.maximum !== undefined
-              ) {
-                   setQuoteToken(data.token)
-                   setQuoteTimestamp(data.timestamp)
-                   setQuoteCrypto(data.crypto)
-                   setQuoteCryptoPriceInSle(data.cryptoPriceInSle)
-                   setQuoteCryptoBalance(data.cryptoBalance)
-                   setQuoteMinimum(data.minimum)
-                   setQuoteMaximum(data.maximum)
-                   setSenderPhone(data.senderPhone)
-                   setSenderName(data.senderName)
-
-                   if (amountCrypto && amountCrypto > 0) {
-                     setAmountSle(calculateAmountSle(
-                       amountCrypto, data.cryptoPriceInSle
-                     ))
-                   }
-                 } else {
-                   console.error('Invalid data format from API:', data)
-                   alert('Invalid data format from API:' + data)
-                 }
+              if (data.thanks !== undefined) {
+                console.log(" Recibido")
+                setStep(5)
+              }
             }
-          })
-          .catch( (error) => {
-            console.error('Error fetching quote:', error.toJSON())
-            alert('Error. Possibly there is an order with the same number.\n' +
-                  'Wait 15 minutes and try again')
-          })
-      } catch (error) {
-        console.error('Error fetching quote:', error)
-        alert('Error. Possibly there is an order with the same number.\n' +
-              'Wait 15 minutes and try again')
-      }
-    }
-  }
-
-  const calculateAmountSle = (_cryptoAmount: number, slePerCrypto: number) => {
-    return slePerCrypto && _cryptoAmount ?
-      Math.round(_cryptoAmount*slePerCrypto) : 0
-  }
-
-  const secondsAsMinutes = (seconds: number):String => {
-    return `${Math.floor(seconds / 60)}:${seconds % 60}`
-  }
-
-  const handleNext = () => {
-    switch (step) {
-      case 1:
-        alert("Should not")
-      break
-      case 2:
-        if (+amountCrypto < quoteMinimum) {
-          alert('Amount should be greather than lower limit')
-        } else if (runningProduction() && !isCelo()) {
-          alert('Switch to the Celo Blockchain')
-        } else if (+quoteMaximum == 0) {
-          alert('Seems there is a problem with the backend, try again later')
-        } else if (+amountCrypto > quoteMaximum) {
-          alert('Amount should be less than upper limit')
-        } else if (amountCrypto && amountCrypto > 0) {
-          setStep(3)
+          }).catch(function (error) {
+            alert("Problem verifying transaction, please take screenshot and contact us. Error: " + error);
+          });
         } else {
-          alert('Please enter valid values.')
+          alert("Transaction not completed")
         }
-        break
-      default:
-        alert('Please enter valid values.')
-    }
-  }
+      }
 
-  const handleBack = () => {
-    if (step > 2) {
-      setStep(step - 1)
-    }
-  }
-
-  const handleConfirm = () => {
-    try {
-      if (runningProduction() && !isCelo()) {
+      try {
+        if (runningProduction() && !isCelo()) {
           alert('Switch to the Celo Blockchain')
           return
-      }
-
-      const apiSalesOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sales_order?token=${quoteToken}&amountSle=${amountSle}`
-      axios.get(apiSalesOrderUrl)
-      .then(response => {
-        if (response.data) {
-          let data = response.data
-          if (data.token !== undefined &&
-            data.seconds !== undefined &&
-            data.amountSle !== undefined &&
-            data.crypto !== undefined &&
-            data.amountCrypto !== undefined &&
-            data.senderPhone !== undefined &&
-            data.senderName !== undefined
-           ) {
-             setSecondsWaitingPayment(data.seconds)
-             setSenderPhone(data.senderPhone)
-             setSenderName(data.senderName)
-             setStep(4)
-           }
-           else {
-            alert('Incorrect information to make order. ' + JSON.stringify(data))
-           }
-        } else {
-          alert("No reponse data");
         }
-      }).catch(function (error) {
-        alert("Problem with axios" + error);
-      });
-    } catch (error) {
-     alert('Error making order:' + error)
+
+        const apiSalesOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
+          `/api/sales_order?token=${quoteToken}&amountCrypto=${amountCrypto}`
+        axios.get(apiSalesOrderUrl)
+        .then(response => {
+          if (response.data) {
+            let data = response.data
+            if (data.token !== undefined &&
+                data.seconds !== undefined &&
+                  data.amountSle !== undefined &&
+                    data.crypto !== undefined &&
+                      data.amountCrypto !== undefined &&
+                        data.senderPhone !== undefined &&
+                          data.senderName !== undefined
+               ) {
+                 //setSecondsWaitingPayment(data.seconds)
+                 setSenderPhone(data.senderPhone)
+                 setSenderName(data.senderName)
+                 setStep(4)
+                 console.log("OJO setStep(4)")
+                 transferFromWallet()
+               } else {
+                 alert('Incorrect information to make order. ' + JSON.stringify(data))
+               }
+          } else {
+            alert("No reponse data");
+          }
+        }).catch(function (error) {
+          alert("Problem with axios" + error);
+        });
+      } catch (error) {
+        alert('Error making order:' + error)
+      }
     }
-  }
 
   const handleSupposePaid = () => {
     if (runningProduction()) {
@@ -426,24 +470,25 @@ export default function Page() {
 
           {step == 4 &&
             <div className="space-y-2">
-              <p className="text-sm">Completing our payment: {secondsAsMinutes(secondsWaitingPayment)}</p>
+              <p className="text-sm">Waiting for your approval of the transaction for {amountCrypto} to send you after {amountSle}SLE to your Orange {phoneNumber} with name {sellerName}. {/*secondsAsMinutes(secondsWaitingPayment)*/}</p>
             </div>
           }
           {step == 5 &&
             <div className="space-y-2">
-              <p className="text-sm">Thanks for selling. We transfered {amountSle}SLE to your Orange Money.</p>
+              <p className="text-sm">Thanks for selling. We are transferring {amountSle}SLE to your Orange Money {phoneNumber} with name {sellerName}.</p>
+              <p>If you don't receive them in the next 15 minutes, please contact us by writing in Telegram to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a> or in WhatsApp to the number +232 75343641.</p>
             </div>
           }
           {step == 5 && runningDevelopment() &&
-            <div className="space-y-2">
-              <p className="text-sm">(Well in reality since this is testnet we just sent an SMS...)</p>
+            <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
+              <p className="text-sm">(Well in reality since this is testnet we are just trying to send an SMS to the provided number.)</p>
             </div>
           }
 
           {step == 6 &&
             <div className="space-y-2">
               <p className="text-sm">stable-sl couldn't send your payment.</p>
-              <p className="text-sm">Please contact support in Telegram by writting to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a>.</p>
+              <p className="text-sm">Please contact support in Telegram by writting to <a href="https://t.me/soporte_pdJ_bot" target="_blank">@soporte_pdJ_bot</a> or in WhatsApp by writing to the number +232 75343641.</p>
             </div>
           }
 
@@ -481,7 +526,7 @@ export default function Page() {
               </div>
             }
 
-            { step == 5 &&
+            { step == 6 &&
               <a href={transactionUrl} target="_blank">Transaction Receipt</a>
             }
 
