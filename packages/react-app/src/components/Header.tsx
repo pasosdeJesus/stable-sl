@@ -27,10 +27,9 @@ export default function Header() {
         >
           <span className="flex items-center justify-center gap-3 text-black text-lg font-extrabold">
             <img 
-              src="stable-sl-logo.png" 
+              src="stable-sl-logo.svg" 
               alt="logo" 
-              className="h-8" 
-              height="32"
+              style={{width: "64px"}}
             />
             Stable SL
           </span>

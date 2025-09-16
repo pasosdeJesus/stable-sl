@@ -5,3 +5,6 @@ all:
 
 syntax:
 	pnpm typecheck
+
+clean:
+	rm -rf .next

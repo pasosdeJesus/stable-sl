@@ -448,7 +448,7 @@ export default function Page() {
             </div>
           }
           {step == 5 && runningDevelopment() &&
-            <div className="space-y-2">
+            <div className="border border-dotted border-orange-500 text-orange-500 flex items-center text-sm flex justify-between">
               <p className="text-sm">(Well in reality since this is testnet we sent {amountCrypto}USDC...)</p>
             </div>
           }
