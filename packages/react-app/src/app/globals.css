@@ -124,3 +124,16 @@
 a {
   text-decoration: underline;
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(90%);
+  }
+  100% {
+    transform: translateX(-40%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 15s linear infinite;
+}

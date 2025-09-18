@@ -97,3 +97,4 @@ next-env.d.ts
 
 .genkit/*
 drizzle/meta
+packages/hardhat/tmpart
