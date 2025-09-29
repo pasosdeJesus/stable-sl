@@ -408,7 +408,7 @@ export default function Page() {
           {step === 2 && (
             <div className="space-y-2">
               <p className="text-sm text-gray-500">
-                Balance in your wallet: {quoteCryptoBalance} {crypto}
+                Balance in your wallet: {Math.floor(quoteCryptoBalance)} {crypto}
               </p>
               <label htmlFor="amountCrypto" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount of {crypto} to sell</label>
               <Input
