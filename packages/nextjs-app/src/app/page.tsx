@@ -230,35 +230,22 @@ export default function Page() {
       </div>
 
       <div className="mb-2 group">
-        <div className="flex items-center justify-between border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
-          <div className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Cryptocurrency</div>
-          <button
-            type="button"
-            tabIndex={4}
-            className="text-center font-medium flex justify-center items-center gap-2 py-3 px-2 bg-surface-100 dark:bg-surface-700 cursor-pointer absolute right-3 min-w-24 h-3/5 rounded-md hover:bg-surface-100/60 focus:!ring-0"
-            onClick={() => setIsCryptoDrawerOpen(true)}
-          >
-            <span className="flex gap-2 items-center justify-between text-surface-600 font-semibold tracking-widest text-xs uppercase">
-              <div className="relative flex-shrink-0" style={{ width: '22px', height: '22px' }}>
-                {/* Simple SVG Icon for USDT or G$ */}
-                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
-                {crypto === 'usdt' ? (
-                  <>
-                    <circle cx="16" cy="16" r="14" fill="#50AF95" />
-                    <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
-                  </>
-                ) : (
-                  <>
-                    <circle cx="16" cy="16" r="14" fill="#FF6B00" />
-                    <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">G</text>
-                  </>
-                )}
-                </svg>
-              </div>
-              {crypto}
-            </span>
-            <ChevronDown className="w-4 h-4 text-surface-600" />
-          </button>
+        <div className="flex items-center justify-around border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
+          <div className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Crypto:&nbsp;&nbsp;&nbsp;</div>
+          <div>
+            <Select onValueChange={setCrypto} defaultValue={crypto}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select crypto" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Crypto</SelectLabel>
+                    <SelectItem value="usdt">USDT</SelectItem>
+                    <SelectItem value="gooddollar">GoodDollar</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -283,63 +270,6 @@ export default function Page() {
             Sell
         </Button>
       </div>
-
-      {/* Crypto Selection Drawer (Modal Placeholder) */}
-      {isCryptoDrawerOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md rounded-lg shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold">Select Cryptocurrency</h3>
-                <Button variant="ghost" size="icon" onClick={() => setIsCryptoDrawerOpen(false)}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </Button>
-              </div>
-              <div className="space-y-2">
-                <Button
-                  variant={crypto === 'usdt' ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setCrypto('usdt')
-                   setIsCryptoDrawerOpen(false)
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative flex-shrink-0" style={{ width: '24px', height: '24px' }}>
-                      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
-                        <circle cx="16" cy="16" r="14" fill="#50AF95" />
-                        <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">T</text>
-                      </svg>
-                    </div>
-                    USDT (Tether)
-                  </div>
-                </Button>
-                <Button
-                  variant={crypto === 'gooddollar' ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setCrypto('gooddollar')
-                    setIsCryptoDrawerOpen(false)
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative flex-shrink-0" style={{ width: '24px', height: '24px' }}>
-                      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
-                        <circle cx="16" cy="16" r="14" fill="#FF6B00" />
-                        <text x="16" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">G</text>
-                      </svg>
-                    </div>
-                    G$ (GoodDollar)
-                  </div>
-                </Button>
-                {/* Add more cryptocurrencies as needed */}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      </div>
+    </div>
   )
 }
