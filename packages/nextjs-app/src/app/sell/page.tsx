@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
 import { useAccount, useWriteContract } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
@@ -15,6 +16,8 @@ import { Label } from '@/components/ui/label'
 
 
 export default function Page() {
+
+  const router = useRouter()
 
   const { address, chainId } = useAccount()
   const { writeContractAsync, isPending } = useWriteContract()
@@ -224,7 +227,14 @@ export default function Page() {
     }
 
     const handleBack = () => {
-      if (step > 2) {
+      if (step == 2) {
+        router.push(
+          '/' +
+            `?customerName=${encodeURIComponent(sellerName)}`+
+            `&phoneNumber=${encodeURIComponent(phoneNumber)}` +
+            `&crypto=${encodeURIComponent(crypto)}`
+        )
+      } else if (step > 2) {
         setStep(step - 1)
       }
     }

@@ -2,8 +2,9 @@
 
 import axios from 'axios'
 import { ChevronDown, MessageCircle, Shield } from "lucide-react"
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
 
 import { Button } from '@/components/ui/button'
 import {
@@ -27,12 +28,24 @@ export default function Page() {
 
   const router = useRouter()
 
+  const searchParams = useSearchParams()
+  const phoneParams = searchParams?.get('phoneNumber') ?? ''
+    .replace(/[^0-9]/g, '')
+    .slice(0, 9)
+  const nameParams = searchParams?.get('customerName') ?? ''
+    .replace(/[^ a-zA-Z]/g, '')
+    .slice(0, 80)
+  const cryptoParams = searchParams && 
+    searchParams.get('crypto') == "gooddollar" ? 
+    'gooddollar' : 'usdt'
+
   const { address, chainId } = useAccount()
   const [previousAddress, setPreviousAddress] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [customerName, setCustomerName] = useState('')
-  const [crypto, setCrypto] = useState('usdt')
+  const [phoneNumber, setPhoneNumber] = useState(phoneParams)
+  const [customerName, setCustomerName] = useState(nameParams)
+  const [crypto, setCrypto] = useState(cryptoParams)
   const [isCryptoDrawerOpen, setIsCryptoDrawerOpen] = useState(false) 
+
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_COORDINATOR == undefined) {
@@ -55,6 +68,7 @@ export default function Page() {
       }
     }
   }, [address])
+
 
   const setDisabledAndValue = (id: string, disabled: boolean, value: any = null) => {
     const e = document.getElementById(id)

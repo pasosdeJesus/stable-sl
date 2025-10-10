@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
+import { useRouter } from 'next/navigation'
 import { useEffect, useState} from 'react'
 import { useAccount } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
@@ -15,6 +16,8 @@ import { Label } from '@/components/ui/label'
 
 
 export default function Page() {
+
+  const router = useRouter()
 
   const cryptoName:Record<string, string> = {
     "usdt": "USDT",
@@ -241,7 +244,14 @@ export default function Page() {
   }
 
   const handleBack = () => {
-    if (step > 2) {
+    if (step == 2) {
+      router.push(
+        '/' +
+          `?customerName=${encodeURIComponent(buyerName)}`+
+          `&phoneNumber=${encodeURIComponent(phoneNumber)}` +
+          `&crypto=${encodeURIComponent(crypto)}`
+      )
+    } else if (step > 2) {
       setStep(step - 1)
     }
   }
