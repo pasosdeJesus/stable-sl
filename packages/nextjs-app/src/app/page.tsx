@@ -3,7 +3,7 @@
 import axios from 'axios'
 import { ChevronDown, MessageCircle, Shield } from "lucide-react"
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
 
 import { Button } from '@/components/ui/button'
@@ -28,23 +28,28 @@ export default function Page() {
 
   const router = useRouter()
 
-  const searchParams = useSearchParams()
-  const phoneParams = searchParams?.get('phoneNumber') ?? ''
-    .replace(/[^0-9]/g, '')
-    .slice(0, 9)
-  const nameParams = searchParams?.get('customerName') ?? ''
-    .replace(/[^ a-zA-Z]/g, '')
-    .slice(0, 80)
-  const cryptoParams = searchParams && 
-    searchParams.get('crypto') == "gooddollar" ? 
-    'gooddollar' : 'usdt'
-
   const { address, chainId } = useAccount()
   const [previousAddress, setPreviousAddress] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState(phoneParams)
-  const [customerName, setCustomerName] = useState(nameParams)
-  const [crypto, setCrypto] = useState(cryptoParams)
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const [crypto, setCrypto] = useState('usdt')
   const [isCryptoDrawerOpen, setIsCryptoDrawerOpen] = useState(false) 
+
+  useEffect(() => {
+/*    const searchParams = useSearchParams()
+    const phoneParams = searchParams?.get('phoneNumber') ?? ''
+      .replace(/[^0-9]/g, '')
+      .slice(0, 9)
+    const nameParams = searchParams?.get('customerName') ?? ''
+      .replace(/[^ a-zA-Z]/g, '')
+      .slice(0, 80)
+    const cryptoParams = searchParams && 
+      searchParams.get('crypto') == "gooddollar" ? 
+      'gooddollar' : 'usdt'
+    setCrypto(cryptoParams)
+    setCustomerName(nameParams)
+    setPhoneNumber(phoneParams) */
+  }, [])
 
 
   useEffect(() => {
@@ -179,6 +184,7 @@ export default function Page() {
 
   return (
     <div className="p-5 sm:px-8 space-y-6">
+      <Suspense>
       <div className="mb-2 group">
         {!address &&
           <div className="border-2 border-dotted border-red-500">
@@ -262,6 +268,7 @@ export default function Page() {
           </div>
         </div>
       </div>
+      </Suspense>
 
       {/* Buttons */}
       <div className="flex justify-around px-2 sm:px-2 py-2 sticky bottom-0">
