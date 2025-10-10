@@ -444,7 +444,8 @@ export default function Page() {
                 Price of one {crypto}: {quoteCryptoPriceInSle} SLE
               </p>
               <p className="text-sm text-gray-500">
-                Order limits in {crypto}: {quoteMinimum} - {quoteMaximum}
+                Order limits in {crypto}: {Math.floor(quoteMinimum)} - 
+                  {Math.floor(quoteMaximum)}
               </p>
               <div className="flex text-sm text-gray-500">
                 <span>Seconds to update:&nbsp; </span>
