@@ -24,32 +24,35 @@ import {
 import { useAccount } from 'wagmi'
 import { celo, celoAlfajores } from 'wagmi/chains'
 
-export default function Page() {
+function ParamsDisplay() {
+  const searchParams = useSearchParams()
 
-  const router = useRouter()
-
-  const { address, chainId } = useAccount()
-  const [previousAddress, setPreviousAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [crypto, setCrypto] = useState('usdt')
-  const [isCryptoDrawerOpen, setIsCryptoDrawerOpen] = useState(false) 
+
 
   useEffect(() => {
-/*    const searchParams = useSearchParams()
-    const phoneParams = searchParams?.get('phoneNumber') ?? ''
-      .replace(/[^0-9]/g, '')
-      .slice(0, 9)
-    const nameParams = searchParams?.get('customerName') ?? ''
-      .replace(/[^ a-zA-Z]/g, '')
-      .slice(0, 80)
-    const cryptoParams = searchParams && 
+    const phoneParam = searchParams?.get('phoneNumber') ?? ''
+    .replace(/[^0-9]/g, '')
+    .slice(0, 9)
+    const nameParam = searchParams?.get('customerName') ?? ''
+    .replace(/[^ a-zA-Z]/g, '')
+    .slice(0, 80)
+    const cryptoParam = searchParams && 
       searchParams.get('crypto') == "gooddollar" ? 
       'gooddollar' : 'usdt'
-    setCrypto(cryptoParams)
-    setCustomerName(nameParams)
-    setPhoneNumber(phoneParams) */
-  }, [])
+
+    setPhoneNumber(phoneParam) 
+    setCustomerName(nameParam)
+    setCrypto(cryptoParam)
+  }, [searchParams])
+
+
+  const router = useRouter()
+  const { address, chainId } = useAccount()
+  const [previousAddress, setPreviousAddress] = useState('')
+  const [isCryptoDrawerOpen, setIsCryptoDrawerOpen] = useState(false) 
 
 
   useEffect(() => {
@@ -58,20 +61,6 @@ export default function Page() {
       return
     }
     console.log("addres=", address)
-    console.log("phoneNumber=", phoneNumber)
-    console.log("customerName=", customerName)
-    console.log("crypto=", crypto)
-    if (address == null) {
-      setDisabledAndValue("phoneNumber", true, "")
-      setDisabledAndValue("customerName", true, "")
-      setDisabledAndValue("crypto", true, "usdt")
-      setPreviousAddress('')
-    } else {
-      if (address != previousAddress) {
-        setPreviousAddress(address)
-        setDisabledAndValue("phoneNumber", false)
-      }
-    }
   }, [address])
 
 
@@ -253,16 +242,13 @@ export default function Page() {
         <div className="flex items-center justify-around border-2 bg-surface-200 dark:bg-surface-800 border-surface-200 dark:border-surface-600 rounded-lg">
           <div className="mb-2 text-sm text-surface-600 dark:text-surface-200 font-medium tracking-wide transition-all">Crypto:&nbsp;&nbsp;&nbsp;</div>
           <div>
-            <Select onValueChange={setCrypto} defaultValue={crypto}>
+            <Select onValueChange={setCrypto} value={crypto}>
               <SelectTrigger>
                 <SelectValue placeholder="Select crypto" />
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Crypto</SelectLabel>
-                    <SelectItem value="usdt">USDT</SelectItem>
-                    <SelectItem value="gooddollar">GoodDollar</SelectItem>
-                </SelectGroup>
+                <SelectItem value="usdt">USDT</SelectItem>
+                <SelectItem value="gooddollar">GoodDollar</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -292,5 +278,14 @@ export default function Page() {
         </Button>
       </div>
     </div>
+  )
+}
+
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+      <ParamsDisplay />
+    </Suspense>
   )
 }
