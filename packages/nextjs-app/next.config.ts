@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'export',
   allowedDevOrigins: ["stable-sl.pdJ.app", "stable-sl.pdj.app", "127.0.0.1"],
 };
 
