@@ -190,7 +190,7 @@ function ParamsDisplay() {
                 style={{display: "none"}}
                 id="testPhone"
                 value="012345678"
-                disabled />
+                />
             <Button
                 className="btn btn-sm bg-orange-500 text-primary-foreground hover:bg-primary/90"
                 onClick={copyTestPhone}>Copy</Button>
@@ -213,7 +213,6 @@ function ParamsDisplay() {
                 onChange={(e) => changePhoneNumber(e.target.value) }
                 onBlur={(e) => blurPhoneNumber(e.target.value) }
                 aria-label="Phone Number"
-                disabled
               />
         </div>
       </div>
