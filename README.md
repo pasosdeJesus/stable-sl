@@ -5,6 +5,13 @@ Making easy to buy and sell crypto for people from Sierra Leone
 Prototype running in production mode on <https://stable-sl.pdJ.app> and in
 development mode on <https://stable-sl.pdJ.app:9001>
 
+See also:
+- [ARCHITECTURE.md](ARCHITECTURE.md) — design, diagrams, flows
+- [CONTRIBUTING.md](CONTRIBUTING.md) — development guide
+- [packages/nextjs-app/README.md](packages/nextjs-app/README.md) — frontend setup
+
+---
+
 ## Problem
 
 In Sierra Leone few people manages a crypto wallet or an exchange and at the
@@ -26,7 +33,7 @@ about this in Sierra Leone.
   their partners in Sierra Leone. Later they told us that they already
   had a team there, but up to now they still don't support the currency,
   neither payment methods of Sierra Leone not even in their sandbox.
-* So at least while FonBnk or another group offers an on-ramp/off-ramp 
+* So at least while FonBnk or another group offers an on-ramp/off-ramp
   solution we have started building one, operating with a team based on the
   Mission Hope School located in Kabala (the school is lead by the pastor
   Zechariah Conteh who is in the team).
@@ -38,40 +45,45 @@ Sierra Leone
 ## Contents of this monorepo
 
 This monorepo includes:
-1. The frontend to interact with the customers that initially can run as a
-   web application.
-2. The APK of the Gateway application that runs in our phone to manage
-   transactions.
+1. `packages/nextjs-app` — The frontend to interact with the customers that
+   initially can run as a web application.
+2. `packages/hardhat` — Smart contracts (MockG for testing) and deployment
+   scripts.
+3. The APK of the Gateway application that runs in our phone to manage
+   transactions (at `gatewaySmsUssd/app-debug.apk`).
+
+## Repositories
+
+This service is split across two repositories:
+
+| Repo | Purpose | Location |
+|---|---|---|
+| `stable-sl` (this one) | Frontend + smart contracts | `/htdocs/stable-sl` |
+| `coordinator-stable-sl` | Backend API (coordinator) | `/htdocs/coordinator-stable-sl` |
+
+The frontend communicates with the coordinator via `NEXT_PUBLIC_COORDINATOR`.
+
+## Frontend environment variables
+
+See `packages/nextjs-app/README.md` for a full list. Key variables:
+
+- `NEXT_PUBLIC_COORDINATOR` — coordinator backend URL
+- `NEXT_PUBLIC_NETWORK` — `ALFAJORES` (testnet) or `CELO` (mainnet)
+- `PORT` — dev server port (default 9002)
 
 ## Running the frontend in development mode
 
 The frontend is better served in SSL with nginx.  See detailed
-instructions in packages/react-app/README.md
-
+instructions in [packages/nextjs-app/README.md](packages/nextjs-app/README.md)
 
 ## Design
 
-### Architecture
-
-The architecutre is presented in the following diagram:
-![Architecture](./doc/img/Architecture_stable-sl-Architecture.drawio.svg)
-
-### Authentication
-
-* For the customer - coordinator backend we use a randomly generated 
-  authentication token.
-* For the coordinator - gateway we want to use a shared secret only between
-  them both to encrypt the messages
-
-### Sequence diagram for on-ramping
-
-![On-ramp](./doc/img/seq_onramp-Sequence diagram.drawio.svg)
-
-
-### Sequence diagram for off-ramping
-
-![On-ramp](./doc/img/seq_offramp-Sequence diagram.drawio.svg)
-
+See [ARCHITECTURE.md](ARCHITECTURE.md) for:
+- C4 architecture diagram
+- On-ramp and off-ramp sequence diagrams
+- Database schema
+- Price strategy
+- Authentication
 
 ## Status of Implementation
 
@@ -87,4 +99,3 @@ It is a prototype that:
    or GoodDollar limited to small amounts.
    The development version runs on Alfajores and makes payments in
    Mock USDT and Mock GoodDollar (deployed by us).
-
