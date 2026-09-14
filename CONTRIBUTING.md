@@ -1,65 +1,99 @@
 # Contributing
 
-## Development setup
+## Configuración de desarrollo
 
-See [README.md](README.md) and [packages/nextjs-app/README.md](packages/nextjs-app/README.md) for environment setup and running instructions.
+Ver [README.md](README.md) y [doc/environments.md](doc/environments.md) para la
+configuración de entorno y los comandos de ejecución.
 
-## Code quality
+Requisitos: Node.js 20+, pnpm 10.6.2, PostgreSQL, y en OpenBSD `ulimit -d` ≥ 7G
+(por el fallback WASM de SWC — ver `doc/environments.md`).
 
-Run the TypeScript type checker:
+## Calidad de código
+
+TypeScript (typecheck):
 
 ```sh
-cd packages/nextjs-app
+cd apps/stable-sl
 pnpm typecheck
 ```
 
-Run the linter:
+> **Nota:** hay errores de tipo preexistentes en componentes `shadcn/ui`
+> (dependencias opcionales como `recharts`, `react-hook-form`, etc.). El
+> `next.config.ts` tiene `ignoreBuildErrors: true` por eso. El código del API
+> (`app/api/`) y la capa de datos (`app/api/db/`) deben quedar sin errores.
+
+## Pruebas
+
+Unit tests (Vitest, con mocks de `kysely`/`pg`/`viem`):
 
 ```sh
-cd packages/nextjs-app
-pnpm lint
+cd apps/stable-sl
+make test          # suite completa (sube ulimit -d)
 ```
 
-> **Note:** Some pre-existing type errors in `shadcn/ui` components may appear.
-> The `next.config.ts` has `ignoreBuildErrors: true` for this reason.
-
-## Smart contracts
-
-Hardhat projects are in `packages/hardhat/`:
+Smoke tests HTTP (requieren la app corriendo):
 
 ```sh
-cd packages/hardhat
-pnpm compile
-pnpm test
+cd apps/stable-sl
+make dev           # en otra terminal
+make test-smoke    # api-routes + flows (testnet)
 ```
 
-## Project structure
+Ver [doc/e2e-testing.md](doc/e2e-testing.md).
+
+## Build
+
+```sh
+cd apps/stable-sl
+make all           # build-guard → swc-wasm → next build --webpack
+```
+
+## Base de datos
+
+La capa de datos usa **Kysely**. Para aplicar migraciones:
+
+```sh
+cd apps/stable-sl
+bin/m db:migrate          # o kysely migrate con .config/kysely.config.ts
+```
+
+El esquema está en `apps/stable-sl/app/api/db/` (`db.d.ts`, `migrations/`).
+
+## Estructura del proyecto
 
 ```
 stable-sl/
-├── packages/
-│   ├── nextjs-app/       # Frontend web application (Next.js)
-│   │   ├── src/
-│   │   │   ├── app/      # Pages (buy, sell, admin)
-│   │   │   └── components/ui/  # shadcn UI components
-│   │   └── public/       # Static assets
-│   ├── hardhat/          # Smart contracts and deployment scripts
-│   │   ├── contracts/    # Solidity contracts
-│   │   └── scripts/      # Deployment scripts
-├── doc/img/              # Architecture and sequence diagrams
-├── gatewaySmsUssd/       # Android gateway APK
-│   └── app-debug.apk
-└── ARCHITECTURE.md       # Architecture documentation
+├── apps/
+│   ├── stable-sl/            # Frontend (Next.js) + API integrada
+│   │   ├── app/              # Páginas (buy, sell) y rutas API (app/api/*)
+│   │   ├── components/       # UI (shadcn, etc.)
+│   │   ├── lib/              # utilidades y hooks
+│   │   ├── providers/        # RainbowKit, Wagmi
+│   │   ├── e2e/              # smoke tests HTTP + browser specs
+│   │   ├── test-utils/       # mocks compartidos (db, viem)
+│   │   ├── bin/              # scripts (dev, prod, start)
+│   │   └── .config/          # kysely.config.ts
+│   └── hardhat/              # Contratos y scripts de despliegue
+├── gatewaySmsUssd/           # APK del gateway
+├── doc/                      # Documentación
+└── ARCHITECTURE.md
 ```
 
-## Conventions
+El backend (coordinator) es un **submodule** en `apps/stable-sl/app/api/`
+(rutas `app/api/*`, `db/`, `services/`). No tiene `package.json` propio: sus
+dependencias se declaran en `apps/stable-sl/package.json`.
 
-- Use TypeScript strict mode.
-- Follow the existing code style (ESLint + Prettier configs provided).
-- Smart contracts follow Hardhat conventions.
-- Frontend uses Next.js App Router.
+## Convenciones
 
-## Support
+- TypeScript en modo estricto.
+- Seguir el estilo existente (ESLint + Prettier).
+- Contratos con convenciones de Hardhat.
+- Frontend con Next.js App Router.
+- Sin emojis en la terminal (OpenBSD no los renderiza): usar `[OK]`, `[FAIL]`,
+  `[WARN]`, etc.
+- Sin operaciones de escritura en Git desde el agente (ver AGENTS.md §7).
 
-For questions or support, contact us on Telegram:
+## Soporte
+
+Para preguntas o soporte, contáctanos en Telegram:
 [@soporte_pdJ_bot](https://t.me/soporte_pdJ_bot)

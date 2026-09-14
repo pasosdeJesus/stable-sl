@@ -1,0 +1,32 @@
+{
+  "name": "stable-sl",
+  "private": true,
+  "packageManager": "pnpm@10.6.2",
+  "scripts": {
+    "dev": "pnpm run -r --parallel dev",
+    "dev:frontend": "pnpm --filter stable-sl-frontend dev",
+    "dev:api": "pnpm --filter coordinator-stable-sl dev",
+    "build": "pnpm run -r build",
+    "typecheck": "pnpm run -r typecheck",
+    "lint": "pnpm run -r lint",
+    "test": "pnpm run -r test",
+    "clean": "rm -rf node_modules apps/*/node_modules",
+    "submodule:update": "git submodule update --remote"
+  },
+  "pnpm": {
+    "overrides": {
+      "lightningcss": "npm:lightningcss-wasm",
+      "@tailwindcss/oxide": "npm:@tailwindcss/oxide-wasm32-wasi"
+    },
+    "onlyBuiltDependencies": [
+      "@firebase/util",
+      "@tailwindcss/oxide",
+      "bufferutil",
+      "keccak",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver",
+      "utf-8-validate"
+    ]
+  }
+}

@@ -1,101 +1,134 @@
 # stable-sl
 
-Making easy to buy and sell crypto for people from Sierra Leone
+Facilitar la compra y venta de criptomonedas estables para las personas de
+Sierra Leona.
 
-Prototype running in production mode on <https://stable-sl.pdJ.app> and in
-development mode on <https://stable-sl.pdJ.app:9001>
+Prototipo en producción en <https://stable-sl.pdJ.app> y en desarrollo en
+<https://stable-sl.pdJ.app:9001>.
 
-See also:
-- [ARCHITECTURE.md](ARCHITECTURE.md) — design, diagrams, flows
-- [CONTRIBUTING.md](CONTRIBUTING.md) — development guide
-- [packages/nextjs-app/README.md](packages/nextjs-app/README.md) — frontend setup
+Ver también:
+- [PRINCIPLES.md](PRINCIPLES.md) — principios que rigen el negocio.
+- [ARCHITECTURE.md](ARCHITECTURE.md) — diseño, diagramas, flujos.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — guía de desarrollo.
+- [doc/environments.md](doc/environments.md) — entornos, billeteras y modos de ejecución.
+- [doc/e2e-testing.md](doc/e2e-testing.md) — pruebas E2E.
 
 ---
 
-## Problem
+## Problema
 
-In Sierra Leone few people manages a crypto wallet or an exchange and at the
-moment of this writing neither FonBnk nor MiniPay support Sierra Leone.
-Regargind exchanges only Binance and OKX operate there.
+En Sierra Leona pocas personas manejan una billetera cripto o un exchange y, al
+momento de escribir esto, ni FonBnk ni MiniPay soportan Sierra Leona. En cuanto
+a exchanges, solo Binance y OKX operan allí.
 
-There are interesting saving and investment options in the web3, but this
-requires tools and education. We want to create tools and promote education
-about this in Sierra Leone.
+Hay opciones interesantes de ahorro e inversión en la web3, pero requieren
+herramientas y educación. Queremos crear herramientas y promover la educación
+sobre esto en Sierra Leona.
 
-## Solution
+## Solución
 
-* Building a webapp or app that will make easy to buy/sell stable crypto
-  to the people of Sierra Leone.
-* Educate in the usage of stable cryptocoins and saving and investment
-  opportunities.
-* Motivated by the initial Divvi offering of FonBnk
-  as a possible backend protocol, in march 2025 we proposed to FonBnk to be
-  their partners in Sierra Leone. Later they told us that they already
-  had a team there, but up to now they still don't support the currency,
-  neither payment methods of Sierra Leone not even in their sandbox.
-* So at least while FonBnk or another group offers an on-ramp/off-ramp
-  solution we have started building one, operating with a team based on the
-  Mission Hope School located in Kabala (the school is lead by the pastor
-  Zechariah Conteh who is in the team).
+- Una aplicación web que facilite la compra y venta de criptomonedas estables a
+  las personas de Sierra Leona.
+- Educación en el uso de criptomonedas estables y en opciones de ahorro e
+  inversión.
+- Motivados por la oferta inicial de Divvi de FonBnk como posible protocolo de
+  backend, en marzo de 2025 propusimos a FonBnk ser sus socios en Sierra Leona.
+  Luego nos dijeron que ya tenían equipo allí, pero hasta ahora no soportan la
+  moneda ni los métodos de pago de Sierra Leona, ni siquiera en su sandbox.
+- Por eso, mientras FonBnk u otro grupo ofrezca una solución de on-ramp/off-ramp,
+  hemos empezado a construir una, operando con un equipo basado en la escuela
+  Mission Hope School de Kabala (dirigida por el pastor Zechariah Conteh, que
+  hace parte del equipo).
 
-## Location of Impact
+## Ubicación del impacto
 
-Sierra Leone
+Sierra Leona
 
-## Contents of this monorepo
+## Contenido de este monorepositorio
 
-This monorepo includes:
-1. `packages/nextjs-app` — The frontend to interact with the customers that
-   initially can run as a web application.
-2. `packages/hardhat` — Smart contracts (MockG for testing) and deployment
-   scripts.
-3. The APK of the Gateway application that runs in our phone to manage
-   transactions (at `gatewaySmsUssd/app-debug.apk`).
+```
+stable-sl/
+├── apps/
+│   ├── stable-sl/        # Frontend (Next.js) + API integrada (submodule app/api)
+│   │   ├── app/          # Páginas (buy, sell) y rutas API (app/api/*)
+│   │   ├── components/   # UI (shadcn, etc.)
+│   │   ├── lib/          # utilidades y hooks
+│   │   ├── providers/    # RainbowKit, Wagmi
+│   │   └── bin/          # scripts (dev, prod)
+│   └── hardhat/          # Contratos inteligentes y scripts de despliegue
+├── gatewaySmsUssd/       # APK del gateway (app-debug.apk)
+└── doc/                  # Documentación (img/, etc.)
+```
 
-## Repositories
+El backend (coordinator) está integrado como **submodule** en
+`apps/stable-sl/app/api/` (rutas `app/api/*`, `db/`, `services/`). No es una
+aplicación Next.js aparte: las rutas del API se sirven desde el mismo frontend,
+y las dependencias se declaran en **un único** `apps/stable-sl/package.json`
+(igual que `learn.tg`).
 
-This service is split across two repositories:
+## Variables de entorno
 
-| Repo | Purpose | Location |
-|---|---|---|
-| `stable-sl` (this one) | Frontend + smart contracts | `/htdocs/stable-sl` |
-| `coordinator-stable-sl` | Backend API (coordinator) | `/htdocs/coordinator-stable-sl` |
+Ver `apps/.env.example` para la lista completa. Variables clave:
 
-The frontend communicates with the coordinator via `NEXT_PUBLIC_COORDINATOR`.
+| Variable | Descripción |
+|---|---|
+| `NEXT_PUBLIC_COORDINATOR` | URL base del API (en este repo es `/api`) |
+| `NEXT_PUBLIC_NETWORK` | `ALFAJORES` (testnet) o `CELO` (mainnet) |
+| `PORT` | Puerto del servidor dev (default 9002) |
+| `PGHOST` / `PGDATABASE` / `PGUSER` / `PGPASSWORD` | Conexión a PostgreSQL (kysely) |
+| `RPC_URL` / `PRIVATE_KEY` / `PUBLIC_ADDRESS` | Blockchain (Celo) |
+| `USD_CONTRACT` / `GOODDOLLAR_CONTRACT` | Contratos de los tokens estables |
+| `PHONE` / `PHONE_NAME` / `ORANGEPASS` | Cuenta Orange Money del operador |
 
-## Frontend environment variables
+## Ejecutar en modo desarrollo
 
-See `packages/nextjs-app/README.md` for a full list. Key variables:
+```sh
+cd apps/stable-sl
+make dev            # o ./bin/dev  (levanta next dev --webpack en PORT)
+```
 
-- `NEXT_PUBLIC_COORDINATOR` — coordinator backend URL
-- `NEXT_PUBLIC_NETWORK` — `ALFAJORES` (testnet) or `CELO` (mainnet)
-- `PORT` — dev server port (default 9002)
+Requiere `ulimit -d` ≥ 7G (OpenBSD) — ver `doc/environments.md`.
 
-## Running the frontend in development mode
+## Ejecutar en modo producción
 
-The frontend is better served in SSL with nginx.  See detailed
-instructions in [packages/nextjs-app/README.md](packages/nextjs-app/README.md)
+```sh
+cd apps/stable-sl
+make all            # build (next build --webpack) con guardas
+./bin/start         # sirve con next start en PORT
+```
 
-## Design
+o, en una sola línea:
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for:
-- C4 architecture diagram
-- On-ramp and off-ramp sequence diagrams
-- Database schema
-- Price strategy
-- Authentication
+```sh
+cd apps/stable-sl && make prod
+```
 
-## Status of Implementation
+## Pruebas
 
-It is a prototype that:
-1. Has fully functional on-ramp with USDT and GoodDollar
-2. Shows how off-ramp works with USDT and GoodDollar
-3. Still doesn't use an API for quotes, we set buying and selling prices
-   manually and adjust periodically (that makes sense given the stability
-   of SLE)
-4. It interacts with the gateway receiving the SMS with Orange Money
-   notifications --a method that has to be improved.
-5. The on-ramp version in production can make payments in mainnet in USDT
-   or GoodDollar limited to small amounts.
-   The development version runs on Alfajores and makes payments in
-   Mock USDT and Mock GoodDollar (deployed by us).
+```sh
+cd apps/stable-sl
+make test           # unit tests (vitest)
+make test-smoke     # smoke tests HTTP (necesita la app corriendo)
+```
+
+Ver [doc/e2e-testing.md](doc/e2e-testing.md).
+
+## Base de datos
+
+PostgreSQL con **Kysely** (antes Drizzle). El esquema vive en
+`apps/stable-sl/app/api/db/` (tipo `DB` en `db.d.ts`, migraciones en
+`db/migrations/`). Ver `ARCHITECTURE.md` §Database.
+
+## Estado de implementación
+
+Es un prototipo que:
+
+1. Tiene on-ramp funcional con USDT y GoodDollar.
+2. Muestra cómo funciona el off-ramp con USDT y GoodDollar.
+3. Aún no usa una API de cotizaciones; los precios de compra y venta se fijan
+   manualmente y se ajustan periódicamente (razonable dada la estabilidad del SLE).
+4. Interactúa con el gateway recibiendo los SMS con notificaciones de Orange
+   Money (método a mejorar).
+5. La versión de producción puede pagar en mainnet en USDT o GoodDollar,
+   limitada a montos pequeños. La versión de desarrollo corre en Alfajores
+   (Celo Sepolia) y paga en Mock USDT y Mock GoodDollar.

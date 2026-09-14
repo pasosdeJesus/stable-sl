@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# OpenBSD: WASM SWC (@next/swc-wasm-nodejs) necesita al menos 7G de data limit
+# (ulimit -d). Sin esto, `next build`/`dev` revienta con un crash nativo de V8.
+# (Adaptado de learn.tg/apps/nextjs/bin/dev.)
+limit=$(ulimit -d 2>/dev/null)
+if [ -n "$limit" ] && [ "$limit" != "unlimited" ] && [ "$limit" -lt 7340032 ]; then
+  ulimit -d 7340032 2>/dev/null || {
+    echo "ERROR: ulimit -d es $limit KB. Se necesitan al menos 7340032 KB (7G)."
+    echo "  Intenta: ulimit -d unlimited   (o en el chroot: data-limit = 7340032)"
+    exit 1
+  }
+fi
+
+rm -rf .next
+pnpm install
+
+# Env compartido: apps/.env (un nivel arriba de apps/stable-sl). Se asume que
+# bin/dev se ejecuta desde apps/stable-sl/ (como learn.tg con apps/nextjs).
+. ../.env
+
+cmd="node_modules/next/dist/bin/next dev -p${PORT} --webpack ${OPDEV}"
+echo "$cmd"
+eval "$cmd"

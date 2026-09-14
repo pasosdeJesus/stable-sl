@@ -1,0 +1,312 @@
+# R-#33: Reorganize the source code in one repository with one private submodule
+
+**Status:** `open`  
+**Priority:** `high`  
+**Repository:** `stable-sl` (branch `v3`)  
+**Date:** 2026-09-08
+
+---
+
+## 📋 Description
+
+Reorganize the source code structure of **stable-sl** into a single repository, integrating `coordinator-stable-sl` as a private submodule at `apps/stable-sl/app/api/`. This reorganization follows the `learn.tg` pattern and facilitates maintenance, deployment, and coordinated development of all components.
+
+---
+
+## 🎯 Objectives
+
+1. **Unify** all code into a single repository (`stable-sl`).
+2. **Preserve** the history of `coordinator-stable-sl` as a submodule.
+3. **Adopt** the `learn.tg` structure (without Rails) for internal consistency.
+4. **Use** `pnpm@10.6.2` with workspaces and catalogs for shared dependencies.
+5. **Centralize** environment variables in `apps/.env.example` and `apps/.env`.
+6. **Ensure** all components continue to work (frontend, API, contracts).
+
+---
+
+## 📁 Proposed Structure
+
+```
+stable-sl/                          # Main repository (branch v3)
+├── .gitmodules                     # Submodule: coordinator-stable-sl
+├── .gitignore                      # Unified (includes apps/.env)
+├── .npmrc                          # pnpm configuration
+├── pnpm-workspace.yaml             # Workspace with catalogs
+├── package.json                    # Root dependencies
+├── pnpm-lock.yaml                  # Unified lockfile
+├── AGENTS.md                       # AI agent instructions
+├── PRINCIPLES.md                   # Guiding principles
+├── ARCHITECTURE.md                 # Global architecture
+├── CONTRIBUTING.md                 # Contribution guide
+├── README.md                       # Main documentation
+├── Makefile                        # Common commands
+│
+├── apps/
+│   ├── .env.example                # ⬅️ Shared environment variables template
+│   ├── .env                        # ⬅️ Actual environment (gitignored)
+│   │
+│   ├── stable-sl/                  # Frontend (Next.js)
+│   │   ├── package.json
+│   │   ├── next.config.ts
+│   │   ├── tsconfig.json
+│   │   ├── app/
+│   │   │   ├── [lang]/             # Pages (buy, sell, admin)
+│   │   │   ├── api/                # ⬅️ SUBMODULE (coordinator-stable-sl)
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── components/             # UI (shadcn, etc.)
+│   │   ├── lib/                    # Hooks, types, utilities
+│   │   ├── providers/              # RainbowKit, Wagmi
+│   │   ├── public/
+│   │   ├── styles/
+│   │   └── bin/                    # Scripts (dev, prod)
+│   │
+│   └── hardhat/                    # Smart contracts
+│       ├── package.json
+│       ├── hardhat.config.ts
+│       ├── contracts/
+│       ├── scripts/
+│       └── test/
+│
+├── gatewaySmsUssd/                 # Gateway APK
+│   └── app-debug.apk
+│
+└── doc/
+    ├── img/
+    ├── api/
+    ├── deployment/
+    └── environments.md
+```
+
+---
+
+## 🔧 Submodule Configuration
+
+**`.gitmodules`:**
+```ini
+[submodule "apps/stable-sl/app/api"]
+    path = apps/stable-sl/app/api
+    url = git@gitlab.com:vtamara/coordinator-stable-sl.git
+    branch = main
+```
+
+**Commands to add the submodule:**
+```bash
+cd stable-sl
+git submodule add git@gitlab.com:vtamara/coordinator-stable-sl.git apps/stable-sl/app/api
+git submodule update --init --recursive
+```
+
+---
+
+## 📦 Dependencies and Versions
+
+Based on `learn.tg` versions:
+
+| Package | Version |
+|---------|---------|
+| **pnpm** | `10.6.2` |
+| **Node.js** | `20.x` (LTS) |
+| **typescript** | `^5.6.3` |
+| **next** | `^16.3.3` |
+| **next-auth** | `^4.24.15` |
+| **react** | `^19.2.3` |
+| **react-dom** | `^19.2.3` |
+| **viem** | `^2.45.0` |
+| **dotenv** | `^17.4.2` |
+| **kysely** | `^0.28.17` |
+| **kysely-postgres-js** | `^2.0.0` |
+
+---
+
+## 🛠️ Key Configuration Files
+
+### `pnpm-workspace.yaml` (root)
+```yaml
+packages:
+  - 'apps/*'
+  - 'apps/stable-sl/app/api'        # Submodule
+  - 'packages/*'
+
+catalog:
+  typescript: ^5.6.3
+  next: ^16.3.3
+  next-auth: ^4.24.15
+  react: ^19.2.3
+  react-dom: ^19.2.3
+  viem: ^2.45.0
+  dotenv: ^17.4.2
+  kysely: ^0.28.17
+  kysely-postgres-js: ^2.0.0
+```
+
+### `package.json` (root)
+```json
+{
+  "name": "stable-sl",
+  "private": true,
+  "packageManager": "pnpm@10.6.2",
+  "scripts": {
+    "dev": "pnpm run -r --parallel dev",
+    "dev:frontend": "pnpm --filter stable-sl-frontend dev",
+    "dev:api": "pnpm --filter coordinator-stable-sl dev",
+    "build": "pnpm run -r build",
+    "typecheck": "pnpm run -r typecheck",
+    "lint": "pnpm run -r lint",
+    "test": "pnpm run -r test",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules",
+    "submodule:update": "git submodule update --remote"
+  }
+}
+```
+
+### `.npmrc` (root)
+```ini
+shamefully-hoist=true
+strict-peer-dependencies=false
+auto-install-peers=true
+```
+
+### `.gitignore` (root)
+```gitignore
+# Environment variables
+apps/.env
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+```
+
+---
+
+## 📝 Environment Variables
+
+**`apps/.env.example`** (shared template, committed):
+```bash
+# ============================================================
+# STABLE-SL ENVIRONMENT VARIABLES
+# Copy this file to .env and fill in your values
+# ============================================================
+
+# ---------- Frontend (stable-sl) ----------
+NEXT_PUBLIC_COORDINATOR=/api
+NEXT_PUBLIC_NETWORK=ALFAJORES
+PORT_DEV=9002
+
+# ---------- Database (shared) ----------
+DB_USER=stablesl
+DB_PASSWORD=MyPassword
+DB_NAME=stablesldev
+DATABASE_URL=postgres://stablesl:MyPassword@localhost:5432/stablesldev
+
+# ---------- Orange Money (API) ----------
+PHONE="075123456"
+PHONE_NAME="Happy Unpaid"
+ORANGEPASS="1234"
+
+# ---------- Blockchain (shared) ----------
+RPC_URL=https://celo-sepolia.g.alchemy.com/v2/YOUR_API_ID
+EXPLORER_TX=https://sepolia.celoscan.io/tx/
+PRIVATE_KEY=0xdad___OF_THE_WALLET
+PUBLIC_ADDRESS=0xffe__OF_THE_WALLET
+
+# ---------- Contracts ----------
+USD_CONTRACT=0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B
+USD_DECIMALS=6
+GOODDOLLAR_CONTRACT=0xb4fF4DcbaC21ECBe3b0A313aFd031aF7279be142
+GOODDOLLAR_DECIMALS=18
+
+# ---------- Prices ----------
+USD_IN_SLE_SELL=22.9
+USD_IN_SLE_BUY=23.9
+GOODDOLLAR_IN_SLE_SELL=0.0025
+GOODDOLLAR_IN_SLE_BUY=0.0026
+
+# ---------- KYC ----------
+KYC1=0x2e77faAdA5fA75230F857980f99Dc40f4BdAdd85
+KYC2=0x2e77faAdA5fA75230F857980f99Dc40f4BdAdd85
+KYC3=0x2e77faAdA5fA75230F857980f99Dc40f4BdAdd85
+KYC4=0x2e77faAdA5fA75230F857980f99Dc40f4BdAdd85
+
+# ---------- Limits ----------
+MIN_SLE=23
+MAX_SLE=114
+MAX_SLE_WHITELISTED=1362
+
+# ---------- Hardhat ----------
+# (Add any Hardhat-specific variables here)
+```
+
+**`apps/.env`** (actual environment, gitignored):
+```bash
+# Copy from .env.example and fill with real values
+```
+
+---
+
+## 🔄 File Mapping
+
+| Source | Destination |
+|--------|-------------|
+| `stable-sl/apps/nextjs/` | `apps/stable-sl/` |
+| `stable-sl/apps/hardhat/` | `apps/hardhat/` |
+| `coordinator-stable-sl/app/api/` | `apps/stable-sl/app/api/` (submodule) |
+| `coordinator-stable-sl/services/` | `apps/stable-sl/app/api/services/` (inside submodule) |
+| `coordinator-stable-sl/db/` | `apps/stable-sl/app/api/db/` (inside submodule) |
+| `coordinator-stable-sl/drizzle/` | `apps/stable-sl/app/api/drizzle/` (inside submodule) |
+| `stable-sl/gatewaySmsUssd/` | `gatewaySmsUssd/` |
+| `stable-sl/apps/.env.template` | `apps/.env.example` (renamed) |
+
+---
+
+## ✅ Acceptance Criteria
+
+- [ ] The `stable-sl` repository exists with branch `v3`.
+- [ ] `coordinator-stable-sl` is added as a submodule at `apps/stable-sl/app/api/`.
+- [ ] `pnpm-workspace.yaml` and root `package.json` are configured.
+- [ ] `apps/.env.example` contains all environment variables.
+- [ ] `apps/.env` is created from `.env.example` (ignored by Git).
+- [ ] `pnpm install` runs without errors.
+- [ ] `pnpm build` compiles frontend, API, and contracts.
+- [ ] `pnpm dev` starts frontend and API in parallel.
+- [ ] Submodule reads environment from `apps/.env` (up one level).
+- [ ] Structure follows the `learn.tg` pattern.
+- [ ] Documentation (`ARCHITECTURE.md`, `README.md`, `CONTRIBUTING.md`) is updated.
+- [ ] `AGENTS.md` and `PRINCIPLES.md` are present.
+
+---
+
+## 📚 Related Documentation
+
+- [learn.tg AGENTS.md](https://github.com/pasosdeJesus/learn.tg/blob/main/AGENTS.md)
+- [learn.tg PRINCIPLES.md](https://github.com/pasosdeJesus/learn.tg/blob/main/PRINCIPLES.md)
+- [learn.tg ARCHITECTURE.md](https://github.com/pasosdeJesus/learn.tg/blob/main/ARCHITECTURE.md)
+- [pnpm Workspaces](https://pnpm.io/workspaces)
+- [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+
+---
+
+## 🗓️ History
+
+| Date | Event |
+|------|-------|
+| 2026-09-08 | Requirement created |
+| 2026-09-08 | Updated: `.env` moved to `apps/.env.example` (standard naming) |
+

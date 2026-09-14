@@ -152,7 +152,7 @@ export default function Page() {
     if (address && phoneNumber && buyerName) {
       let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
       const apiPurchaseQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_quote?${tokenParam}`+
+        `/purchase_quote?${tokenParam}`+
         `wallet=${address}&`+
         `phone=${phoneNumber}&` +
         `crypto=${crypto}&` +
@@ -264,7 +264,7 @@ export default function Page() {
       }
 
       const apiPurchaseOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
+        `/purchase_order?token=${quoteToken}&amountSle=${amountSle}`
       axios.get(apiPurchaseOrderUrl)
       .then(response => {
         if (response.data) {
@@ -314,7 +314,7 @@ export default function Page() {
       let msg= `Transaction Id AB0123CD.45EF Transfer Successful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
 
       const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sms_received`
+        `/sms_received`
 
       axios.post(apiSmsReceivedUrl, {
         sender: "OrangeMoney",
@@ -345,7 +345,7 @@ export default function Page() {
     try {
      if (quoteToken) {
        const apiPurchaseOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/purchase_order_state?token=${quoteToken}`
+        `/purchase_order_state?token=${quoteToken}`
         axios.get(apiPurchaseOrderStateUrl)
         .then(response => {
           if (response.data) {

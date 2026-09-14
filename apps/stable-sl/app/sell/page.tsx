@@ -133,7 +133,7 @@ export default function Page() {
       if (address && phoneNumber && sellerName) {
         let tokenParam = quoteToken == "" ? "" : `token=${quoteToken}&`
         const apiSalesQuoteUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-          `/api/sales_quote?${tokenParam}`+
+          `/sales_quote?${tokenParam}`+
           `wallet=${address}&`+
           `crypto=${crypto}&`+
           `phone=${phoneNumber}&` +
@@ -267,7 +267,7 @@ export default function Page() {
         console.log('Transaction sent:', txHash);
         if (txHash) {
           const cryptoTransferredUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-            `/api/crypto_transferred`
+            `/crypto_transferred`
           axios.post(
             cryptoTransferredUrl,
             {
@@ -298,7 +298,7 @@ export default function Page() {
         }
 
         const apiSalesOrderUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-          `/api/sales_order?token=${quoteToken}&amountCrypto=${amountCrypto}`
+          `/sales_order?token=${quoteToken}&amountCrypto=${amountCrypto}`
         axios.get(apiSalesOrderUrl)
         .then(response => {
           if (response.data) {
@@ -344,7 +344,7 @@ export default function Page() {
       let msg= `Transaction Id AB0123CD.45EF Transfer Successful from ${phoneNumber} transaction amount SLE${amountSle} net credit amount SLE${amountSle} your new balance is SLE500`
 
       const apiSmsReceivedUrl = process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sms_received`
+        `/sms_received`
 
       axios.post(apiSmsReceivedUrl, {
         sender: "OrangeMoney",
@@ -375,7 +375,7 @@ export default function Page() {
     try {
      if (quoteToken) {
        const apiSalesOrderStateUrl= process.env.NEXT_PUBLIC_COORDINATOR +
-        `/api/sales_order_state?token=${quoteToken}`
+        `/sales_order_state?token=${quoteToken}`
         axios.get(apiSalesOrderStateUrl)
         .then(response => {
           if (response.data) {
