@@ -97,5 +97,5 @@ It is a prototype that:
    notifications --a method that has to be improved.
 5. The on-ramp version in production can make payments in mainnet in USDT
    or GoodDollar limited to small amounts.
-   The development version runs on Alfajores and makes payments in
+   The development version runs on Sepolia and makes payments in
    Mock USDT and Mock GoodDollar (deployed by us).
