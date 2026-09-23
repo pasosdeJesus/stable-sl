@@ -18,7 +18,7 @@ Variables clave:
 | Variable | Descripción |
 |---|---|
 | `NEXT_PUBLIC_COORDINATOR` | Base del API (`/api` en este repo) |
-| `NEXT_PUBLIC_NETWORK` | `ALFAJORES` (dev) o `CELO` (prod) |
+| `NEXT_PUBLIC_NETWORK` | `celoSepolia` (dev) o `CELO` (prod) |
 | `PORT` | Puerto del dev server (9002) |
 | `PGHOST`/`PGDATABASE`/`PGUSER`/`PGPASSWORD` | Conexión PostgreSQL (kysely) |
 | `PG_SUPERUSER`/`PG_SUPERUSER_PASSWORD` | Para `bin/m db:super:createuser` |

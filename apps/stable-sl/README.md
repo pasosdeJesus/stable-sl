@@ -8,7 +8,7 @@ Copy `.env.template` to `.env` and fill the values:
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_COORDINATOR` | URL of the coordinator backend (e.g. `https://stable-sl-coordinator.pdJ.app:9001`) |
-| `NEXT_PUBLIC_NETWORK` | `ALFAJORES` for testnet, `CELO` for mainnet |
+| `NEXT_PUBLIC_NETWORK` | `celoSepolia` for testnet, `CELO` for mainnet |
 | `PORT` | Dev server port (default: 9002) |
 | `NEXT_PUBLIC_ADMIN1` | Admin wallet address (for admin features) |
 | `NEXT_PUBLIC_ADMIN2` | Secondary admin wallet address |

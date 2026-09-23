@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useAccount } from 'wagmi'
-import { celo, celoAlfajores } from 'wagmi/chains'
+import { celo, celoSepolia } from 'wagmi/chains'
 
 function ParamsDisplay() {
   const searchParams = useSearchParams()
@@ -77,12 +77,12 @@ function ParamsDisplay() {
   }
 
   const runningDevelopment = () => {
-    return process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
+    return process.env.NEXT_PUBLIC_NETWORK == "celoSepolia"
   }
 
   const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
 
-  const isAlfajores = () => chainId && chainId == celoAlfajores.id
+  const isSepolia = () => chainId && chainId == celoSepolia.id
 
   const isCelo= () => chainId && chainId == celo.id
 

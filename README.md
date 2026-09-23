@@ -73,7 +73,7 @@ Ver `apps/.env.example` para la lista completa. Variables clave:
 | Variable | Descripción |
 |---|---|
 | `NEXT_PUBLIC_COORDINATOR` | URL base del API (en este repo es `/api`) |
-| `NEXT_PUBLIC_NETWORK` | `ALFAJORES` (testnet) o `CELO` (mainnet) |
+| `NEXT_PUBLIC_NETWORK` | `celoSepolia` (testnet) o `CELO` (mainnet) |
 | `PORT` | Puerto del servidor dev (default 9002) |
 | `PGHOST` / `PGDATABASE` / `PGUSER` / `PGPASSWORD` | Conexión a PostgreSQL (kysely) |
 | `RPC_URL` / `PRIVATE_KEY` / `PUBLIC_ADDRESS` | Blockchain (Celo) |
@@ -130,5 +130,5 @@ Es un prototipo que:
 4. Interactúa con el gateway recibiendo los SMS con notificaciones de Orange
    Money (método a mejorar).
 5. La versión de producción puede pagar en mainnet en USDT o GoodDollar,
-   limitada a montos pequeños. La versión de desarrollo corre en Alfajores
+   limitada a montos pequeños. La versión de desarrollo corre en Celo Sepolia
    (Celo Sepolia) y paga en Mock USDT y Mock GoodDollar.

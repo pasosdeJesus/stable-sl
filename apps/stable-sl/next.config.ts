@@ -1,4 +1,11 @@
 import type {NextConfig} from 'next';
+import {config as loadEnv} from 'dotenv';
+import path from 'path';
+
+// Carga el .env compartido de apps/.env (un nivel arriba de apps/stable-sl).
+// Next.js solo auto-carga .env* desde la raíz del proyecto, así que lo
+// cargamos explícitamente para no depender de un symlink.
+loadEnv({path: path.join(process.cwd(), '..', '.env')});
 
 const nextConfig: NextConfig = {
   typescript: {

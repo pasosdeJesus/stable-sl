@@ -17,10 +17,10 @@ import {
     parseEther,
     stringToHex,
 } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celoSepolia } from "viem/chains";
 
 const publicClient = createPublicClient({
-    chain: celoAlfajores,
+    chain: celoSepolia,
     transport: http(),
 });
 
@@ -38,7 +38,7 @@ export const useWeb3 = () => {
         if (typeof window !== "undefined" && window.ethereum) {
             let walletClient = createWalletClient({
                 transport: custom(window.ethereum),
-                chain: celoAlfajores,
+                chain: celoSepolia,
             });
 
             let [address] = await walletClient.getAddresses();
@@ -49,7 +49,7 @@ export const useWeb3 = () => {
     const sendCUSD = async (to: string, amount: string) => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: celoSepolia,
         });
 
         let [address] = await walletClient.getAddresses();
@@ -74,7 +74,7 @@ export const useWeb3 = () => {
     const mintMinipayNFT = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: celoSepolia,
         });
 
         let [address] = await walletClient.getAddresses();
@@ -100,7 +100,7 @@ export const useWeb3 = () => {
     const getNFTs = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: celoSepolia,
         });
 
         const minipayNFTContract = getContract({
@@ -128,7 +128,7 @@ export const useWeb3 = () => {
     const signTransaction = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: celoSepolia,
         });
 
         let [address] = await walletClient.getAddresses();

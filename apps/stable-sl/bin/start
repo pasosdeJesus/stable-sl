@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./.env
+. ../.env
 if (test "$PORT" != "") then {
   node_modules/next/dist/bin/next start -p${PORT}
 } else {

@@ -5,7 +5,7 @@ import {ArrowLeft, CheckCircle, RefreshCw, Shield} from "lucide-react"
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
 import { useAccount, useWriteContract } from 'wagmi'
-import { celo, celoAlfajores } from 'wagmi/chains'
+import { celo, celoSepolia } from 'wagmi/chains'
 import { Address, erc20Abi, http } from 'viem'
 import { Button } from '@/components/ui/button'
 import {
@@ -112,11 +112,11 @@ export default function Page() {
 
   const shortAddress = (a: string) => a.slice(0,4) + '...' + a.slice(-4)
 
-  const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "ALFAJORES"
+  const runningDevelopment = () => process.env.NEXT_PUBLIC_NETWORK == "celoSepolia"
 
   const runningProduction = () => process.env.NEXT_PUBLIC_NETWORK == "CELO"
 
-  const isAlfajores = () => chainId && chainId == celoAlfajores.id
+  const isSepolia = () => chainId && chainId == celoSepolia.id
 
   const isCelo= () => chainId && chainId == celo.id
 
