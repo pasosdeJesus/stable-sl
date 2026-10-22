@@ -1,12 +1,35 @@
+# Workspace raíz: una sola instalación, un solo lockfile y versiones compartidas
+# por catálogo. Las apps viven en apps/web (Next.js) y apps/contracts (Hardhat).
 packages:
   - 'apps/*'
+  - 'packages/*'
 
+# Versión única por dependencia: las apps escriben `"catalog:"`.
 catalog:
   typescript: ^5.9.3
-  react: ^19.2.1
-  react-dom: ^19.2.1
+  react: ^19.2.5
+  react-dom: ^19.2.5
   next: ^16.3.3
-  viem: ^2.41.2
+  viem: ^2.48.4
   kysely: ^0.28.17
   kysely-postgres-js: ^2.0.0
   dotenv: ^17.4.2
+
+# OpenBSD/adJ: variantes WASM (no hay binarios nativos de estos paquetes).
+overrides:
+  lightningcss: npm:lightningcss-wasm
+  '@tailwindcss/oxide': npm:@tailwindcss/oxide-wasm32-wasi
+
+# pnpm 11 falla con ERR_PNPM_IGNORED_BUILDS si un paquete con script de
+# instalación no está aquí (reemplaza `pnpm.onlyBuiltDependencies`).
+allowBuilds:
+  '@firebase/util': true
+  '@tailwindcss/oxide': true
+  bufferutil: true
+  esbuild: true
+  keccak: true
+  protobufjs: true
+  secp256k1: true
+  sharp: true
+  unrs-resolver: true
+  utf-8-validate: true

@@ -57,7 +57,7 @@ server {
     ssl_certificate      /etc/ssl/pdJ.app-cadena.crt;
     ssl_certificate_key  /etc/ssl/private/pdJ.app.key;
 
-    root /htdocs/stable-sl/packages/nextjs-app/out/;
+    root /htdocs/stable-sl/apps/web/out/;
     index index.html;
     location / {
         try_files $uri /index.html;

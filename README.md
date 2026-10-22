@@ -61,9 +61,9 @@ stable-sl/
 ```
 
 El backend (coordinator) está integrado como **submodule** en
-`apps/stable-sl/app/api/` (rutas `app/api/*`, `db/`, `services/`). No es una
+`apps/web/app/api/` (rutas `app/api/*`, `db/`, `services/`). No es una
 aplicación Next.js aparte: las rutas del API se sirven desde el mismo frontend,
-y las dependencias se declaran en **un único** `apps/stable-sl/package.json`
+y las dependencias se declaran en **un único** `apps/web/package.json`
 (igual que `learn.tg`).
 
 ## Variables de entorno
@@ -83,7 +83,7 @@ Ver `apps/.env.example` para la lista completa. Variables clave:
 ## Ejecutar en modo desarrollo
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make dev            # o ./bin/dev  (levanta next dev --webpack en PORT)
 ```
 
@@ -92,7 +92,7 @@ Requiere `ulimit -d` ≥ 7G (OpenBSD) — ver `doc/environments.md`.
 ## Ejecutar en modo producción
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make all            # build (next build --webpack) con guardas
 ./bin/start         # sirve con next start en PORT
 ```
@@ -100,13 +100,13 @@ make all            # build (next build --webpack) con guardas
 o, en una sola línea:
 
 ```sh
-cd apps/stable-sl && make prod
+cd apps/web && make prod
 ```
 
 ## Pruebas
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make test           # unit tests (vitest)
 make test-smoke     # smoke tests HTTP (necesita la app corriendo)
 ```
@@ -116,7 +116,7 @@ Ver [doc/e2e-testing.md](doc/e2e-testing.md).
 ## Base de datos
 
 PostgreSQL con **Kysely** (antes Drizzle). El esquema vive en
-`apps/stable-sl/app/api/db/` (tipo `DB` en `db.d.ts`, migraciones en
+`apps/web/app/api/db/` (tipo `DB` en `db.d.ts`, migraciones en
 `db/migrations/`). Ver `ARCHITECTURE.md` §Database.
 
 ## Estado de implementación

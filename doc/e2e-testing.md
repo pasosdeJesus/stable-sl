@@ -2,7 +2,7 @@
 
 Las pruebas E2E de stable-sl siguen el patrón de `learn.tg`: **smoke tests
 HTTP** (sin navegador) y **browser specs** (Puppeteer + Chrome). Los scripts
-están en `apps/stable-sl/e2e/`.
+están en `apps/web/e2e/`.
 
 ## Referencia rápida
 
@@ -31,7 +31,7 @@ Scripts Node standalone (`.mjs`) con `fetch`/`axios`. No requieren navegador.
 Requieren la app corriendo:
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make dev            # terminal 1
 make test-smoke     # terminal 2
 ```

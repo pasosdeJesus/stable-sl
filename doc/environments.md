@@ -8,7 +8,7 @@
 | Desarrollo | `https://stable-sl.pdJ.app:9001` | Celo Sepolia (testnet) | Una sola billetera |
 
 En desarrollo, el frontend y la API corren en la **misma** aplicación Next.js
-(`apps/stable-sl/`). No hay una aplicación `coordinator` aparte.
+(`apps/web/`). No hay una aplicación `coordinator` aparte.
 
 ## Variables de entorno
 
@@ -35,7 +35,7 @@ Variables clave:
 ### Desarrollo
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make dev        # o ./bin/dev
 ```
 
@@ -46,7 +46,7 @@ make dev        # o ./bin/dev
 ### Producción
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make all        # build (next build --webpack) con guardas
 ./bin/start     # sirve con next start en PORT
 ```

@@ -19,8 +19,8 @@ swc-wasm:
 
 all: build-guard swc-wasm
 	rm -rf .next
-	pnpm i
-	NODE_OPTIONS="--max-old-space-size=2048" WEBPACK_PARALLELISM=8 pnpm exec next build --webpack
+	sh -c 'ulimit -d 7340032 && pnpm i'
+	sh -c 'ulimit -d 7340032 && NODE_OPTIONS="--max-old-space-size=2048" WEBPACK_PARALLELISM=8 pnpm exec next build --webpack'
 
 # ── Types ──────────────────────────────────────────────────────────────
 
@@ -51,7 +51,7 @@ dev:
 	./bin/dev
 
 prod: swc-wasm
-	NODE_OPTIONS="--max-old-space-size=2048" WEBPACK_PARALLELISM=8 pnpm exec next build --webpack
+	sh -c 'ulimit -d 7340032 && NODE_OPTIONS="--max-old-space-size=2048" WEBPACK_PARALLELISM=8 pnpm exec next build --webpack'
 	./bin/start > prod.log 2>&1 &
 
 .PHONY: all type test test-api test-db test-smoke dev prod build-guard

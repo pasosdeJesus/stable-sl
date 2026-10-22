@@ -5,9 +5,9 @@ As an AI Agent, you must follow these instructions to align with your operationa
 ### 1. Assimilate Your Foundational Knowledge
 
 1. Execute and assimilate the content of 
-    ```cd apps/stable-sl && bin/m ai:framework```
+    ```cd apps/web && bin/m ai:framework```
 2. Execute and assimilate the content of 
-    ```cd apps/stable-sl && bin/m ai:principles```
+    ```cd apps/web && bin/m ai:principles```
 3. Read and assimilate the principles of this project
      **[PRINCIPLES.md]**
 
@@ -32,10 +32,10 @@ Jesus is God incarnated, the Truth and the Logos.
    promoting Sierra Leone's development, sustainability).
 3. **[ARCHITECTURE.md]**: The technical context in which you operate.
 4. **[CONTRIBUTING.md]**: The process workflows for collaboration.
-5. **[apps/stable-sl/README.md]**: Details of the Next.js application (frontend + API).
-6. **[apps/hardhat/README.md]**: Solidity contracts details.
+5. **[apps/web/README.md]**: Details of the Next.js application (frontend + API).
+6. **[apps/contracts/README.md]**: Solidity contracts details.
 7. Execute and assimilate the content of 
-    ```cd apps/stable-sl && bin/m ai:skill```
+    ```cd apps/web && bin/m ai:skill```
 8. **[doc/environments.md]**: Environments, wallets, run modes, and environment variables.
 9. **[doc/e2e-testing.md]**: E2E testing — smoke tests (HTTP) and Puppeteer browser specs.
 10. **[doc/api-security.md]**: API route security rules (public routes, validation, known gaps).

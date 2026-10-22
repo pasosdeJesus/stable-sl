@@ -13,7 +13,7 @@ Requisitos: Node.js 20+, pnpm 10.6.2, PostgreSQL, y en OpenBSD `ulimit -d` ≥ 7
 TypeScript (typecheck):
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 pnpm typecheck
 ```
 
@@ -27,14 +27,14 @@ pnpm typecheck
 Unit tests (Vitest, con mocks de `kysely`/`pg`/`viem`):
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make test          # suite completa (sube ulimit -d)
 ```
 
 Smoke tests HTTP (requieren la app corriendo):
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make dev           # en otra terminal
 make test-smoke    # api-routes + flows (testnet)
 ```
@@ -44,7 +44,7 @@ Ver [doc/e2e-testing.md](doc/e2e-testing.md).
 ## Build
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 make all           # build-guard → swc-wasm → next build --webpack
 ```
 
@@ -53,11 +53,11 @@ make all           # build-guard → swc-wasm → next build --webpack
 La capa de datos usa **Kysely**. Para aplicar migraciones:
 
 ```sh
-cd apps/stable-sl
+cd apps/web
 bin/m db:migrate          # o kysely migrate con .config/kysely.config.ts
 ```
 
-El esquema está en `apps/stable-sl/app/api/db/` (`db.d.ts`, `migrations/`).
+El esquema está en `apps/web/app/api/db/` (`db.d.ts`, `migrations/`).
 
 ## Estructura del proyecto
 
@@ -79,9 +79,9 @@ stable-sl/
 └── ARCHITECTURE.md
 ```
 
-El backend (coordinator) es un **submodule** en `apps/stable-sl/app/api/`
+El backend (coordinator) es un **submodule** en `apps/web/app/api/`
 (rutas `app/api/*`, `db/`, `services/`). No tiene `package.json` propio: sus
-dependencias se declaran en `apps/stable-sl/package.json`.
+dependencias se declaran en `apps/web/package.json`.
 
 ## Convenciones
 

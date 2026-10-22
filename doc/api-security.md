@@ -2,7 +2,7 @@
 
 ## Estado actual
 
-Las rutas del API (`apps/stable-sl/app/api/*/route.ts`) son **públicas**: no
+Las rutas del API (`apps/web/app/api/*/route.ts`) son **públicas**: no
 implementan autenticación. La protección actual se limita a:
 
 1. **Validación de entrada**: formato de billetera (`0x` + 40 hex), formato de

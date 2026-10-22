@@ -3,14 +3,14 @@
 ## Overview
 
 `stable-sl` es un único repositorio. El backend (coordinator) está integrado
-como **submodule** en `apps/stable-sl/app/api/` (no es una aplicación Next.js
+como **submodule** en `apps/web/app/api/` (no es una aplicación Next.js
 aparte): las rutas del API se sirven desde el mismo frontend.
 
 | Componente | Ubicación | Propósito |
 |---|---|---|
-| Frontend + API | `apps/stable-sl/` | UI + rutas API (`app/api/*`), BD, servicios |
-| Coordinator (submodule) | `apps/stable-sl/app/api/` | Lógica de órdenes, blockchain y Orange Money |
-| Smart contracts | `apps/hardhat/` | Contratos (MockG para pruebas) y despliegue |
+| Frontend + API | `apps/web/` | UI + rutas API (`app/api/*`), BD, servicios |
+| Coordinator (submodule) | `apps/web/app/api/` | Lógica de órdenes, blockchain y Orange Money |
+| Smart contracts | `apps/contracts/` | Contratos (MockG para pruebas) y despliegue |
 
 ```
 ┌──────────────┐     HTTP/JSON     ┌──────────────────────────────┐     Blockchain     ┌─────────┐
@@ -231,7 +231,7 @@ sequenceDiagram
 ## Database
 
 PostgreSQL gestionado con **Kysely** (antes Drizzle). Seis tablas (ver
-`apps/stable-sl/app/api/db/db.d.ts` para el tipo `DB`):
+`apps/web/app/api/db/db.d.ts` para el tipo `DB`):
 
 | Table | Purpose |
 |---|---|
@@ -243,7 +243,7 @@ PostgreSQL gestionado con **Kysely** (antes Drizzle). Seis tablas (ver
 | `movementsmobile` | Movimientos y saldo de Orange Money del operador. |
 
 Las columnas monetarias/precio/saldo usan `numeric` (no `real`). La migración
-`apps/stable-sl/app/api/db/migrations/20260908120000_numeric_fks_indexes.ts`
+`apps/web/app/api/db/migrations/20260908120000_numeric_fks_indexes.ts`
 agrega las claves foráneas y los índices (la BD de producción solo tenía
 `PRIMARY KEY (id)`):
 
