@@ -2,21 +2,29 @@ import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-verify';
 import { config as dotEnvConfig } from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
+import path from 'path';
 
-dotEnvConfig();
+// Clave centralizada en apps/.env (ver doc/environments.md).
+dotEnvConfig({ path: path.resolve(__dirname, '../.env') });
+
+// Sin PRIVATE_KEY válida la red queda sin cuentas: así `compile` y `test`
+// funcionan sin secretos. Desplegar exige una PRIVATE_KEY de 32 bytes.
+const accounts = /^0x[0-9a-fA-F]{64}$/.test(process.env.PRIVATE_KEY ?? '')
+  ? [process.env.PRIVATE_KEY as string]
+  : [];
 
 const config: HardhatUserConfig = {
   networks: {
     celo: {
-      accounts: [process.env.PRIVATE_KEY ?? '0x0'],
+      accounts,
       url: 'https://forno.celo.org',
     },
     celoSepolia: {
-      accounts: [process.env.PRIVATE_KEY ?? '0x0'],
+      accounts,
       url: 'https://forno.celo-sepolia.celo-testnet.org/',
     },
     'base-sepolia': {
-      accounts: [process.env.PRIVATE_KEY ?? '0x0'],
+      accounts,
       url: 'https://sepolia.base.org',
     },
   },

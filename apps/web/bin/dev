@@ -15,8 +15,8 @@ fi
 rm -rf .next
 pnpm install
 
-# Env compartido: apps/.env (un nivel arriba de apps/stable-sl). Se asume que
-# bin/dev se ejecuta desde apps/stable-sl/ (como learn.tg con apps/nextjs).
+# Env compartido: apps/.env (un nivel arriba de apps/web). Se asume que
+# bin/dev se ejecuta desde apps/web/ (como learn.tg con apps/nextjs).
 . ../.env
 
 cmd="node_modules/next/dist/bin/next dev -p${PORT} --webpack ${OPDEV}"

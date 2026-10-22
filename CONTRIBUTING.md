@@ -5,8 +5,18 @@
 Ver [README.md](README.md) y [doc/environments.md](doc/environments.md) para la
 configuración de entorno y los comandos de ejecución.
 
-Requisitos: Node.js 20+, pnpm 10.6.2, PostgreSQL, y en OpenBSD `ulimit -d` ≥ 7G
+Requisitos: Node.js 20+, pnpm 11.28.6, PostgreSQL, y en OpenBSD `ulimit -d` ≥ 7G
 (por el fallback WASM de SWC — ver `doc/environments.md`).
+
+Instalar y compilar desde la **raíz** del workspace (un solo lockfile):
+
+```sh
+ulimit -d 7340032
+pnpm install
+make check          # m:check + contract:checkdeploy
+make type test
+make build
+```
 
 ## Calidad de código
 
@@ -17,9 +27,10 @@ cd apps/web
 pnpm typecheck
 ```
 
-> **Nota:** hay errores de tipo preexistentes en componentes `shadcn/ui`
-> (dependencias opcionales como `recharts`, `react-hook-form`, etc.). El
-> `next.config.ts` tiene `ignoreBuildErrors: true` por eso. El código del API
+> **Nota:** la deuda de tipos de `shadcn/ui` (dependencias opcionales como
+> `recharts`, `react-hook-form`, `react-day-picker`) quedó saldada declarando los
+> paquetes, así que `make type` es verde y `next.config.ts` conserva
+> `ignoreBuildErrors: true` sólo como red de seguridad. El código del API
 > (`app/api/`) y la capa de datos (`app/api/db/`) deben quedar sin errores.
 
 ## Pruebas
@@ -64,18 +75,21 @@ El esquema está en `apps/web/app/api/db/` (`db.d.ts`, `migrations/`).
 ```
 stable-sl/
 ├── apps/
-│   ├── stable-sl/            # Frontend (Next.js) + API integrada
+│   ├── web/                  # Frontend (Next.js) + API integrada
 │   │   ├── app/              # Páginas (buy, sell) y rutas API (app/api/*)
 │   │   ├── components/       # UI (shadcn, etc.)
 │   │   ├── lib/              # utilidades y hooks
 │   │   ├── providers/        # RainbowKit, Wagmi
 │   │   ├── e2e/              # smoke tests HTTP + browser specs
 │   │   ├── test-utils/       # mocks compartidos (db, viem)
+│   │   ├── abis/             # ABIs sincronizadas desde apps/contracts
 │   │   ├── bin/              # scripts (dev, prod, start)
 │   │   └── .config/          # kysely.config.ts
-│   └── hardhat/              # Contratos y scripts de despliegue
+│   └── contracts/            # Hardhat: contratos y scripts de despliegue
 ├── gatewaySmsUssd/           # APK del gateway
 ├── doc/                      # Documentación
+├── Makefile                  # install/env-check/build/test/type/check
+├── pnpm-workspace.yaml       # apps/*, packages/*, catálogo y allowBuilds
 └── ARCHITECTURE.md
 ```
 

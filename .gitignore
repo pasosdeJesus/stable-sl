@@ -3,7 +3,7 @@ node_modules
 .env
 apps/.env
 apps/*/.env
-apps/stable-sl/app/api/.env
+apps/web/app/api/.env
 
 # IntelliJ project files
 *.iml
