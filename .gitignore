@@ -1,7 +1,9 @@
 .pnpm-store
 node_modules
 .env
-packages/*/.env
+apps/.env
+apps/*/.env
+apps/stable-sl/app/api/.env
 
 # IntelliJ project files
 *.iml
@@ -99,3 +101,5 @@ next-env.d.ts
 drizzle/meta
 packages/hardhat/tmpart
 contexto.md
+*.core
+*.bak

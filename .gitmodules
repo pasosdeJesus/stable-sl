@@ -1,0 +1,3 @@
+[submodule "apps/stable-sl/app/api"]
+	path = apps/stable-sl/app/api
+	url = git@gitlab.com:vtamara/coordinator-stable-sl.git

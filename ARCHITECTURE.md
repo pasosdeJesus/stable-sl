@@ -2,25 +2,28 @@
 
 ## Overview
 
-The stable-sl service is split across two repositories:
+`stable-sl` es un único repositorio. El backend (coordinator) está integrado
+como **submodule** en `apps/stable-sl/app/api/` (no es una aplicación Next.js
+aparte): las rutas del API se sirven desde el mismo frontend.
 
-| Repo | Purpose |
-|---|---|
-| `coordinator-stable-sl` | Backend API — coordinates orders, blockchain, and Orange Money |
-| `stable-sl` (this one) | Frontend + smart contracts |
+| Componente | Ubicación | Propósito |
+|---|---|---|
+| Frontend + API | `apps/stable-sl/` | UI + rutas API (`app/api/*`), BD, servicios |
+| Coordinator (submodule) | `apps/stable-sl/app/api/` | Lógica de órdenes, blockchain y Orange Money |
+| Smart contracts | `apps/hardhat/` | Contratos (MockG para pruebas) y despliegue |
 
 ```
-┌──────────────┐     HTTP/JSON     ┌──────────────────┐     Blockchain     ┌─────────┐
-│   Frontend   │ ────────────────> │   Coordinator    │ ────────────────> │  Celo   │
-│ (nextjs-app) │ <──────────────── │ (API backend)    │ <──────────────── │ (USDT,  │
-└──────────────┘                   │                  │                   │  G$)    │
-                                   │ PostgreSQL       │                   └─────────┘
-                                   │                  │
-                                   │  ┌────────────┐  │     SMS / Orange
-                                   │  │  Drizzle   │  │ <──────────────── Orange Money
-                                   │  │  ORM       │  │
-                                   │  └────────────┘  │
-                                   └──────────────────┘
+┌──────────────┐     HTTP/JSON     ┌──────────────────────────────┐     Blockchain     ┌─────────┐
+│   Frontend   │ ────────────────> │  Coordinator (app/api)       │ ────────────────> │  Celo   │
+│ (stable-sl)  │ <──────────────── │  (misma app Next.js)         │ <──────────────── │ (USDT,  │
+└──────────────┘                   │                              │                   │  G$)    │
+                                   │ PostgreSQL                   │                   └─────────┘
+                                   │                              │
+                                   │  ┌────────────┐              │     SMS / Orange
+                                   │  │  Kysely    │              │ <──────────────── Orange Money
+                                   │  │  ORM       │              │
+                                   │  └────────────┘              │
+                                   └──────────────────────────────┘
                                            │
                                            │ USSD / anything_to_send
                                            v
@@ -218,9 +221,37 @@ sequenceDiagram
 2. **Frontend** calls `GET /api/sales_order` with quote token and crypto amount.
 3. **Seller** transfers crypto from their wallet to the coordinator wallet.
 4. Seller or gateway calls **POST /api/crypto_transferred**, order → `received`.
-5. **Gateway** polls `GET /api/anything_to_send`, gets USSD code.
-6. Operator executes USSD to send SLE via Orange Money to seller.
-7. **Gateway** calls **POST /api/report_send** to confirm, order → `paid`.
+5. **Frontend** polls `GET /api/sales_order_state` until state is `received`.
+6. **Gateway** polls `GET /api/anything_to_send`, gets USSD code.
+7. Operator executes USSD to send SLE via Orange Money to seller.
+8. **Gateway** calls **POST /api/report_send** to confirm, order → `paid`.
+
+---
+
+## Database
+
+PostgreSQL gestionado con **Kysely** (antes Drizzle). Seis tablas (ver
+`apps/stable-sl/app/api/db/db.d.ts` para el tipo `DB`):
+
+| Table | Purpose |
+|---|---|
+| `purchasequote` | Cotizaciones de compra (buy crypto). |
+| `purchaseorder` | Órdenes de compra. |
+| `salesquote` | Cotizaciones de venta (sell crypto). |
+| `salesorder` | Órdenes de venta. |
+| `smslog` | Registro de SMS entrantes de Orange Money. |
+| `movementsmobile` | Movimientos y saldo de Orange Money del operador. |
+
+Las columnas monetarias/precio/saldo usan `numeric` (no `real`). La migración
+`apps/stable-sl/app/api/db/migrations/20260908120000_numeric_fks_indexes.ts`
+agrega las claves foráneas y los índices (la BD de producción solo tenía
+`PRIMARY KEY (id)`):
+
+- FK `purchaseorder.quoteId → purchasequote.id`
+- FK `salesorder.quoteId → salesquote.id`
+- FK `movementsmobile.salesOrderId → salesorder.id`
+- FK `movementsmobile.purchaseOrderId → purchaseorder.id`
+- Índices en `token`, `quoteId`, `state`, `phoneNumber`, etc.
 
 ---
 
