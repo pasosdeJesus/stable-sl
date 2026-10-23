@@ -70,11 +70,24 @@ async function main() {
   await expect400Error('/api/purchase_order_state', 'Missing quote')
   await expect400Error('/api/sales_order', 'Missing quote')
 
-  // anything_to_send: consulta la BD (debe devolver 200 action=rest si no hay pendientes)
+  // anything_to_send: consulta la BD. Con la cola vacía responde {action:"rest"};
+  // con una orden pendiente devuelve el SMS/USSD. En ambos casos el payload debe
+  // venir interpolado: un `${...}` literal significa que el mensaje no se armó.
   {
     const { status, body } = await get('/api/anything_to_send')
-    if (status === 200 && body?.action === 'rest') ok('GET /api/anything_to_send → 200 action=rest (BD OK)')
-    else fail(`GET /api/anything_to_send → ${status} ${JSON.stringify(body)}`)
+    const text = JSON.stringify(body ?? {})
+    const unexpanded = /\$\{[^}]*\}/.test(text)
+    if (status !== 200) {
+      fail(`GET /api/anything_to_send → ${status} ${text}`)
+    } else if (body?.action === 'rest') {
+      ok('GET /api/anything_to_send → 200 action=rest (BD OK, cola vacía)')
+    } else if (unexpanded) {
+      fail(`GET /api/anything_to_send → 200 ${text} (plantilla sin interpolar)`)
+    } else if (typeof body?.amountSle === 'number' && typeof body?.receiverPhone === 'string') {
+      ok(`GET /api/anything_to_send → 200 orden pendiente ${body.amountSle} SLE → ${body.receiverPhone} (BD OK)`)
+    } else {
+      fail(`GET /api/anything_to_send → 200 ${text} (forma inesperada)`)
+    }
   }
 
   console.log(`\n${failed === 0 ? 'Smoke PASS' : 'Smoke FAIL'} — ${passed} passed, ${failed} failed`)
