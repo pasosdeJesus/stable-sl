@@ -61,14 +61,30 @@ make all           # build-guard → swc-wasm → next build --webpack
 
 ## Base de datos
 
-La capa de datos usa **Kysely**. Para aplicar migraciones:
+La capa de datos usa **Kysely**. Preparar una base local desde cero:
 
 ```sh
 cd apps/web
-bin/m db:migrate          # o kysely migrate con .config/kysely.config.ts
+bin/m db:super:createuser   # rol de PostgreSQL (PGUSER de apps/.env)
+bin/m db:create             # createdb (sólo crea la base vacía)
+bin/m db:structure:load     # ¡dropea la base! carga apps/web/db/structure.sql
 ```
 
-El esquema está en `apps/web/app/api/db/` (`db.d.ts`, `migrations/`).
+`db:structure:load` es el camino canónico: `apps/web/db/structure.sql` es el
+esquema (volcado de producción sin `COPY`, o sea sin datos de clientes). Para
+regenerarlo desde una base que sí tenga los datos:
+`bin/m db:structure:dump` (escribe `db/structure.sql`). Para un respaldo
+completo con datos: `bin/m db:dump` y `bin/m db:restore`.
+
+Migraciones (sólo para bases creadas antes de `structure.sql`, la config de
+Kysely vive en el submódulo `app/api/.config/`):
+
+```sh
+cd apps/web/app/api
+../../bin/m db:migrate
+```
+
+El esquema tipado está en `apps/web/app/api/db/` (`db.d.ts`, `migrations/`).
 
 ## Estructura del proyecto
 

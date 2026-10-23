@@ -1,1 +1,5 @@
-../../../../m/bin/m
+#!/usr/bin/env node
+(async () => {
+  try { await import('@pasosdejesus/mpdj') } catch {}
+  await import('@pasosdejesus/m/m')
+})()

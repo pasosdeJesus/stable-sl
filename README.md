@@ -119,6 +119,16 @@ PostgreSQL con **Kysely** (antes Drizzle). El esquema vive en
 `apps/web/app/api/db/` (tipo `DB` en `db.d.ts`, migraciones en
 `db/migrations/`). Ver `ARCHITECTURE.md` §Database.
 
+La base local se arma con el **esquema versionado** `apps/web/db/structure.sql`
+(volcado `--schema-only`, sin datos):
+
+```sh
+cd apps/web
+bin/m db:super:createuser   # rol de PostgreSQL
+bin/m db:create             # base vacía
+bin/m db:structure:load     # ¡dropea y recrea! carga db/structure.sql
+```
+
 ## Estado de implementación
 
 Es un prototipo que:

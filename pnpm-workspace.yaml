@@ -14,7 +14,8 @@ catalog:
   kysely: ^0.28.17
   kysely-postgres-js: ^2.0.0
   dotenv: ^17.4.2
-  '@pasosdejesus/contract-test': ^0.1.7
+  '@pasosdejesus/m': ^0.37.2
+  '@pasosdejesus/contract-test': ^0.2.3
 
 # OpenBSD/adJ: variantes WASM (no hay binarios nativos de estos paquetes).
 overrides:
@@ -35,3 +36,6 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   utf-8-validate: true
+
+minimumReleaseAgeExclude:
+  - '@pasosdejesus/*'
